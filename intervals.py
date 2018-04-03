@@ -208,10 +208,10 @@ class AtomicInterval:
             return '()'
 
         return '{}{},{}{}'.format(
-            '[' if self.left == CLOSED else ']',
+            '[' if self.left == CLOSED else '(',
             repr(self.lower),
             repr(self.upper),
-            ']' if self.right == CLOSED else '[',
+            ']' if self.right == CLOSED else ')',
         )
 
 

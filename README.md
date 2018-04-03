@@ -1,9 +1,10 @@
 
 # Interval arithmetic for Python
 
-This repository contains the Python ``intervals`` library that provides basic arithmetic for intervals in Python, supporting arbitrary object type.
+This repository contains the Python 3.5+ ``intervals`` library that provides basic arithmetic for intervals in Python, supporting arbitrary object type.
 
-This library is inspired by [pyinter](https://github.com/intiocean/pyinter). Tested on Python3.5.
+This library is inspired by [pyinter](https://github.com/intiocean/pyinter). 
+
 
 ## Installation
 
@@ -47,17 +48,17 @@ Additionally, an ``Interval`` provides:
 >>> I.closed(0, 3)
 [0,3]
 >>> I.openclosed('a', 'z')
-]'a','z']
+('a','z']
 >>> I.openclosed(-I.INF, 0)
-]-inf,0]
+(-inf,0]
 >>> 2 in I.closed(0, 3)
 True
 >>> I.closed(0, 2) & I.open(1, 4)
-]1,2]
+(1,2]
 >>> I.closed(0, 1) & I.closed(2, 3)
 ()
 >>> I.closed(0, 2) | I.open(1, 4)
-[0,4[
+[0,4)
 >>> I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)
 [0,3]
 >>> I.closed(0, 1) | I.closed(2, 3)

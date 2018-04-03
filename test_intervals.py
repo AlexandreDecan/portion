@@ -81,25 +81,25 @@ def test_union():
 
 def test_example():
     example = """
->>> I.closed(0, 3)  
-[0,3]  
->>> I.openclosed('a', 'z')  
-]'a','z']  
->>> I.openclosed(-I.INF, 0)
-]-inf,0]
->>> 2 in I.closed(0, 3)  
-True  
->>> I.closed(0, 2) & I.open(1, 4)  
-]1,2]  
->>> I.closed(0, 1) & I.closed(2, 3)
-()
->>> I.closed(0, 2) | I.open(1, 4)  
-[0,4[  
->>> I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)  
-[0,3]  
->>> I.closed(0, 1) | I.closed(2, 3)  
-[0,1] | [2,3]
-"""
+    >>> I.closed(0, 3)
+    [0,3]
+    >>> I.openclosed('a', 'z')
+    ('a','z']
+    >>> I.openclosed(-I.INF, 0)
+    (-inf,0]
+    >>> 2 in I.closed(0, 3)
+    True
+    >>> I.closed(0, 2) & I.open(1, 4)
+    (1,2]
+    >>> I.closed(0, 1) & I.closed(2, 3)
+    ()
+    >>> I.closed(0, 2) | I.open(1, 4)
+    [0,4)
+    >>> I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)
+    [0,3]
+    >>> I.closed(0, 1) | I.closed(2, 3)
+    [0,1] | [2,3]
+    """
     lines = iter(example.strip().splitlines())
     for line in lines:
-        assert repr(eval(line.replace('>>> ', ''))) == next(lines).strip()
+        assert repr(eval(line.strip().replace('>>> ', ''))) == next(lines).strip()
