@@ -9,7 +9,7 @@ This library is inspired by [pyinter](https://github.com/intiocean/pyinter). Tes
 
 Although distributed as a Python package, this library is not available on PyPi. To install it, use:
 
-``pip install git+https://github.com/AlexandreDecan/python-intervals``
+``pip install git+https://github.com/AlexandreDecan/python-intervals.git``
 
 
 ## Usage
