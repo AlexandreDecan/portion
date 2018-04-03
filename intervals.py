@@ -1,4 +1,3 @@
-from functools import total_ordering
 from itertools import combinations
 
 import operator
@@ -6,21 +5,23 @@ import operator
 __ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
 
 
-# TODO: Documentation for complement/difference
-# TODO: Docstrings
-# TODO: Raise NotImplementedError for all intersection, union, complement, difference, ... and try: .. except: for shortcuts
-
-
 class _PInf:
     """
     Use to represent positive infinity.
     """
+
     def __neg__(self): return _NInf()
+
     def __lt__(self, o): return False
+
     def __le__(self, o): return isinstance(o, _PInf)
+
     def __gt__(self, o): return not isinstance(o, _PInf)
+
     def __ge__(self, o): return True
+
     def __eq__(self, o): return isinstance(o, _PInf)
+
     def __repr__(self):  return '+inf'
 
 
@@ -28,12 +29,19 @@ class _NInf:
     """
     Use to represent negative infinity.
     """
+
     def __neg__(self): return _PInf()
+
     def __lt__(self, o): return not isinstance(o, _NInf)
+
     def __le__(self, o): return True
+
     def __gt__(self, o): return False
+
     def __ge__(self, o): return isinstance(o, _NInf)
+
     def __eq__(self, o): return isinstance(o, _NInf)
+
     def __repr__(self):  return '-inf'
 
 
@@ -77,7 +85,9 @@ class AtomicInterval:
 
     def __init__(self, left, lower, upper, right):
         if lower > upper:
-            raise ValueError('Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower, upper))
+            raise ValueError(
+                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower,
+                                                                                                              upper))
         self.left = left if lower != -inf else OPEN
         self.lower = lower
         self.upper = upper
@@ -99,13 +109,13 @@ class AtomicInterval:
             first, second = other, self
         else:
             first, second = self, other
-         
+
         if first.upper == second.lower:
             if permissive:
                 return first.right == CLOSED or second.right == CLOSED
             else:
                 return first.right == CLOSED and second.right == CLOSED
-         
+
         return first.upper > second.lower
 
     def intersection(self, other):
@@ -116,14 +126,14 @@ class AtomicInterval:
             else:
                 lower = max(self.lower, other.lower)
                 left = self.left if lower == self.lower else other.left
-                
+
             if self.upper == other.upper:
                 upper = self.upper
                 right = self.right if self.right == OPEN else other.right
             else:
                 upper = min(self.upper, other.upper)
                 right = self.right if upper == self.upper else other.right
-            
+
             if lower <= upper:
                 return AtomicInterval(left, lower, upper, right)
             else:
@@ -140,14 +150,14 @@ class AtomicInterval:
                 else:
                     lower = min(self.lower, other.lower)
                     left = self.left if lower == self.lower else other.left
-                    
+
                 if self.upper == other.upper:
                     upper = self.upper
                     right = self.right if self.right == OPEN else other.right
                 else:
                     upper = max(self.upper, other.upper)
                     right = self.right if upper == self.upper else other.right
-                
+
                 return AtomicInterval(left, lower, upper, right)
             else:
                 return Interval(self, other)
@@ -162,8 +172,10 @@ class AtomicInterval:
         :return: True if given item is contained in this atomic interval.
         """
         if isinstance(item, AtomicInterval):
-            left = item.lower > self.lower or (item.lower == self.lower and (item.left == self.left or self.left == CLOSED))
-            right = item.upper < self.upper or (item.upper == self.upper and (item.right == self.right or self.right == CLOSED))
+            left = item.lower > self.lower or (
+                        item.lower == self.lower and (item.left == self.left or self.left == CLOSED))
+            right = item.upper < self.upper or (
+                        item.upper == self.upper and (item.right == self.right or self.right == CLOSED))
             return left and right
         else:
             left = (item >= self.lower) if self.left == CLOSED else (item > self.lower)
@@ -211,10 +223,10 @@ class AtomicInterval:
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
             return (
-                self.left == other.left and
-                self.lower == other.lower and
-                self.upper == other.upper and
-                self.right == other.right
+                    self.left == other.left and
+                    self.lower == other.lower and
+                    self.upper == other.upper and
+                    self.right == other.right
             )
         else:
             return NotImplemented
@@ -244,26 +256,27 @@ class Interval:
 
     Support equality (=), intersection (&), union (|), containment (in) and iteration (on AtomicInterval).
     """
+
     def __init__(self, interval, *intervals):
         self._intervals = set()
-        
+
         self._intervals.add(interval)
         for interval in intervals:
             self._intervals.add(interval)
-        
+
         self._clean()
 
     def _clean(self):
         # Remove empty intervals
         self._intervals = {i for i in self._intervals if not i.is_empty()}
-        
+
         # Remove intervals contained in other ones
         to_remove = set()
         for i1, i2 in combinations(self._intervals, 2):
             if i1 not in to_remove and i1 in i2:
                 to_remove.add(i1)
         self._intervals = self._intervals.difference(to_remove)
-        
+
         # Merge contiguous intervals
         to_remove = set()
         to_add = set()
@@ -275,7 +288,7 @@ class Interval:
                 to_remove.add(i1)
                 to_remove.add(i2)
                 to_add.add(i3)
-                
+
         # Do until nothing change
         self._intervals = self._intervals.difference(to_remove).union(to_add)
         if len(to_remove) + len(to_add) > 0:
@@ -303,12 +316,12 @@ class Interval:
         :return: An AtomicInterval instance that contains this Interval.
         """
         first = next(iter(self._intervals))
-        
+
         lower = first.lower
         left = first.left
         upper = first.upper
         right = first.right
-        
+
         for interval in self._intervals:
             if interval.lower < lower:
                 lower = interval.lower
@@ -316,14 +329,14 @@ class Interval:
             elif interval.lower == lower:
                 if left == OPEN and interval.left == CLOSED:
                     left = CLOSED
-                    
+
             if interval.upper > upper:
                 upper = interval.upper
                 right = interval.right
             elif interval.upper == upper:
                 if right == OPEN and interval.right == CLOSED:
                     right = CLOSED
-        
+
         return AtomicInterval(left, lower, upper, right)
 
     def overlaps(self, other, permissive=False):
@@ -420,7 +433,7 @@ class Interval:
 
     def __len__(self):
         return len([i for i in self._intervals if not i.is_empty()])
-    
+
     def __iter__(self):
         return [i for i in self._intervals if not i.is_empty()]
 
