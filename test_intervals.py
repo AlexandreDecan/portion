@@ -28,6 +28,7 @@ def test_creation():
     assert I.open(0, 1) == I.AtomicInterval(I.OPEN, 0, 1, I.OPEN)
     assert I.openclosed(0, 1) == I.AtomicInterval(I.OPEN, 0, 1, I.CLOSED)
     assert I.closedopen(0, 1) == I.AtomicInterval(I.CLOSED, 0, 1, I.OPEN)
+    assert I.closed(-I.inf, I.inf) == I.open(-I.inf, I.inf)
 
 
 def test_to_interval_to_atomic():
@@ -107,6 +108,8 @@ def test_complement():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
     for interval in intervals:
         assert ~(~interval) == interval
+    assert ~I.open(1, 1) == I.open(-I.inf, I.inf)
+    assert (~I.closed(-I.inf, I.inf)).is_empty()
 
 
 def test_example():

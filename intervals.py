@@ -73,10 +73,10 @@ class AtomicInterval:
     def __init__(self, left, lower, upper, right):
         if lower > upper:
             raise ValueError('Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower, upper))
-        self.left = left
+        self.left = left if lower != -inf else OPEN
         self.lower = lower
         self.upper = upper
-        self.right = right
+        self.right = right if upper != inf else OPEN
 
     def is_empty(self):
         return self.lower == self.upper and (self.left == OPEN or self.right == OPEN)
