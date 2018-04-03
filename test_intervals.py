@@ -78,27 +78,42 @@ def test_containment():
 
 def test_intersection():
     assert I.closed(0, 1) & I.closed(0, 1) == I.closed(0, 1)
+    assert I.closed(0, 1) & I.closed(0, 1).to_atomic() == I.closed(0, 1)
     assert I.closed(0, 1) & I.open(0, 1) == I.open(0, 1)
     assert I.openclosed(0, 1) & I.closedopen(0, 1) == I.open(0, 1)
     assert (I.closed(0, 1) & I.closed(2, 3)).is_empty()
+
+    with pytest.raises(TypeError):
+        I.closed(0, 1) & 1
+    with pytest.raises(TypeError):
+        I.closed(0, 1).to_atomic() & 1
 
 
 def test_union():
     assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
     assert I.closed(1, 4) | I.closed(2, 3) == I.closed(1, 4)
-    
+    assert I.closed(1, 4) | I.closed(2, 3).to_atomic() == I.closed(1, 4)
+
     assert I.closed(1, 2) | I.open(2, 3) == I.closedopen(1, 3)
     assert I.closed(1, 3) | I.closed(2, 4) == I.closed(1, 4)
-    
+
+    assert I.closed(1, 2) | I.closed(2, 3) == I.closed(2, 3) | I.closed(1, 2)
+
     assert I.closedopen(1, 2) | I.closed(2, 3) == I.closed(1, 3)
     assert I.open(1, 2) | I.closed(2, 4) == I.openclosed(1, 4)
 
     assert I.closed(1, 2) | I.closed(3, 4) != I.closed(1, 4)
     assert (I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)).is_atomic()
     assert I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3) == I.closed(1, 4)
+    assert I.closed(1, 2) | I.closed(0, 4) == I.closed(0, 4)
 
     assert (I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)).is_atomic()
     assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
+
+    with pytest.raises(TypeError):
+        I.closed(0, 1) | 1
+    with pytest.raises(TypeError):
+        I.closed(0, 1).to_atomic() | 1
 
 
 def test_complement():
@@ -114,9 +129,16 @@ def test_complement():
 
 def test_difference():
     assert I.closed(1, 4) - I.closed(1, 3) == I.openclosed(3, 4)
+    assert I.closed(1, 4) - I.closed(1, 3).to_atomic() == I.openclosed(3, 4)
+    assert I.closed(1, 4).to_atomic() - I.closed(1, 3).to_atomic() == I.openclosed(3, 4)
     assert (I.closed(1, 4) - I.closed(1, 4)).is_empty()
     assert I.closed(0, 1) - I.closed(2, 3) == I.closed(0, 1)
     assert I.closed(0, 4) - I.closed(2, 3) == I.closedopen(0, 2) | I.openclosed(3, 4)
+
+    with pytest.raises(TypeError):
+        I.closed(0, 1) - 1
+    with pytest.raises(TypeError):
+        I.closed(0, 1).to_atomic() - 1
 
 
 def test_example():

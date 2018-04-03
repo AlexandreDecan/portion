@@ -3,7 +3,7 @@ import operator
 
 
 __name__ = 'python-intervals'
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 __author__ = 'Alexandre Decan'
 __author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'
@@ -140,9 +140,15 @@ class AtomicInterval:
     def overlaps(self, other, permissive=False):
         """
         Return True if sets have any overlapping value.
+
         If 'permissive' is set to True, it considers [1, 2) and [2, 3] as an
         overlap on value 2, not [1, 2) and (2, 3].
+
+        Only supports AtomicInterval.
         """
+        if not isinstance(other, AtomicInterval):
+            raise TypeError('Only AtomicInterval instances are supported.')
+
         if self._lower > other.lower:
             first, second = other, self
         else:
@@ -176,8 +182,10 @@ class AtomicInterval:
                 return AtomicInterval(left, lower, upper, right)
             else:
                 return AtomicInterval(OPEN, lower, lower, OPEN)
+        elif isinstance(other, Interval):
+            return other & self
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def union(self, other):
         if isinstance(other, AtomicInterval):
@@ -199,8 +207,10 @@ class AtomicInterval:
                 return AtomicInterval(left, lower, upper, right)
             else:
                 return Interval(self, other)
+        elif isinstance(other, Interval):
+            return other | self
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def contains(self, item):
         """
@@ -215,6 +225,11 @@ class AtomicInterval:
             right = item._upper < self._upper or (
                     item._upper == self._upper and (item._right == self._right or self._right == CLOSED))
             return left and right
+        elif isinstance(item, Interval):
+            for interval in item:
+                if interval not in self:
+                    return False
+            return True
         else:
             left = (item >= self._lower) if self._left == CLOSED else (item > self._lower)
             right = (item <= self._upper) if self._right == CLOSED else (item < self._upper)
@@ -232,18 +247,18 @@ class AtomicInterval:
         if isinstance(other, AtomicInterval):
             return self & ~other
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def __and__(self, other):
         try:
             return self.intersection(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __or__(self, other):
         try:
             return self.union(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __contains__(self, item):
@@ -255,7 +270,7 @@ class AtomicInterval:
     def __sub__(self, other):
         try:
             return self.difference(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __eq__(self, other):
@@ -392,7 +407,7 @@ class Interval:
                     return True
             return False
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def intersection(self, other):
         """
@@ -410,7 +425,7 @@ class Interval:
                     new_intervals.append(interval & o_interval)
             return Interval(*new_intervals)
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def union(self, other):
         """
@@ -422,7 +437,7 @@ class Interval:
         elif isinstance(other, Interval):
             return Interval(*(list(self._intervals) + list(other._intervals)))
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def contains(self, item):
         """
@@ -465,7 +480,7 @@ class Interval:
         if isinstance(other, (AtomicInterval, Interval)):
             return self & ~other
         else:
-            raise ValueError('Unsupported type {} for {}'.format(type(other), other))
+            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
     def __len__(self):
         return len([i for i in self._intervals if not i.is_empty()])
@@ -481,13 +496,13 @@ class Interval:
     def __and__(self, other):
         try:
             return self.intersection(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __or__(self, other):
         try:
             return self.union(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __contains__(self, item):
@@ -499,7 +514,7 @@ class Interval:
     def __sub__(self, other):
         try:
             return self.difference(other)
-        except ValueError:
+        except TypeError:
             return NotImplemented
 
     def __eq__(self, other):

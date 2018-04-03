@@ -124,6 +124,8 @@ Both classes support interval arithmetic:
    (-inf,0) | (1,+inf)
    >>> ~(I.open(-I.inf, 0) | I.open(1, I.inf))
    [0,1]
+   >>> ~I.open(-I.inf, I.inf)
+   ()
    ```
  - ``x.difference(other)`` or ``x - other`` returns the difference between ``x`` and ``other``.
    ```python
@@ -165,6 +167,12 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 
 ## Changelog
+
+**1.0.4** (2018-04-03)
+
+ - All operations of ``AtomicInterval`` (except overlaps) accept ``Interval``.
+ - Raise ``TypeError`` instead of ``ValueError`` if type is not supported (coherent with ``NotImplemented``).
+
 
 **1.0.3** (2018-04-03)
 
