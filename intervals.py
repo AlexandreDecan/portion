@@ -1,46 +1,48 @@
 from functools import total_ordering
 from itertools import combinations
 
+__ALL__ = ['INF', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
+
 
 @total_ordering
-class PInf:
+class _PInf:
     """
     Use to represent positive infinity.
     """
 
     def __neg__(self):
-        return NInf()
+        return _NInf()
 
     def __lt__(self, o):
-        return isinstance(o, PInf)
+        return isinstance(o, _PInf)
 
     def __eq__(self, o):
-        return isinstance(o, PInf)
+        return isinstance(o, _PInf)
 
     def __repr__(self):
         return '+inf'
 
 
 @total_ordering
-class NInf:
+class _NInf:
     """
     Use to represent negative infinity.
     """
 
     def __neg__(self):
-        return PInf()
+        return _PInf()
 
     def __gt__(self, o):
-        return isinstance(o, NInf)
+        return isinstance(o, _NInf)
 
     def __eq__(self, o):
-        return isinstance(o, NInf)
+        return isinstance(o, _NInf)
 
     def __repr__(self):
         return '-inf'
 
 
-INF = PInf()
+INF = _PInf()
 OPEN = 0
 CLOSED = 1
 

@@ -59,11 +59,11 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['tests']),
+    #packages=find_packages(exclude=['tests']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
-    #py_modules=['intervals'],
+    py_modules=['intervals'],
 
     python_requires='>=3.4',
 
@@ -72,7 +72,9 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[],
-
+    tests_require=[
+          'pytest',
+    ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
@@ -82,6 +84,7 @@ setup(
     },
 
     include_package_data=True,
+    zip_safe=True,
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
