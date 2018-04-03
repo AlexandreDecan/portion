@@ -6,10 +6,12 @@ python:
 - nightly
 install:
 - pip install pip -U
-- pip install -r requirements.txt
+- pip install coverage pytest coveralls
 - pip install -e .
 script:
-- pytest
+- coverage run --source intervals -m pytest
+after_success:
+- coveralls
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
