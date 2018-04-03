@@ -2,7 +2,9 @@
 
 # Interval arithmetic for Python
 
-[![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)  [![Coveralls](https://coveralls.io/repos/AlexandreDecan/python-intervals/badge.svg?branch=master&service=github)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)  [![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
+[![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
+[![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/python-intervals/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)
+[![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 
 Provide interval arithmetic for Python 3.4+.
@@ -165,7 +167,10 @@ LGPLv3 - GNU Lesser General Public License, version 3
 ## Changelog
 
 **1.0.3** (2018-04-03)
-Initial working release on PyPi.
+
+ - Initial working release on PyPi.
+
 
 **1.0.0** (2018-04-03)
-Initial release.
+
+ - Initial release.
