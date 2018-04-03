@@ -4,7 +4,7 @@ from os import path
 
 from setuptools import find_packages, setup
 
-version = '1.0.0'
+version = '1.0.1'
 
 # python setup.py register
 # python setup.py sdist bdist_wheel upload
