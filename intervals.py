@@ -1,7 +1,14 @@
 from itertools import combinations
-from enum import Enum
-
 import operator
+
+
+__name__ = 'python-intervals'
+__version__ = '1.0.2'
+__author__ = 'Alexandre Decan'
+__author_email__ = 'alexandre.decan@lexpage.net'
+__licence__ = 'LGPL3'
+__description__ = 'Python Intervals Arithmetic'
+__url__ = 'https://github.com/AlexandreDecan/python-intervals'
 
 
 __ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']

@@ -4,10 +4,7 @@ from os import path
 
 from setuptools import find_packages, setup
 
-version = '1.0.0'
-
-# python setup.py register
-# python setup.py sdist bdist_wheel upload
+import intervals
 
 here = path.abspath(path.dirname(__file__))
 
@@ -16,26 +13,26 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='python-intervals',
+    name=intervals.__name__,
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=version,
+    version=intervals.__version__,
 
-    description='Python Intervals Arithmetic',
+    description=intervals.__description__,
     long_description=long_description,
     long_description_content_type='text/markdown',
 
     # The project's main homepage.
-    url='https://github.com/AlexandreDecan/python-intervals',
+    url=intervals.__url__,
 
     # Author details
-    author='Alexandre Decan',
-    author_email='alexandre.decan@lexpage.net',
+    author=intervals.__author__,
+    author_email=intervals.__author_email__,
 
     # Choose your license
-    license='LGPL3',
+    license=intervals.__licence__,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
