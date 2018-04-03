@@ -3,7 +3,7 @@ import operator
 
 
 __name__ = 'python-intervals'
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 __author__ = 'Alexandre Decan'
 __author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'

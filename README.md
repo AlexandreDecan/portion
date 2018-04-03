@@ -161,8 +161,11 @@ LGPLv3 - GNU Lesser General Public License, version 3
   
   
 ## Changelog  
-  
-  
-### 1.0.0 (2018-04-03)  
-  
- - Initial release on PyPi
+
+### 1.0.3 (2018-04-03)
+
+ - Initial working release on PyPi.
+
+### 1.0.0 (2018-04-03)
+
+ - Initial release.
