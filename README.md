@@ -145,8 +145,8 @@ Additionally, an ``Interval`` provides:
 The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed with its ``left``, ``right``, ``lower`` and ``upper`` attribute. 
 
 ```python
->>> [(i.lower, i.upper) for i in I.closed(2, 3) | I.closed(0, 1)]  
-[(0, 1), (2, 3)]
+>>> [(i.left, i.lower, i.upper, i.right) for i in I.open(2, 3) | I.closed(0, 1)]
+[(True, 0, 1, True), (False, 2, 3, False)]
 ```
   
 ## Contributions  

@@ -1,6 +1,8 @@
 from itertools import combinations
+from enum import Enum
 
 import operator
+
 
 __ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
 
@@ -46,8 +48,9 @@ class _NInf:
 
 
 inf = _PInf()
-OPEN = 0
-CLOSED = 1
+
+OPEN = False
+CLOSED = True
 
 
 def open(lower, upper):
@@ -86,8 +89,8 @@ class AtomicInterval:
     def __init__(self, left, lower, upper, right):
         if lower > upper:
             raise ValueError(
-                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower,
-                                                                                                              upper))
+                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower, upper))
+
         self._left = left if lower != -inf else OPEN
         self._lower = lower
         self._upper = upper
