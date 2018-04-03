@@ -30,6 +30,9 @@ def test_creation():
     assert I.closedopen(0, 1) == I.AtomicInterval(I.CLOSED, 0, 1, I.OPEN)
     assert I.closed(-I.inf, I.inf) == I.open(-I.inf, I.inf)
 
+    with pytest.raises(ValueError):
+        I.closed(1, -1)
+
 
 def test_to_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
@@ -39,6 +42,24 @@ def test_to_interval_to_atomic():
 
     assert I.closed(0, 1) | I.closed(2, 3) != I.closed(0, 3)
     assert (I.closed(0, 1) | I.closed(2, 3)).to_atomic() == I.closed(0, 3)
+
+
+def test_overlaps():
+    assert I.closed(0, 1).overlaps(I.closed(0, 1))
+    assert I.closed(0, 1).overlaps(I.open(0, 1))
+    assert I.closed(0, 1).overlaps(I.closed(1, 2))
+    assert not I.closed(0, 1).overlaps(I.closed(3, 4))
+    assert not I.closed(0, 1).overlaps(I.open(1, 2))
+
+    assert I.closed(0, 1).overlaps(I.closed(0, 1), permissive=True)
+    assert I.closed(0, 1).overlaps(I.open(0, 1), permissive=True)
+    assert I.closed(0, 1).overlaps(I.closed(1, 2), permissive=True)
+    assert not I.closed(0, 1).overlaps(I.closed(3, 4), permissive=True)
+    assert I.closed(0, 1).overlaps(I.open(1, 2), permissive=True)
+
+    # Overlaps should reject non supported types
+    with pytest.raises(TypeError):
+        I.closed(0, 1).to_atomic().overlaps(1)
 
 
 def test_emptyness():
@@ -75,6 +96,17 @@ def test_containment():
     assert I.closed(0, 1) in I.closed(-I.inf, I.inf)
     assert I.closed(-I.inf, I.inf) not in I.closed(0, 1)
 
+    # AtomicIntervals
+    assert I.closed(1, 2) in I.closed(0, 3).to_atomic()
+    assert I.closed(1, 2) in I.closed(1, 2).to_atomic()
+    assert I.open(1, 2) in I.closed(1, 2).to_atomic()
+    assert I.closed(1, 2) not in I.open(1, 2).to_atomic()
+    assert I.closed(0, 1) not in I.closed(1, 2).to_atomic()
+    assert I.closed(0, 2) not in I.closed(1, 3).to_atomic()
+    assert I.closed(-I.inf, I.inf) in I.closed(-I.inf, I.inf).to_atomic()
+    assert I.closed(0, 1) in I.closed(-I.inf, I.inf).to_atomic()
+    assert I.closed(-I.inf, I.inf) not in I.closed(0, 1).to_atomic()
+
 
 def test_intersection():
     assert I.closed(0, 1) & I.closed(0, 1) == I.closed(0, 1)
@@ -90,6 +122,11 @@ def test_intersection():
 
 
 def test_union():
+    assert I.closed(1, 2).to_atomic() | I.closed(1, 2).to_atomic() == I.closed(1, 2).to_atomic()
+    assert I.closed(1, 4).to_atomic() | I.closed(2, 3).to_atomic() == I.closed(1, 4).to_atomic()
+    assert I.closed(1, 2).to_atomic() | I.closed(2, 3).to_atomic() == I.closed(2, 3).to_atomic() | I.closed(1, 2).to_atomic()
+    assert I.closed(1, 2).to_atomic() | I.closed(3, 4).to_atomic() == I.closed(1, 2) | I.closed(3, 4)
+
     assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
     assert I.closed(1, 4) | I.closed(2, 3) == I.closed(1, 4)
     assert I.closed(1, 4) | I.closed(2, 3).to_atomic() == I.closed(1, 4)
