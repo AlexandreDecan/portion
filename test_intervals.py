@@ -112,6 +112,13 @@ def test_complement():
     assert (~I.closed(-I.inf, I.inf)).is_empty()
 
 
+def test_difference():
+    assert I.closed(1, 4) - I.closed(1, 3) == I.openclosed(3, 4)
+    assert (I.closed(1, 4) - I.closed(1, 4)).is_empty()
+    assert I.closed(0, 1) - I.closed(2, 3) == I.closed(0, 1)
+    assert I.closed(0, 4) - I.closed(2, 3) == I.closedopen(0, 2) | I.openclosed(3, 4)
+
+
 def test_example():
     example = """
     >>> I.closed(0, 3)
@@ -136,6 +143,8 @@ def test_example():
     (-inf,0) | (1,+inf)
     >>> ~(I.closed(0, 1) | I.open(2, 3))
     (-inf,0) | (1,2] | [3,+inf)
+    >>> I.closed(0, 4) - I.openclosed(1, 2)
+    [0,1] | (2,4]
     """
     lines = iter(example.strip().splitlines())
     for line in lines:

@@ -34,6 +34,7 @@ Both ``Interval`` and ``AtomicInterval`` support the following operations:
  - ``x.union(other)`` or ``x | other`` returns the union of two intervals.
  - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval. Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
  - ``x.complement(other)`` or ``~x`` returns the complement of the interval.
+ - ``x.difference(other)`` or ``x - other`` returns the difference between ``x`` and ``other``.
  - ``x == other`` checks for interval equality.
 
 Additionally, an ``Interval`` provides:
@@ -68,6 +69,8 @@ True
 (-inf,0) | (1,+inf)
 >>> ~(I.closed(0, 1) | I.open(2, 3))
 (-inf,0) | (1,2] | [3,+inf)
+>>> I.closed(0, 4) - I.openclosed(1, 2)
+[0,1] | (2,4]
 ```
 
 ## Contributions

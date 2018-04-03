@@ -6,6 +6,11 @@ import operator
 __ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
 
 
+# TODO: Documentation for complement/difference
+# TODO: Docstrings
+# TODO: Raise NotImplementedError for all intersection, union, complement, difference, ... and try: .. except: for shortcuts
+
+
 class _PInf:
     """
     Use to represent positive infinity.
@@ -79,6 +84,9 @@ class AtomicInterval:
         self.right = right if upper != inf else OPEN
 
     def is_empty(self):
+        """
+        :return: True if interval is empty
+        """
         return self.lower == self.upper and (self.left == OPEN or self.right == OPEN)
 
     def overlaps(self, other, permissive=False):
@@ -157,8 +165,6 @@ class AtomicInterval:
             left = item.lower > self.lower or (item.lower == self.lower and (item.left == self.left or self.left == CLOSED))
             right = item.upper < self.upper or (item.upper == self.upper and (item.right == self.right or self.right == CLOSED))
             return left and right
-        elif isinstance(item, Interval):
-            return item.to_atomic() in self
         else:
             left = (item >= self.lower) if self.left == CLOSED else (item > self.lower)
             right = (item <= self.upper) if self.right == CLOSED else (item < self.upper)
@@ -172,6 +178,12 @@ class AtomicInterval:
             AtomicInterval(inverted_right, self.upper, inf, OPEN)
         )
 
+    def difference(self, other):
+        if isinstance(other, AtomicInterval):
+            return self & ~other
+        else:
+            return NotImplemented
+
     def __and__(self, other):
         return self.intersection(other)
 
@@ -184,6 +196,9 @@ class AtomicInterval:
     def __invert__(self):
         return self.complement()
 
+    def __sub__(self, other):
+        return self.difference(other)
+
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
             return (
@@ -192,8 +207,6 @@ class AtomicInterval:
                 self.upper == other.upper and
                 self.right == other.right
             )
-        elif isinstance(other, Interval):
-            return other.is_atomic() and self == other.to_atomic()
         else:
             return NotImplemented
 
@@ -324,6 +337,10 @@ class Interval:
             raise ValueError('Parameter must be an Interval or an AtomicInterval')
 
     def intersection(self, other):
+        """
+        :param other: Other Interval or AtomicInterval
+        :return: Intersection between the two intervals
+        """
         if isinstance(other, (AtomicInterval, Interval)):
             if isinstance(other, AtomicInterval):
                 intervals = [other]
@@ -338,6 +355,10 @@ class Interval:
             return NotImplemented
 
     def union(self, other):
+        """
+        :param other: Other Interval or AtomicInterval
+        :return: Union of given intervals
+        """
         if isinstance(other, AtomicInterval):
             return self | Interval(other)
         elif isinstance(other, Interval):
@@ -369,11 +390,24 @@ class Interval:
             return False
 
     def complement(self):
+        """
+        :return: The complement for this interval.
+        """
         complements = map(operator.invert, self._intervals)
         intersection = next(iter(complements))
         for interval in complements:
             intersection = intersection & interval
         return intersection
+
+    def difference(self, other):
+        """
+        :param other: Other Interval or AtomicInterval
+        :return: Difference betwen given intervals.
+        """
+        if isinstance(other, (AtomicInterval, Interval)):
+            return self & ~other
+        else:
+            return NotImplemented
 
     def __len__(self):
         return len([i for i in self._intervals if not i.is_empty()])
@@ -392,6 +426,9 @@ class Interval:
 
     def __invert__(self):
         return self.complement()
+
+    def __sub__(self, other):
+        return self.difference(other)
 
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
