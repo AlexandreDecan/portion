@@ -2,12 +2,10 @@
 # Interval arithmetic for Python  
   
 [![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals) [![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)  
-  
-This repository contains the Python 3.5+ ``intervals`` library that provides basic arithmetic for intervals in Python, supporting arbitrary object type.  
-  
-This library is inspired by [pyinter](https://github.com/intiocean/pyinter).   
-  
-  
+
+Provide interval arithmetic for Python 3.4+.
+
+
 ## Features  
   
  - Support intervals of arbitrary comparable objects.  
@@ -153,7 +151,9 @@ The left and right boundaries, and the lower and upper bound of an ``AtomicInter
   
 Contributions are very welcome!  
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.  
-  
+
+This library was inspired by [pyinter](https://github.com/intiocean/pyinter).
+
   
 ## Licence  
   
