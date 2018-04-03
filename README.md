@@ -168,6 +168,7 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 ## Changelog
 
+
 **1.0.4** (2018-04-03)
 
  - All operations of ``AtomicInterval`` (except overlaps) accept ``Interval``.

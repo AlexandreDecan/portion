@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import combinations, permutations
 import operator
 
 
@@ -323,7 +323,7 @@ class Interval:
 
         # Remove intervals contained in other ones
         to_remove = set()
-        for i1, i2 in combinations(self._intervals, 2):
+        for i1, i2 in permutations(self._intervals, 2):
             if i1 not in to_remove and i1 in i2:
                 to_remove.add(i1)
         self._intervals = self._intervals.difference(to_remove)

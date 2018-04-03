@@ -128,8 +128,10 @@ def test_union():
     assert I.closed(1, 2).to_atomic() | I.closed(3, 4).to_atomic() == I.closed(1, 2) | I.closed(3, 4)
 
     assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
+    assert I.closed(1, 4) | I.closed(2, 3) == I.closed(2, 3) | I.closed(1, 4)
     assert I.closed(1, 4) | I.closed(2, 3) == I.closed(1, 4)
     assert I.closed(1, 4) | I.closed(2, 3).to_atomic() == I.closed(1, 4)
+    assert I.closed(1, 4) | I.closed(2, 3).to_atomic() == I.closed(2, 3).to_atomic() | I.closed(1, 4)
 
     assert I.closed(1, 2) | I.open(2, 3) == I.closedopen(1, 3)
     assert I.closed(1, 3) | I.closed(2, 4) == I.closed(1, 4)
