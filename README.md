@@ -6,6 +6,15 @@ This repository contains the Python 3.5+ ``intervals`` library that provides bas
 This library is inspired by [pyinter](https://github.com/intiocean/pyinter). 
 
 
+## Features
+
+ - Support arbitrary comparable objects.
+ - Provide absolute minimal and maximal bounds.
+ - Union of intervals out of the box.
+ - Support intersection, union, complement, difference and containment.
+ - Automatically simplify union of intervals.
+
+
 ## Installation
 
 Although distributed as a Python package, this library is not available on PyPi. To install it, use:
