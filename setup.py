@@ -4,7 +4,7 @@ from os import path
 
 from setuptools import find_packages, setup
 
-version = '1.0.1'
+version = '1.0.0'
 
 # python setup.py register
 # python setup.py sdist bdist_wheel upload
@@ -25,6 +25,7 @@ setup(
 
     description='Python Intervals Arithmetic',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/AlexandreDecan/python-intervals',

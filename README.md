@@ -1,6 +1,6 @@
 # Interval arithmetic for Python
 
-[![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals) [![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.python.org/pypi/python-intervals)
+[![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals) [![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 This repository contains the Python 3.5+ ``intervals`` library that provides basic arithmetic for intervals in Python, supporting arbitrary object type.
 
