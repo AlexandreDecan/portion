@@ -1,0 +1,24 @@
+language: python
+python:
+- 3.4
+- 3.5
+- 3.6
+- nightly
+install:
+- pip install pip -U
+- pip install -r requirements.txt
+- pip install -e .
+script:
+- pytest
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: AlexandreDecan
+  password:
+    secure: SNcWHKnxF5ZVEEzXYHci1yyA9BivCUsDuDgZUT+b4h7YXcxBZVvWKJcxA9d5e+Hc3q/6l/Ij1RII5C4fRG7OtBlJSb3sdNgX2MQc9Dd1DAyn5XHijFNbieJ8C9nuXMNFwjDkeNw1IQHm1F6bvyTBQkURF2DnuYNQLOpuP4T9lKeVVRbx/ido1Q1BQTmDHoNW2tTlyTP6XSssW7gBfOSqnH/u8lytpGLREGkMwJ42hcNgR+dTZjKVVMDxOUYQeYrK5mLbHowj97YDThDQR1qs5dxq2EtVVKjHLPQU/MOI+q74fNQWzi8OY6Yr8M52uE7sRyczQzjdCiO/Bb1i1nI+yBxVoPjo9gPM5JVSKTdc6NGqTRurSasst72VuYzj7Fqlof+eJuzHgrhZRXOcD/duiQrCqLVv0y9trQnElWO1+geqsbgouMSoFmVPiIlxOJ1zmMvtDB3Q4g2vmtGjbPzfgxb9Hq7iFcd7FewwYFhpzSY/GddosDQ9wZRCKE0Rs/xBCxmy1cXtwepe4qz4NRSm1zcWu/7LgWj7ka2BpnTAR6CNxWFUrlEPkHzfZH2ZvHBcrN9tLFEg5prmj/55aMpLEo8f6B6+l4RO2cESUe7pObyxmAtMwYr/aQ8VZfYFwRggBfhtVIlHWPDet28+9swu69e3J2ViScM+AOOBXt+qNgc=
+  on:
+    branch: pypi
+    python: '3.4'
+matrix:
+  allow_failures:
+    - python: nightly

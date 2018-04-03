@@ -4,6 +4,7 @@ from os import path
 
 from setuptools import find_packages, setup
 
+version = '1.0.0'
 
 # python setup.py register
 # python setup.py sdist bdist_wheel upload
@@ -20,7 +21,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0',
+    version=version,
 
     description='Python Intervals Arithmetic',
     # long_description=long_description,
@@ -85,9 +86,4 @@ setup(
 
     include_package_data=True,
     zip_safe=True,
-
-    # To provide executable scripts, use entry points in preference to the
-    # "scripts" keyword. Entry points provide cross-platform support and allow
-    # pip to create the appropriate form of executable for the target platform.
-    entry_points={},
 )

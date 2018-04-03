@@ -17,9 +17,12 @@ This library is inspired by [pyinter](https://github.com/intiocean/pyinter).
 
 ## Installation
 
-Although distributed as a Python package, this library is not available on PyPi. To install it, use:
+You can use ``pip`` to install this library:
 
-``pip install git+https://github.com/AlexandreDecan/python-intervals.git``
+``pip install python-intervals``
+
+This will install the latest available version from *pypi* branche.
+Prereleases are available from the *master* branch.
 
 
 ## Usage
