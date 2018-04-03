@@ -2,6 +2,27 @@ import pytest
 import intervals as I
 
 
+def test_infinity():
+    assert I.inf == I.inf
+    assert I.inf >= I.inf
+    assert I.inf <= I.inf
+    assert not (I.inf > I.inf)
+    assert not (I.inf < I.inf)
+    assert not (I.inf != I.inf)
+
+    assert -I.inf == -I.inf
+    assert -I.inf >= -I.inf
+    assert -I.inf <= -I.inf
+    assert not (-I.inf > -I.inf)
+    assert not (-I.inf < -I.inf)
+    assert not (-I.inf != -I.inf)
+
+    assert I.inf > -I.inf
+    assert -I.inf < I.inf
+    assert -I.inf != I.inf
+    assert not (-I.inf == I.inf)
+
+
 def test_creation():
     assert I.closed(0, 1) == I.AtomicInterval(I.CLOSED, 0, 1, I.CLOSED)
     assert I.open(0, 1) == I.AtomicInterval(I.OPEN, 0, 1, I.OPEN)
@@ -36,11 +57,11 @@ def test_containment():
     assert 1 not in I.open(0, 1)
     assert 1 not in I.open(1, 2)
 
-    assert 1 in I.closed(-I.INF, I.INF)
-    assert 1 in I.closed(-I.INF, 1)
-    assert 1 in I.closed(1, I.INF)
-    assert 1 not in I.closed(-I.INF, 0)
-    assert 1 not in I.closed(2, I.INF)
+    assert 1 in I.closed(-I.inf, I.inf)
+    assert 1 in I.closed(-I.inf, 1)
+    assert 1 in I.closed(1, I.inf)
+    assert 1 not in I.closed(-I.inf, 0)
+    assert 1 not in I.closed(2, I.inf)
 
     # Intervals
     assert I.closed(1, 2) in I.closed(0, 3)
@@ -49,9 +70,9 @@ def test_containment():
     assert I.closed(1, 2) not in I.open(1, 2)
     assert I.closed(0, 1) not in I.closed(1, 2)
     assert I.closed(0, 2) not in I.closed(1, 3)
-    assert I.closed(-I.INF, I.INF) in I.closed(-I.INF, I.INF)
-    assert I.closed(0, 1) in I.closed(-I.INF, I.INF)
-    assert I.closed(-I.INF, I.INF) not in I.closed(0, 1)
+    assert I.closed(-I.inf, I.inf) in I.closed(-I.inf, I.inf)
+    assert I.closed(0, 1) in I.closed(-I.inf, I.inf)
+    assert I.closed(-I.inf, I.inf) not in I.closed(0, 1)
 
 
 def test_intersection():
@@ -79,13 +100,22 @@ def test_union():
     assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
 
 
+def test_complement():
+    assert ~I.closed(1, 2) == I.open(-I.inf, 1) | I.open(2, I.inf)
+    assert ~I.open(1, 2) == I.openclosed(-I.inf, 1) | I.closedopen(2, I.inf)
+
+    intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
+    for interval in intervals:
+        assert ~(~interval) == interval
+
+
 def test_example():
     example = """
     >>> I.closed(0, 3)
     [0,3]
     >>> I.openclosed('a', 'z')
     ('a','z']
-    >>> I.openclosed(-I.INF, 0)
+    >>> I.openclosed(-I.inf, 0)
     (-inf,0]
     >>> 2 in I.closed(0, 3)
     True
@@ -99,6 +129,10 @@ def test_example():
     [0,3]
     >>> I.closed(0, 1) | I.closed(2, 3)
     [0,1] | [2,3]
+    >>> ~I.closed(0, 1)
+    (-inf,0) | (1,+inf)
+    >>> ~(I.closed(0, 1) | I.open(2, 3))
+    (-inf,0) | (1,2] | [3,+inf)
     """
     lines = iter(example.strip().splitlines())
     for line in lines:

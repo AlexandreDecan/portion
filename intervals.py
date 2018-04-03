@@ -1,48 +1,38 @@
 from functools import total_ordering
 from itertools import combinations
 
-__ALL__ = ['INF', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
+import operator
+
+__ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
 
 
-@total_ordering
 class _PInf:
     """
     Use to represent positive infinity.
     """
-
-    def __neg__(self):
-        return _NInf()
-
-    def __lt__(self, o):
-        return isinstance(o, _PInf)
-
-    def __eq__(self, o):
-        return isinstance(o, _PInf)
-
-    def __repr__(self):
-        return '+inf'
+    def __neg__(self): return _NInf()
+    def __lt__(self, o): return False
+    def __le__(self, o): return isinstance(o, _PInf)
+    def __gt__(self, o): return not isinstance(o, _PInf)
+    def __ge__(self, o): return True
+    def __eq__(self, o): return isinstance(o, _PInf)
+    def __repr__(self):  return '+inf'
 
 
-@total_ordering
 class _NInf:
     """
     Use to represent negative infinity.
     """
-
-    def __neg__(self):
-        return _PInf()
-
-    def __gt__(self, o):
-        return isinstance(o, _NInf)
-
-    def __eq__(self, o):
-        return isinstance(o, _NInf)
-
-    def __repr__(self):
-        return '-inf'
+    def __neg__(self): return _PInf()
+    def __lt__(self, o): return not isinstance(o, _NInf)
+    def __le__(self, o): return True
+    def __gt__(self, o): return False
+    def __ge__(self, o): return isinstance(o, _NInf)
+    def __eq__(self, o): return isinstance(o, _NInf)
+    def __repr__(self):  return '-inf'
 
 
-INF = _PInf()
+inf = _PInf()
 OPEN = 0
 CLOSED = 1
 
@@ -78,7 +68,6 @@ def closedopen(lower, upper):
 class AtomicInterval:
     """
     Represent an (open/closed) interval.
-    Support equality (=), intersection (&), union (|) and containment (in).
     """
 
     def __init__(self, left, lower, upper, right):
@@ -175,6 +164,14 @@ class AtomicInterval:
             right = (item <= self.upper) if self.right == CLOSED else (item < self.upper)
             return left and right
 
+    def complement(self):
+        inverted_left = OPEN if self.left == CLOSED else CLOSED
+        inverted_right = OPEN if self.right == CLOSED else CLOSED
+        return Interval(
+            AtomicInterval(OPEN, -inf, self.lower, inverted_left),
+            AtomicInterval(inverted_right, self.upper, inf, OPEN)
+        )
+
     def __and__(self, other):
         return self.intersection(other)
 
@@ -183,6 +180,9 @@ class AtomicInterval:
 
     def __contains__(self, item):
         return self.contains(item)
+
+    def __invert__(self):
+        return self.complement()
 
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
@@ -261,7 +261,7 @@ class Interval:
 
         # If there is no remaining interval, set the empty one
         if len(self._intervals) == 0:
-            self._intervals.add(AtomicInterval(OPEN, INF, INF, OPEN))
+            self._intervals.add(AtomicInterval(OPEN, inf, inf, OPEN))
 
     def is_empty(self):
         """
@@ -368,6 +368,13 @@ class Interval:
                     return True
             return False
 
+    def complement(self):
+        complements = map(operator.invert, self._intervals)
+        intersection = next(iter(complements))
+        for interval in complements:
+            intersection = intersection & interval
+        return intersection
+
     def __len__(self):
         return len([i for i in self._intervals if not i.is_empty()])
     
@@ -382,6 +389,9 @@ class Interval:
 
     def __contains__(self, item):
         return self.contains(item)
+
+    def __invert__(self):
+        return self.complement()
 
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):

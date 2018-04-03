@@ -22,7 +22,7 @@ Assuming this library is imported using ``import intervals as I``, intervals can
  - ``I.openclosed(1, 2)`` corresponds to (1, 2];
  - and ``I.closedopen(1, 2)`` corresponds to [1, 2).
 
-For convenience, we provide ``I.INF`` and ``-I.INF`` that can be used respectively as upper or lower bound, and that always evaluate to ``True`` when compared using ``<`` and ``>`` respectively, regardless of the type involved in the comparison.
+For convenience, we provide ``I.inf`` and ``-I.inf`` that can be used respectively as upper or lower bound, and that always evaluate to ``True`` when compared using ``<`` and ``>`` respectively, regardless of the type involved in the comparison.
 
 An ``I.Interval`` is a disjunction of ``I.AtomicInterval``. An ``AtomicInterval`` represents a single interval (e.g. [1, 2]) while an ``Interval`` can also represent union of intervals (e.g. [1, 2] | [3, 4]). These unions are automatically simplified, e.g. [1, 2] | (2, 3] | (5, 5] automatically translates to [1, 3].
 
@@ -33,6 +33,7 @@ Both ``Interval`` and ``AtomicInterval`` support the following operations:
  - ``x.intersection(other)`` or ``x & other`` returns the intersection of two intervals.
  - ``x.union(other)`` or ``x | other`` returns the union of two intervals.
  - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval. Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
+ - ``x.complement(other)`` or ``~x`` returns the complement of the interval.
  - ``x == other`` checks for interval equality.
 
 Additionally, an ``Interval`` provides:
@@ -49,7 +50,7 @@ Additionally, an ``Interval`` provides:
 [0,3]
 >>> I.openclosed('a', 'z')
 ('a','z']
->>> I.openclosed(-I.INF, 0)
+>>> I.openclosed(-I.inf, 0)
 (-inf,0]
 >>> 2 in I.closed(0, 3)
 True
@@ -63,6 +64,10 @@ True
 [0,3]
 >>> I.closed(0, 1) | I.closed(2, 3)
 [0,1] | [2,3]
+>>> ~I.closed(0, 1)
+(-inf,0) | (1,+inf)
+>>> ~(I.closed(0, 1) | I.open(2, 3))
+(-inf,0) | (1,2] | [3,+inf)
 ```
 
 ## Contributions
