@@ -24,7 +24,7 @@ setup(
     version=version,
 
     description='Python Intervals Arithmetic',
-    # long_description=long_description,
+    long_description=long_description,
 
     # The project's main homepage.
     url='https://github.com/AlexandreDecan/python-intervals',
