@@ -120,32 +120,10 @@ def test_difference():
 
 
 def test_example():
-    example = """
-    >>> I.closed(0, 3)
-    [0,3]
-    >>> I.openclosed('a', 'z')
-    ('a','z']
-    >>> I.openclosed(-I.inf, 0)
-    (-inf,0]
-    >>> 2 in I.closed(0, 3)
-    True
-    >>> I.closed(0, 2) & I.open(1, 4)
-    (1,2]
-    >>> I.closed(0, 1) & I.closed(2, 3)
-    ()
-    >>> I.closed(0, 2) | I.open(1, 4)
-    [0,4)
-    >>> I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)
-    [0,3]
-    >>> I.closed(0, 1) | I.closed(2, 3)
-    [0,1] | [2,3]
-    >>> ~I.closed(0, 1)
-    (-inf,0) | (1,+inf)
-    >>> ~(I.closed(0, 1) | I.open(2, 3))
-    (-inf,0) | (1,2] | [3,+inf)
-    >>> I.closed(0, 4) - I.openclosed(1, 2)
-    [0,1] | (2,4]
-    """
-    lines = iter(example.strip().splitlines())
+    with open('README.md', 'r') as f:
+        readme = f.read()
+
+    lines = iter([e.strip() for e in readme.splitlines()])
     for line in lines:
-        assert repr(eval(line.strip().replace('>>> ', ''))) == next(lines).strip()
+        if line.startswith('>>>'):
+            assert repr(eval(line.replace('>>> ', ''))) == next(lines), line

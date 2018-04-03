@@ -88,16 +88,44 @@ class AtomicInterval:
             raise ValueError(
                 'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower,
                                                                                                               upper))
-        self.left = left if lower != -inf else OPEN
-        self.lower = lower
-        self.upper = upper
-        self.right = right if upper != inf else OPEN
+        self._left = left if lower != -inf else OPEN
+        self._lower = lower
+        self._upper = upper
+        self._right = right if upper != inf else OPEN
+
+    @property
+    def left(self):
+        """
+        Left boundary, either CLOSED or OPEN.
+        """
+        return self._left
+
+    @property
+    def lower(self):
+        """
+        Lower bound.
+        """
+        return self._lower
+
+    @property
+    def upper(self):
+        """
+        Upper bound.
+        """
+        return self._upper
+
+    @property
+    def right(self):
+        """
+        Right boundary, either CLOSED or OPEN.
+        """
+        return self._right
 
     def is_empty(self):
         """
         :return: True if interval is empty
         """
-        return self.lower == self.upper and (self.left == OPEN or self.right == OPEN)
+        return self._lower == self._upper and (self._left == OPEN or self._right == OPEN)
 
     def overlaps(self, other, permissive=False):
         """
@@ -105,34 +133,34 @@ class AtomicInterval:
         If 'permissive' is set to True, it considers [1, 2) and [2, 3] as an
         overlap on value 2, not [1, 2) and (2, 3].
         """
-        if self.lower > other.lower:
+        if self._lower > other.lower:
             first, second = other, self
         else:
             first, second = self, other
 
-        if first.upper == second.lower:
+        if first._upper == second._lower:
             if permissive:
-                return first.right == CLOSED or second.right == CLOSED
+                return first._right == CLOSED or second._right == CLOSED
             else:
-                return first.right == CLOSED and second.right == CLOSED
+                return first._right == CLOSED and second._right == CLOSED
 
-        return first.upper > second.lower
+        return first._upper > second._lower
 
     def intersection(self, other):
         if isinstance(other, AtomicInterval):
-            if self.lower == other.lower:
-                lower = self.lower
-                left = self.left if self.left == OPEN else other.left
+            if self._lower == other._lower:
+                lower = self._lower
+                left = self._left if self._left == OPEN else other._left
             else:
-                lower = max(self.lower, other.lower)
-                left = self.left if lower == self.lower else other.left
+                lower = max(self._lower, other._lower)
+                left = self._left if lower == self._lower else other._left
 
-            if self.upper == other.upper:
-                upper = self.upper
-                right = self.right if self.right == OPEN else other.right
+            if self._upper == other._upper:
+                upper = self._upper
+                right = self._right if self._right == OPEN else other._right
             else:
-                upper = min(self.upper, other.upper)
-                right = self.right if upper == self.upper else other.right
+                upper = min(self._upper, other._upper)
+                right = self._right if upper == self._upper else other._right
 
             if lower <= upper:
                 return AtomicInterval(left, lower, upper, right)
@@ -144,19 +172,19 @@ class AtomicInterval:
     def union(self, other):
         if isinstance(other, AtomicInterval):
             if self.overlaps(other, permissive=True):
-                if self.lower == other.lower:
-                    lower = self.lower
-                    left = self.left if self.left == OPEN else other.left
+                if self._lower == other._lower:
+                    lower = self._lower
+                    left = self._left if self._left == OPEN else other._left
                 else:
-                    lower = min(self.lower, other.lower)
-                    left = self.left if lower == self.lower else other.left
+                    lower = min(self._lower, other._lower)
+                    left = self._left if lower == self._lower else other._left
 
-                if self.upper == other.upper:
-                    upper = self.upper
-                    right = self.right if self.right == OPEN else other.right
+                if self._upper == other._upper:
+                    upper = self._upper
+                    right = self._right if self._right == OPEN else other._right
                 else:
-                    upper = max(self.upper, other.upper)
-                    right = self.right if upper == self.upper else other.right
+                    upper = max(self._upper, other._upper)
+                    right = self._right if upper == self._upper else other._right
 
                 return AtomicInterval(left, lower, upper, right)
             else:
@@ -172,22 +200,22 @@ class AtomicInterval:
         :return: True if given item is contained in this atomic interval.
         """
         if isinstance(item, AtomicInterval):
-            left = item.lower > self.lower or (
-                        item.lower == self.lower and (item.left == self.left or self.left == CLOSED))
-            right = item.upper < self.upper or (
-                        item.upper == self.upper and (item.right == self.right or self.right == CLOSED))
+            left = item._lower > self._lower or (
+                    item._lower == self._lower and (item._left == self._left or self._left == CLOSED))
+            right = item._upper < self._upper or (
+                    item._upper == self._upper and (item._right == self._right or self._right == CLOSED))
             return left and right
         else:
-            left = (item >= self.lower) if self.left == CLOSED else (item > self.lower)
-            right = (item <= self.upper) if self.right == CLOSED else (item < self.upper)
+            left = (item >= self._lower) if self._left == CLOSED else (item > self._lower)
+            right = (item <= self._upper) if self._right == CLOSED else (item < self._upper)
             return left and right
 
     def complement(self):
-        inverted_left = OPEN if self.left == CLOSED else CLOSED
-        inverted_right = OPEN if self.right == CLOSED else CLOSED
+        inverted_left = OPEN if self._left == CLOSED else CLOSED
+        inverted_right = OPEN if self._right == CLOSED else CLOSED
         return Interval(
-            AtomicInterval(OPEN, -inf, self.lower, inverted_left),
-            AtomicInterval(inverted_right, self.upper, inf, OPEN)
+            AtomicInterval(OPEN, -inf, self._lower, inverted_left),
+            AtomicInterval(inverted_right, self._upper, inf, OPEN)
         )
 
     def difference(self, other):
@@ -223,17 +251,17 @@ class AtomicInterval:
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
             return (
-                    self.left == other.left and
-                    self.lower == other.lower and
-                    self.upper == other.upper and
-                    self.right == other.right
+                    self._left == other._left and
+                    self._lower == other._lower and
+                    self._upper == other._upper and
+                    self._right == other._right
             )
         else:
             return NotImplemented
 
     def __hash__(self):
         try:
-            return hash(self.lower)
+            return hash(self._lower)
         except TypeError:
             return 0
 
@@ -242,10 +270,10 @@ class AtomicInterval:
             return '()'
 
         return '{}{},{}{}'.format(
-            '[' if self.left == CLOSED else '(',
-            repr(self.lower),
-            repr(self.upper),
-            ']' if self.right == CLOSED else ')',
+            '[' if self._left == CLOSED else '(',
+            repr(self._lower),
+            repr(self._upper),
+            ']' if self._right == CLOSED else ')',
         )
 
 
@@ -253,8 +281,6 @@ class Interval:
     """
     Represent an interval (union of atomic intervals).
     Consider using open, closed, openclosed or closedopen to create an Interval.
-
-    Support equality (=), intersection (&), union (|), containment (in) and iteration (on AtomicInterval).
     """
 
     def __init__(self, interval, *intervals):
@@ -435,7 +461,12 @@ class Interval:
         return len([i for i in self._intervals if not i.is_empty()])
 
     def __iter__(self):
-        return [i for i in self._intervals if not i.is_empty()]
+        return iter(
+            sorted(
+                [i for i in self._intervals if not i.is_empty()]
+                , key=lambda i: i.lower
+            )
+        )
 
     def __and__(self, other):
         try:
