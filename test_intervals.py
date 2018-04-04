@@ -101,13 +101,14 @@ def test_atomic_comparisons():
     assert i1 != i3
 
     assert i1 < i3
+    assert i1 <= i2
     assert i1 <= i3
     assert not (i1 < i2)
-    assert not (i1 <= i2)
+
+    assert i2 >= i1
     assert i3 > i1
     assert i3 >= i1
     assert not (i2 > i1)
-    assert not (i2 >= i1)
 
     assert not i1 == 1
 
@@ -129,13 +130,16 @@ def test_comparisons():
     assert i1 != i3
 
     assert i1 < i3
-    assert i1 <= i3
     assert not (i1 < i2)
-    assert not (i1 <= i2)
+    assert i1 <= i2
+    assert i1 <= i3
+    assert not (i2 <= i1)
+
     assert i3 > i1
-    assert i3 >= i1
     assert not (i2 > i1)
-    assert not (i2 >= i1)
+    assert i2 >= i1
+    assert i3 >= i1
+    assert not (i1 >= i2)
 
     i4 = i1 | i3
 
@@ -144,14 +148,18 @@ def test_comparisons():
     assert not i4 <= i2
     assert not i4 > i2
     assert not i4 >= i2
+    assert i2 <= i4
+    assert i2 >= i4
 
     i5 = I.closed(5, 6) | I.closed(7, 8)
 
     assert i4 != i5
     assert i4 < i5
     assert i4 <= i5
+    assert i5 >= i4
     assert not i4 > i5
     assert not i4 >= i5
+    assert not i5 <= i4
 
     assert not i1 == 1
 

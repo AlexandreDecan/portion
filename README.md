@@ -202,29 +202,28 @@ True
 True
 ```
 
-Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using e.g. ``>`` or ``<``.
+Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using e.g. ``>``, ``>=``, ``<`` or ``<=``.
 The comparison is based on the interval itself, not on its lower or upper bound only.
-For instance, assuming ``a`` and ``b`` are intervals, ``a < b`` holds if and only if ``a`` is entirely lower than ``b``.
+For instance, ``a < b`` holds if ``a`` is entirely on the left of ``b`` and ``a > b`` holds if ``a`` is entirely
+on the right of ``b``.
 
 ```python
->>> I.closed(0, 2) < I.closed(3, 4)
+>>> I.closed(0, 1) < I.closed(2, 3)
 True
->>> I.closed(0, 2) < I.closed(2, 3)
+>>> I.closed(0, 1) < I.closed(1, 2)
 False
 ```
 
-While less meaningful, ``a <= b`` and ``a >= b`` are supported too and correspond exactly to ``a < b or a == b`` (resp. ``a > b or a == b``).
-Consequently, comparisons between partially overlapping intervals will always evaluate to ``False``.
+Similarly, ``a <= b`` holds if ``a`` is entirely on the left of the upper bound of ``b``, and ``a >= b``
+holds if ``a`` is entirely on the right of the lower bound of ``b``.
 
 ```python
->>> I.closed(0, 2) <= I.closed(2, 3)
-False
->>> I.closed(0, 2) < I.closed(0, 2)
-False
->>> I.closed(0, 2) | I.closed(5, 6) <= I.closed(3, 4)
-False
->>> I.closed(0, 2) <= I.closed(0, 2)
+>>> I.closed(0, 1) <= I.closed(2, 3)
 True
+>>> I.closed(0, 2) <= I.closed(1, 3)
+True
+>>> I.closed(0, 3) <= I.closed(1, 2)
+False
 ```
 
 
@@ -260,10 +259,13 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 
 ## Changelog
 
+**1.3.0** (2018-04-04)
+
+ - Meaningful ``<=`` and ``>=`` comparisons for intervals.
+
 **1.2.0** (2018-04-04)
 
  - ``Interval`` supports indexing to retrieve the underlying ``AtomicInterval`` objects.
-
 
 **1.1.0** (2018-04-04)
 
@@ -274,17 +276,14 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
  - Interval simplification is in O(n) instead of O(n*m).
  - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower and upper bounds.
 
-
 **1.0.4** (2018-04-03)
 
  - All operations of ``AtomicInterval`` (except overlaps) accept ``Interval``.
  - Raise ``TypeError`` instead of ``ValueError`` if type is not supported (coherent with ``NotImplemented``).
 
-
 **1.0.3** (2018-04-03)
 
  - Initial working release on PyPi.
-
 
 **1.0.0** (2018-04-03)
 

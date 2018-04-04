@@ -1,5 +1,5 @@
 __name__ = 'python-intervals'
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 __author__ = 'Alexandre Decan'
 __author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'
@@ -10,7 +10,7 @@ __url__ = 'https://github.com/AlexandreDecan/python-intervals'
 __ALL__ = [
     'inf', 'CLOSED', 'OPEN',
     'Interval', 'AtomicInterval',
-    'open', 'closed', 'openclosed', 'closedopen', 'singleton'
+    'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
 ]
 
 
@@ -31,7 +31,7 @@ class _PInf:
 
     def __eq__(self, o): return isinstance(o, _PInf)
 
-    def __repr__(self):  return '+inf'
+    def __repr__(self): return '+inf'
 
 
 class _NInf:
@@ -51,7 +51,7 @@ class _NInf:
 
     def __eq__(self, o): return isinstance(o, _NInf)
 
-    def __repr__(self):  return '-inf'
+    def __repr__(self): return '-inf'
 
 
 inf = _PInf()
@@ -286,21 +286,39 @@ class AtomicInterval:
 
     def __lt__(self, other):
         if isinstance(other, AtomicInterval):
-            return self._upper <= other._lower and not self.overlaps(other)
+            if self._right == OPEN:
+                return self._upper <= other._lower
+            else:
+                return self._upper < other._lower or (self._upper == other._lower and other._left == OPEN)
         else:
             return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, AtomicInterval):
-            return self._lower >= other._upper and not self.overlaps(other)
+            if self._left == OPEN:
+                return self._lower >= other._upper
+            else:
+                return self._lower > other._upper or (self._lower == other._upper and other._right == OPEN)
         else:
             return NotImplemented
 
     def __le__(self, other):
-        return self < other or self == other
+        if isinstance(other, AtomicInterval):
+            if self._right == OPEN:
+                return self._upper <= other._upper
+            else:
+                return self._upper < other._upper or (self._upper == other._upper and other._right == CLOSED)
+        else:
+            return NotImplemented
 
     def __ge__(self, other):
-        return self > other or self == other
+        if isinstance(other, AtomicInterval):
+            if self._left == OPEN:
+                return self._lower >= other._lower
+            else:
+                return self._lower > other._lower or (self._lower == other._lower and other._left == CLOSED)
+        else:
+            return NotImplemented
 
     def __hash__(self):
         try:
@@ -537,10 +555,20 @@ class Interval:
             return NotImplemented
 
     def __le__(self, other):
-        return self < other or self == other
+        if isinstance(other, AtomicInterval):
+            return self._intervals[-1] <= other
+        elif isinstance(other, Interval):
+            return self._intervals[-1] <= other._intervals[-1]
+        else:
+            return NotImplemented
 
     def __ge__(self, other):
-        return self > other or self == other
+        if isinstance(other, AtomicInterval):
+            return self._intervals[0] >= other
+        elif isinstance(other, Interval):
+            return self._intervals[0] >= other._intervals[0]
+        else:
+            return NotImplemented
 
     def __hash__(self):
         return hash(self._intervals[0])
