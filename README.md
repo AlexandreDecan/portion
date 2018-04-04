@@ -51,7 +51,8 @@ Assuming this library is imported using ``import intervals as I``, intervals can
 ()
 ```
 
-Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds. These two objects support comparison with any other object.
+Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds.
+These two objects support comparison with any other object.
 
 ```python
 >>> I.openclosed(-I.inf, 0)
@@ -130,7 +131,8 @@ Both classes support interval arithmetic:
    >>> I.empty().is_empty()
    True
    ```
- - ``x.overlaps(other)`` test if there is an overlap between two intervals. This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
+ - ``x.overlaps(other)`` test if there is an overlap between two intervals.
+ This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
    True
@@ -139,7 +141,8 @@ Both classes support interval arithmetic:
    >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
    True
    ```
- - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval. Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
+ - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval.
+ Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
    True
@@ -194,8 +197,8 @@ Additionally, an ``Interval`` provides:
  - ``x.to_atomic()`` is equivalent to ``x.enclosure()`` but returns an ``AtomicInterval`` instead of an ``Interval`` object.
 
 
-Intervals can be iterated to access the underlying set of ``AtomicInterval``, sorted by their lower bounds.
-As intervals are automatically simplified, this implies their upper bounds are also sorted.
+Intervals can be iterated to access the underlying ``AtomicInterval`` objects, sorted by their lower bounds.
+Their lower bounds are also sorted, as intervals are automatically simplified.
 
 ```python
 >>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
@@ -219,22 +222,20 @@ with its ``left``, ``right``, ``lower`` and ``upper`` attribute.
 
 ## Contributions
 
-Contributions are very welcome!
+This library was inspired by [pyinter](https://github.com/intiocean/pyinter). Contributions are very welcome!
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
-
-This library was inspired by [pyinter](https://github.com/intiocean/pyinter).
 
 
 ## Licence
 
-LGPLv3 - GNU Lesser General Public License, version 3
+Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 
 
 ## Changelog
 
 **1.2.0** (2018-04-04)
 
- - ``Interval`` support indexing, to retrieve the underlying ``AtomicInterval``.
+ - ``Interval`` support indexing, to retrieve the underlying ``AtomicInterval`` objects.
 
 
 **1.1.0** (2018-04-04)
@@ -244,7 +245,7 @@ LGPLv3 - GNU Lesser General Public License, version 3
  - Add ``empty()`` to create an empty interval.
  - Add ``Interval.enclosure()`` that returns the smallest interval that includes the current one.
  - Interval simplification is in O(n) instead of O(n*m).
- - ``AtomicInterval`` in an ``Interval`` are sorted by lower bound.
+ - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower bound.
 
 
 **1.0.4** (2018-04-03)
