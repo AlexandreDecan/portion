@@ -34,6 +34,8 @@ projects without the need for an explicit dependency (hint: don't do that!).
 
 ## Usage
 
+### Creation
+
 Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the following functions:
 
  - ``I.open(1, 2)`` corresponds to ``(1,2)``;
@@ -81,9 +83,22 @@ For convenience, ``Interval`` are automatically simplified:
 [1,3]
 ```
 
-Both classes support interval arithmetic:
+### Arithmetic operations
+
+Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic operations:
 
 
+ - ``x.is_empty()`` tests if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).is_empty()
+   False
+   >>> I.closed(0, 0).is_empty()
+   False
+   >>> I.openclosed(0, 0).is_empty()
+   True
+   >>> I.empty().is_empty()
+   True
+   ```
  - ``x.intersection(other)`` or ``x & other`` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
@@ -118,32 +133,6 @@ Both classes support interval arithmetic:
    >>> I.closed(0, 4) - I.closed(1, 2)
    [0,1) | (2,4]
    ```
- - ``x == other`` checks for interval equality.
-   ```python
-   >>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
-   True
-   ```
- - ``x.is_empty()`` tests if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).is_empty()
-   False
-   >>> I.closed(0, 0).is_empty()
-   False
-   >>> I.openclosed(0, 0).is_empty()
-   True
-   >>> I.empty().is_empty()
-   True
-   ```
- - ``x.overlaps(other)`` tests if there is an overlap between two intervals.
- This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
-   ```python
-   >>> I.closed(1, 2).overlaps(I.closed(2, 3))
-   True
-   >>> I.closed(1, 2).overlaps(I.open(2, 3))
-   False
-   >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
-   True
-   ```
  - ``x.contains(other)`` or ``other in x`` return True if given item is contained in the interval.
  Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
    ```python
@@ -154,10 +143,64 @@ Both classes support interval arithmetic:
    >> I.open(0, 1) in I.closed(0, 2)
    True
    ```
+ - ``x.overlaps(other)`` tests if there is an overlap between two intervals.
+ This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and
+ [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
+   ```python
+   >>> I.closed(1, 2).overlaps(I.closed(2, 3))
+   True
+   >>> I.closed(1, 2).overlaps(I.open(2, 3))
+   False
+   >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
+   True
+   ```
 
-Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using ``>`` or ``<``.
-The comparison is based on the interval, not only on one bound or the other.
-For instance, assuming ``a`` and ``b`` are intervals, ``a < b`` holds iff ``a`` is entirely lower than ``b``.
+### Other methods and attributes
+
+The following methods are only available for ``Interval`` instances:
+
+ - ``x.enclosure()`` returns the smallest interval that includes the current one.
+   ```python
+   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
+   [0,3]
+   ```
+ - ``x.to_atomic()`` is equivalent to ``x.enclosure()`` but returns an ``AtomicInterval`` instead of an ``Interval`` object.
+ - ``x.is_atomic()`` evaluates to ``True`` if interval is composed of a single (possibly empty) atomic interval.
+   ```python
+   >>> I.closed(0, 2).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   False
+   ```
+
+The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed
+with its ``left``, ``right``, ``lower`` and ``upper`` attributes.
+The ``left`` and ``right`` bounds are either ``I.CLOSED`` (``True``) or ``I.OPEN`` (``False``).
+
+```python
+>> I.CLOSED, I.OPEN
+True, False
+>>> [getattr(I.closedopen(0, 1).to_atomic(), attr) for attr in ['left', 'lower', 'upper', 'right']]
+[True, 0, 1, False]
+```
+
+
+### Comparison
+
+Equality between intervals can be checked using the classical ``==`` operator:
+
+```python
+>>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
+True
+>>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
+True
+```
+
+Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using e.g. ``>`` or ``<``.
+The comparison is based on the interval itself, not on its lower or upper bound only.
+For instance, assuming ``a`` and ``b`` are intervals, ``a < b`` holds if and only if ``a`` is entirely lower than ``b``.
 
 ```python
 >>> I.closed(0, 2) < I.closed(3, 4)
@@ -166,7 +209,7 @@ True
 False
 ```
 
-While less meaningful, ``<=`` and ``>=`` are supported too and correspond exactly to ``< or ==`` (resp. ``> or ==``).
+While less meaningful, ``a <= b`` and ``a >= b`` are supported too and correspond exactly to ``a < b or a == b`` (resp. ``a > b or a == b``).
 Consequently, comparisons between partially overlapping intervals will always evaluate to ``False``.
 
 ```python
@@ -181,47 +224,24 @@ True
 ```
 
 
-Additionally, an ``Interval`` provides:
+### Iteration
 
- - ``x.enclosure()`` returns the smallest interval that includes the current one.
-   ```python
-   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
-   [0,3]
-   ```
- - ``x.is_atomic()`` evaluates to ``True`` if it is the union of a single (possibly empty) atomic interval.
-   ```python
-   >>> I.closed(0, 2).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
-   False
-   ```
- - ``x.to_atomic()`` is equivalent to ``x.enclosure()`` but returns an ``AtomicInterval`` instead of an ``Interval`` object.
-
-
-Intervals can be iterated to access the underlying ``AtomicInterval`` objects, sorted by their lower bounds.
-Their lower bounds are also sorted, as intervals are automatically simplified.
+Intervals can be iterated to access the underlying ``AtomicInterval`` objects, sorted by their lower and upper bounds.
 
 ```python
 >>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
 [[0,1], (2,3), [21,24]]
 ```
 
-The ``AtomicInterval`` of an ``Interval`` can also be accessed using their index.
+The ``AtomicInterval`` objects of an ``Interval`` can also be accessed using their indexes:
 
 ```python
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
+[0,1]
 >>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
 (2,3)
 ```
 
-The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed
-with its ``left``, ``right``, ``lower`` and ``upper`` attribute.
-
-```python
->>> [(i.left, i.lower, i.upper, i.right) for i in I.open(2, 3) | I.closed(0, 1)]
-[(True, 0, 1, True), (False, 2, 3, False)]
-```
 
 ## Contributions
 
@@ -238,7 +258,7 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 
 **1.2.0** (2018-04-04)
 
- - ``Interval`` support indexing, to retrieve the underlying ``AtomicInterval`` objects.
+ - ``Interval`` supports indexing to retrieve the underlying ``AtomicInterval`` objects.
 
 
 **1.1.0** (2018-04-04)
@@ -248,7 +268,7 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
  - Add ``empty()`` to create an empty interval.
  - Add ``Interval.enclosure()`` that returns the smallest interval that includes the current one.
  - Interval simplification is in O(n) instead of O(n*m).
- - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower bound.
+ - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower and upper bounds.
 
 
 **1.0.4** (2018-04-03)
