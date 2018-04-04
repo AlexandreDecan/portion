@@ -16,7 +16,7 @@ Provide interval arithmetic for Python 3.4+.
  - Closed or open, finite or infinite intervals.
  - Union of intervals out of the box.
  - Automatic simplification of (union of) intervals.
- - Support comparison, intersection, union, complement, difference and containment.
+ - Support iteration, comparison, intersection, union, complement, difference and containment.
 
 
 ## Installation
@@ -149,18 +149,29 @@ Both classes support interval arithmetic:
    True
    ```
 
-Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using ``==, !=, <, <=, >`` and ``>=``.
-The comparison is based on the full interval, not only on one bound or the other:
+Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using ``>`` or ``<``.
+The comparison is based on the interval, not only on one bound or the other.
+For instance, assuming ``a`` and ``b`` are intervals, ``a < b`` holds iff ``a`` is entirely lower than ``b``.
 
 ```python
 >>> I.closed(0, 2) < I.closed(3, 4)
 True
 >>> I.closed(0, 2) < I.closed(2, 3)
 False
+```
+
+While less meaningful, ``<=`` and ``>=`` are supported too and correspond exactly to ``< or ==`` (resp. ``> or ==``).
+Consequently, comparisons between partially overlapping intervals will always evaluate to ``False``.
+
+```python
 >>> I.closed(0, 2) <= I.closed(2, 3)
+False
+>>> I.closed(0, 2) < I.closed(0, 2)
 False
 >>> I.closed(0, 2) | I.closed(5, 6) <= I.closed(3, 4)
 False
+>>> I.closed(0, 2) <= I.closed(0, 2)
+True
 ```
 
 
@@ -178,9 +189,25 @@ Additionally, an ``Interval`` provides:
    ```
  - ``x.to_atomic()`` returns the smallest ``AtomicInterval`` that contains the interval(s). Is equivalent to ``x.enclosure()``
  but returns an ``AtomicInterval`` instead of an ``Interval`` object.
- - Iteration protocol for the underlying set of ``AtomicInterval``, sorted by their lower bound value.
 
-The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed with its ``left``, ``right``, ``lower`` and ``upper`` attribute.
+
+Intervals can be iterated to access the underlying set of ``AtomicInterval``, sorted by their lower bounds.
+As intervals are automatically simplified, this implies their upper bounds are also sorted.
+
+```python
+>>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
+[[0,1], (2,3), [21,24]]
+```
+
+The ``AtomicInterval`` of an ``Interval`` can also be accessed using their index.
+
+```python
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
+(2,3)
+```
+
+The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed
+with its ``left``, ``right``, ``lower`` and ``upper`` attribute.
 
 ```python
 >>> [(i.left, i.lower, i.upper, i.right) for i in I.open(2, 3) | I.closed(0, 1)]
@@ -201,6 +228,11 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 
 ## Changelog
+
+**1.2.0** (2018-04-04)
+
+ - ``Interval`` support indexing, to retrieve the underlying ``AtomicInterval``.
+
 
 **1.1.0** (2018-04-04)
 

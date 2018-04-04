@@ -241,6 +241,28 @@ def test_union():
     assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
 
 
+def test_iteration():
+    i1 = I.closed(10, 10) | I.closed(5, 6) | I.closed(7, 8) | I.closed(8, 9)
+
+    assert len(i1) == 3
+    for i in i1:
+        assert i in i1
+    assert sorted(i1, key=lambda i: i.lower) == list(i1)
+    assert sorted(i1, key=lambda i: i.upper) == list(i1)
+
+    assert i1[0] == I.closed(5, 6)
+    assert i1[1] == I.closed(7, 9)
+    assert i1[2] == I.closed(10, 10)
+    assert i1[-1] == I.closed(10, 10)
+    with pytest.raises(IndexError):
+        i1[3]
+
+    assert len(I.empty()) == 0
+    assert list(I.empty()) == []
+    with pytest.raises(IndexError):
+        I.empty()[0]
+
+
 def test_complement():
     assert ~I.closed(1, 2) == I.open(-I.inf, 1) | I.open(2, I.inf)
     assert ~I.open(1, 2) == I.openclosed(-I.inf, 1) | I.closedopen(2, I.inf)

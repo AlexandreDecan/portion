@@ -1,5 +1,5 @@
 __name__ = 'python-intervals'
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 __author__ = 'Alexandre Decan'
 __author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'
@@ -242,12 +242,6 @@ class AtomicInterval:
             return NotImplemented
 
     def __contains__(self, item):
-        """
-        Return True if given item is contained in this atomic interval.
-        Item must be either a value, an AtomicInterval or an Interval.
-        :param item: a value, an AtomicInterval or an Interval
-        :return: True if given item is contained in this atomic interval.
-        """
         if isinstance(item, AtomicInterval):
             left = item._lower > self._lower or (
                     item._lower == self._lower and (item._left == self._left or self._left == CLOSED))
@@ -331,7 +325,8 @@ class AtomicInterval:
 class Interval:
     """
     Represent an interval (union of atomic intervals).
-    Consider using open, closed, openclosed or closedopen to create an Interval.
+    Can be instanciated by providing AtomicIntervals, but consider using one of the helpers
+    to create Interval objects (open, closed, openclosed, closedopen, singleton, or empty).
     """
 
     def __init__(self, *intervals):
@@ -448,10 +443,22 @@ class Interval:
         return self - other
 
     def __len__(self):
-        return len([i for i in self._intervals if not i.is_empty()])
+        if self._intervals[0].is_empty():
+            return 0
+        else:
+            return len(self._intervals)
 
     def __iter__(self):
-        return iter([i for i in self._intervals if not i.is_empty()])
+        if self._intervals[0].is_empty():
+            return iter([])
+        else:
+            return iter(self._intervals)
+
+    def __getitem__(self, item):
+        if self._intervals[0].is_empty():
+            raise IndexError('Interval is empty')
+        else:
+            return self._intervals[item]
 
     def __and__(self, other):
         if isinstance(other, (AtomicInterval, Interval)):
