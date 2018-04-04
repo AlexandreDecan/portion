@@ -84,7 +84,7 @@ For convenience, ``Interval`` are automatically simplified:
 Both classes support interval arithmetic:
 
 
- - ``x.intersection(other)`` or ``x & other`` returns the intersection of two intervals.
+ - ``x.intersection(other)`` or ``x & other`` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
    [1,2]
@@ -95,14 +95,14 @@ Both classes support interval arithmetic:
    >>> I.closed(0, 2) & I.closed(3, 4)
    ()
    ```
- - ``x.union(other)`` or ``x | other`` returns the union of two intervals.
+ - ``x.union(other)`` or ``x | other`` return the union of two intervals.
    ```python
    >>> I.closed(0, 1) | I.closed(1, 2)
    [0,2]
    >>> I.closed(0, 1) | I.closed(2, 3)
    [0,1] | [2,3]
    ```
- - ``x.complement(other)`` or ``~x`` returns the complement of the interval.
+ - ``x.complement(other)`` or ``~x`` return the complement of the interval.
    ```python
    >>> ~I.closed(0, 1)
    (-inf,0) | (1,+inf)
@@ -111,7 +111,7 @@ Both classes support interval arithmetic:
    >>> ~I.open(-I.inf, I.inf)
    ()
    ```
- - ``x.difference(other)`` or ``x - other`` returns the difference between ``x`` and ``other``.
+ - ``x.difference(other)`` or ``x - other`` return the difference between ``x`` and ``other``.
    ```python
    >>> I.closed(0,2) - I.closed(1,2)
    [0,1)
@@ -134,7 +134,7 @@ Both classes support interval arithmetic:
    >>> I.empty().is_empty()
    True
    ```
- - ``x.overlaps(other)`` test if there is an overlap between two intervals.
+ - ``x.overlaps(other)`` tests if there is an overlap between two intervals.
  This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
@@ -144,7 +144,7 @@ Both classes support interval arithmetic:
    >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
    True
    ```
- - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval.
+ - ``x.contains(other)`` or ``other in x`` return True if given item is contained in the interval.
  Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
