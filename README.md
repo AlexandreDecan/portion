@@ -56,22 +56,10 @@ Assuming this library is imported using ``import intervals as I``, intervals can
 ()
 ```
 
-Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds.
-These two objects support comparison with any other object.
-
-```python
->>> I.openclosed(-I.inf, 0)
-(-inf,0]
->>> I.closed(-I.inf, I.inf)  # Automatically converted
-(-inf,+inf)
->>> I.inf > 'a', I.inf > 0, I.inf > True
-(True, True, True)
-```
-
 Intervals created with this library are ``Interval`` instances.
 An ``Interval`` object is a disjunction of ``AtomicInterval``.
-An ``AtomicInterval`` represents a single interval (e.g. ``[1,2])`` while an ``Interval`` represents union of intervals (e.g. ``[1,2] | [3,4]``).
-
+An ``AtomicInterval`` represents a single interval (e.g. ``[1,2])`` while an ``Interval`` represents union
+of intervals (e.g. ``[1,2] | [3,4]``).
 
 For convenience, ``Interval`` are automatically simplified:
 ```python
@@ -82,6 +70,20 @@ For convenience, ``Interval`` are automatically simplified:
 >>> I.closed(1, 2) | I.openclosed(2, 3) | I.closedopen(5, 5)
 [1,3]
 ```
+
+Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds.
+These two objects support comparison with any other object.
+When infinites are used as a lower or upper bound, the corresponding boundary is automatically converted to an open one.
+
+```python
+>>> I.inf > 'a', I.inf > 0, I.inf > True
+(True, True, True)
+>>> I.openclosed(-I.inf, 0)
+(-inf,0]
+>>> I.closed(-I.inf, I.inf)  # Automatically converted to an open interval
+(-inf,+inf)
+```
+
 
 ### Arithmetic operations
 
