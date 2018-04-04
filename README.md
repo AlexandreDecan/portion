@@ -182,13 +182,16 @@ Additionally, an ``Interval`` provides:
    >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
    [0,3]
    ```
- - ``x.is_atomic()`` evaluates to ``True`` if interval is the union of a single (possibly empty) atomic interval.
+ - ``x.is_atomic()`` evaluates to ``True`` if it is the union of a single (possibly empty) atomic interval.
    ```python
-   >>> I.closed(0, 2).is_atomic(), (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
-   (True, False)
+   >>> I.closed(0, 2).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   False
    ```
- - ``x.to_atomic()`` returns the smallest ``AtomicInterval`` that contains the interval(s). Is equivalent to ``x.enclosure()``
- but returns an ``AtomicInterval`` instead of an ``Interval`` object.
+ - ``x.to_atomic()`` is equivalent to ``x.enclosure()`` but returns an ``AtomicInterval`` instead of an ``Interval`` object.
 
 
 Intervals can be iterated to access the underlying set of ``AtomicInterval``, sorted by their lower bounds.
