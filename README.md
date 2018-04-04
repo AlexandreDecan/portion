@@ -16,7 +16,7 @@ Provide interval arithmetic for Python 3.4+.
  - Closed or open, finite or infinite intervals.
  - Union of intervals out of the box.
  - Automatic simplification of (union of) intervals.
- - Support intersection, union, complement, difference and containment.
+ - Support comparison, intersection, union, complement, difference and containment.
 
 
 ## Installation
@@ -33,12 +33,12 @@ Prereleases are available from the *master* branch.
 
 Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the following functions:
 
- - ``I.open(1, 2)`` corresponds to (1, 2);
- - ``I.closed(1, 2)`` corresponds to [1, 2];
- - ``I.openclosed(1, 2)`` corresponds to (1, 2];
- - ``I.closedopen(1, 2)`` corresponds to [1, 2);
- - ``I.singleton(1)`` corresponds to [1, 1];
- - ``I.empty()`` corresponds to the empty interval.
+ - ``I.open(1, 2)`` corresponds to ``(1,2)``;
+ - ``I.closed(1, 2)`` corresponds to ``[1,2]``;
+ - ``I.openclosed(1, 2)`` corresponds to ``(1,2]``;
+ - ``I.closedopen(1, 2)`` corresponds to ``[1,2)``;
+ - ``I.singleton(1)`` corresponds to ``[1,1]``;
+ - ``I.empty()`` corresponds to the empty interval ``()``.
 
 ```python
 >>> I.closed(0, 3)
@@ -47,6 +47,8 @@ Assuming this library is imported using ``import intervals as I``, intervals can
 ('a','z']
 >>> I.singleton(2.5)
 [2.5]
+>>> I.empty()
+()
 ```
 
 Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds. These two objects support comparison with any other object.
@@ -200,7 +202,7 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 ## Changelog
 
-** Unreleased**
+**1.1.0** (2018-04-04)
 
  - Both ``AtomicInterval`` and ``Interval`` are fully comparable.
  - Add ``singleton(x)`` to create a singleton interval [x].
