@@ -28,6 +28,9 @@ You can use ``pip`` to install this library:
 This will install the latest available version from *pypi* branch.
 Prereleases are available from the *master* branch.
 
+For convenience, the library is contained within a single Python file, and can thus be easily integrated in other
+projects without the need for an explicit dependency (hint: don't do that!).
+
 
 ## Usage
 
