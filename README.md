@@ -14,9 +14,11 @@ Provide interval arithmetic for Python 3.4+.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or infinite intervals.
- - Union of intervals out of the box.
- - Automatic simplification of (union of) intervals.
+ - Atomic intervals and interval sets are supported.
+ - Automatic simplification of intervals.
  - Support iteration, comparison, intersection, union, complement, difference and containment.
+
+Inspired by [pyinter](https://github.com/intiocean/pyinter).
 
 
 ## Installation
@@ -57,11 +59,11 @@ Assuming this library is imported using ``import intervals as I``, intervals can
 ```
 
 Intervals created with this library are ``Interval`` instances.
-An ``Interval`` object is a disjunction of ``AtomicInterval``.
-An ``AtomicInterval`` represents a single interval (e.g. ``[1,2])`` while an ``Interval`` represents union
-of intervals (e.g. ``[1,2] | [3,4]``).
+An ``Interval`` object is a disjunction of atomic intervals that represent a single interval (e.g. [1,2])
+corresponding to ``AtomicInterval`` instances.
+Except when atomic intervals are explicitly created or retrieved, only ``Interval`` instances are exposed.
 
-For convenience, ``Interval`` are automatically simplified:
+For convenience, intervals are automatically simplified:
 ```python
 >>> I.closed(0, 2) | I.closed(2, 4)
 [0,4]
@@ -247,7 +249,7 @@ The ``AtomicInterval`` objects of an ``Interval`` can also be accessed using the
 
 ## Contributions
 
-This library was inspired by [pyinter](https://github.com/intiocean/pyinter). Contributions are very welcome!
+Contributions are very welcome!
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
 
 
