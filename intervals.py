@@ -99,6 +99,13 @@ def singleton(value):
     return Interval(AtomicInterval(CLOSED, value, value, CLOSED))
 
 
+def empty():
+    """
+    Create an empty set
+    """
+    return Interval(AtomicInterval(OPEN, inf, inf, OPEN))
+
+
 class AtomicInterval:
     """
     Represent an (open/closed) interval.
@@ -328,17 +335,12 @@ class Interval:
             if not interval.is_empty():
                 self._intervals.add(interval)
 
-        self._simplify()
+        if len(self._intervals) == 0:
+            self._intervals.add(AtomicInterval(OPEN, inf, inf, OPEN))
+        else:
+            self._simplify()
 
     def _simplify(self):
-
-        # Remove intervals contained in other ones
-        to_remove = set()
-        for i1, i2 in permutations(self._intervals, 2):
-            if i1 not in to_remove and i1 in i2:
-                to_remove.add(i1)
-        self._intervals = self._intervals.difference(to_remove)
-
         # Merge contiguous intervals
         to_remove = set()
         to_add = set()
@@ -355,10 +357,6 @@ class Interval:
         self._intervals = self._intervals.difference(to_remove).union(to_add)
         if len(to_remove) + len(to_add) > 0:
             self._simplify()
-
-        # If there is no remaining interval, set the empty one
-        if len(self._intervals) == 0:
-            self._intervals.add(AtomicInterval(OPEN, inf, inf, OPEN))
 
     def is_empty(self):
         """

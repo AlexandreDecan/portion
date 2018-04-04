@@ -38,6 +38,7 @@ Assuming this library is imported using ``import intervals as I``, intervals can
  - ``I.openclosed(1, 2)`` corresponds to (1, 2];
  - ``I.closedopen(1, 2)`` corresponds to [1, 2);
  - ``I.singleton(1)`` corresponds to [1, 1];
+ - ``I.empty()`` corresponds to the empty interval.
 
 ```python
 >>> I.closed(0, 3)
@@ -85,7 +86,7 @@ Both classes support interval arithmetic:
    False
    >>> I.openclosed(0, 0).is_empty()
    True
-   >>> I.Interval().is_empty()
+   >>> I.empty().is_empty()
    True
    ```
 
@@ -175,8 +176,7 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 ** Unreleased**
 
- - Add a ``singleton`` helper to create singletons.
- - ``Interval`` can be created with no ``AtomicInterval``, i.e., empty.
+ - Add ``singleton`` and ``empty`` helpers to create singletons and empty intervals.
 
 
 **1.0.4** (2018-04-03)

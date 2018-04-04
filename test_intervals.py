@@ -35,6 +35,7 @@ def test_creation():
 
     assert I.singleton(2) == I.closed(2, 2)
     assert I.Interval() == I.open(0, 0)
+    assert I.empty() == I.Interval()
 
 
 def test_to_interval_to_atomic():
@@ -71,6 +72,7 @@ def test_emptyness():
     assert I.open(1, 1).is_empty()
     assert not I.closed(1, 1).is_empty()
     assert I.Interval().is_empty()
+    assert I.empty().is_empty()
 
 
 def test_containment():
