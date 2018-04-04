@@ -32,9 +32,9 @@ For convenience, the library is contained within a single Python file, and can t
 projects without the need for an explicit dependency (hint: don't do that!).
 
 
-## Usage
+## Documentation & usage
 
-### Creation
+### Interval instantiation
 
 Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the following functions:
 
@@ -187,7 +187,7 @@ True, False
 ```
 
 
-### Comparison
+### Comparison operators
 
 Equality between intervals can be checked using the classical ``==`` operator:
 
@@ -224,7 +224,7 @@ True
 ```
 
 
-### Iteration
+### Iteration & indexing
 
 Intervals can be iterated to access the underlying ``AtomicInterval`` objects, sorted by their lower and upper bounds.
 
