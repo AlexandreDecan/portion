@@ -226,6 +226,16 @@ True
 False
 ```
 
+Note that this semantics differ from classical comparison operators.
+As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
+
+```python
+>>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
+False
+>>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
+False
+```
+
 
 ### Iteration & indexing
 
