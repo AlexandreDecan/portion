@@ -33,6 +33,9 @@ def test_creation():
     with pytest.raises(ValueError):
         I.closed(1, -1)
 
+    assert I.singleton(2) == I.closed(2, 2)
+    assert I.Interval() == I.open(0, 0)
+
 
 def test_to_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
@@ -67,6 +70,7 @@ def test_emptyness():
     assert I.closedopen(1, 1).is_empty()
     assert I.open(1, 1).is_empty()
     assert not I.closed(1, 1).is_empty()
+    assert I.Interval().is_empty()
 
 
 def test_containment():

@@ -36,13 +36,16 @@ Assuming this library is imported using ``import intervals as I``, intervals can
  - ``I.open(1, 2)`` corresponds to (1, 2);
  - ``I.closed(1, 2)`` corresponds to [1, 2];
  - ``I.openclosed(1, 2)`` corresponds to (1, 2];
- - and ``I.closedopen(1, 2)`` corresponds to [1, 2).
+ - ``I.closedopen(1, 2)`` corresponds to [1, 2);
+ - ``I.singleton(1)`` corresponds to [1, 1];
 
 ```python
 >>> I.closed(0, 3)
 [0,3]
 >>> I.openclosed('a', 'z')
 ('a','z']
+>>> I.singleton(2.5)
+[2.5]
 ```
 
 Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds. These two objects support comparison with any other object.
@@ -81,6 +84,8 @@ Both classes support interval arithmetic:
    >>> I.closed(0, 0).is_empty()
    False
    >>> I.openclosed(0, 0).is_empty()
+   True
+   >>> I.Interval().is_empty()
    True
    ```
 
@@ -167,6 +172,11 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 
 ## Changelog
+
+** Unreleased**
+
+ - Add a ``singleton`` helper to create singletons.
+ - ``Interval`` can be created with no ``AtomicInterval``, i.e., empty.
 
 
 **1.0.4** (2018-04-03)

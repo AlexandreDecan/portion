@@ -11,7 +11,11 @@ __description__ = 'Python Intervals Arithmetic'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
 
 
-__ALL__ = ['inf', 'CLOSED', 'OPEN', 'Interval', 'AtomicInterval', 'open', 'closed', 'openclosed', 'closedopen']
+__ALL__ = [
+    'inf', 'CLOSED', 'OPEN',
+    'Interval', 'AtomicInterval',
+    'open', 'closed', 'openclosed', 'closedopen', 'singleton'
+]
 
 
 class _PInf:
@@ -83,9 +87,16 @@ def openclosed(lower, upper):
 
 def closedopen(lower, upper):
     """
-        Create an right-open interval with given bounds.
+    Create an right-open interval with given bounds.
     """
     return Interval(AtomicInterval(CLOSED, lower, upper, OPEN))
+
+
+def singleton(value):
+    """
+    Create a singleton
+    """
+    return Interval(AtomicInterval(CLOSED, value, value, CLOSED))
 
 
 class AtomicInterval:
@@ -293,13 +304,15 @@ class AtomicInterval:
     def __repr__(self):
         if self.is_empty():
             return '()'
-
-        return '{}{},{}{}'.format(
-            '[' if self._left == CLOSED else '(',
-            repr(self._lower),
-            repr(self._upper),
-            ']' if self._right == CLOSED else ')',
-        )
+        elif self._lower == self._upper:
+            return '[{}]'.format(self._lower)
+        else:
+            return '{}{},{}{}'.format(
+                '[' if self._left == CLOSED else '(',
+                repr(self._lower),
+                repr(self._upper),
+                ']' if self._right == CLOSED else ')',
+            )
 
 
 class Interval:
@@ -308,18 +321,16 @@ class Interval:
     Consider using open, closed, openclosed or closedopen to create an Interval.
     """
 
-    def __init__(self, interval, *intervals):
+    def __init__(self, *intervals):
         self._intervals = set()
 
-        self._intervals.add(interval)
         for interval in intervals:
-            self._intervals.add(interval)
+            if not interval.is_empty():
+                self._intervals.add(interval)
 
-        self._clean()
+        self._simplify()
 
-    def _clean(self):
-        # Remove empty intervals
-        self._intervals = {i for i in self._intervals if not i.is_empty()}
+    def _simplify(self):
 
         # Remove intervals contained in other ones
         to_remove = set()
@@ -343,7 +354,7 @@ class Interval:
         # Do until nothing change
         self._intervals = self._intervals.difference(to_remove).union(to_add)
         if len(to_remove) + len(to_add) > 0:
-            self._clean()
+            self._simplify()
 
         # If there is no remaining interval, set the empty one
         if len(self._intervals) == 0:
