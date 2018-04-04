@@ -290,6 +290,24 @@ class AtomicInterval:
         else:
             return NotImplemented
 
+    def __lt__(self, other):
+        if isinstance(other, AtomicInterval):
+            return self._upper <= other._lower and not self.overlaps(other)
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, AtomicInterval):
+            return self._lower >= other._upper and not self.overlaps(other)
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __ge__(self, other):
+        return self > other or self == other
+
     def __hash__(self):
         try:
             return hash(self._lower)
@@ -361,27 +379,10 @@ class Interval:
         Return an AtomicInterval instance that contains this Interval.
         :return: An AtomicInterval instance that contains this Interval.
         """
-        first = self._intervals[0]
-
-        lower = first.lower
-        left = first.left
-        upper = first.upper
-        right = first.right
-
-        for interval in self._intervals:
-            if interval.lower < lower:
-                lower = interval.lower
-                left = interval.left
-            elif interval.lower == lower:
-                if left == OPEN and interval.left == CLOSED:
-                    left = CLOSED
-
-            if interval.upper > upper:
-                upper = interval.upper
-                right = interval.right
-            elif interval.upper == upper:
-                if right == OPEN and interval.right == CLOSED:
-                    right = CLOSED
+        lower = self._intervals[0].lower
+        left = self._intervals[0].left
+        upper = self._intervals[-1].upper
+        right = self._intervals[-1].right
 
         return AtomicInterval(left, lower, upper, right)
 
@@ -510,7 +511,29 @@ class Interval:
         elif isinstance(other, Interval):
             return self._intervals == other._intervals
         else:
-            return False
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, AtomicInterval):
+            return self._intervals[-1] < other
+        elif isinstance(other, Interval):
+            return self._intervals[-1] < other._intervals[0]
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, AtomicInterval):
+            return self._intervals[0] > other
+        elif isinstance(other, Interval):
+            return self._intervals[0] > other._intervals[-1]
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __ge__(self, other):
+        return self > other or self == other
 
     def __hash__(self):
         return hash(self._intervals[0])

@@ -77,29 +77,6 @@ For convenience, ``Interval`` are automatically simplified:
 
 Both classes support interval arithmetic:
 
- - ``x.is_empty()`` tests if the interval is empty.
-
-   ```python
-   >>> I.closed(0, 1).is_empty()
-   False
-   >>> I.closed(0, 0).is_empty()
-   False
-   >>> I.openclosed(0, 0).is_empty()
-   True
-   >>> I.empty().is_empty()
-   True
-   ```
-
- - ``x.overlaps(other)`` test if there is an overlap between two intervals. This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
-
-   ```python
-   >>> I.closed(1, 2).overlaps(I.closed(2, 3))
-   True
-   >>> I.closed(1, 2).overlaps(I.open(2, 3))
-   False
-   >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
-   True
-   ```
 
  - ``x.intersection(other)`` or ``x & other`` returns the intersection of two intervals.
    ```python
@@ -107,6 +84,10 @@ Both classes support interval arithmetic:
    [1,2]
    >>> I.closed(0, 4) & I.open(2, 3)
    (2,3)
+   >>> I.closed(0, 2) & I.closed(2, 3)
+   [2]
+   >>> I.closed(0, 2) & I.closed(3, 4)
+   ()
    ```
  - ``x.union(other)`` or ``x | other`` returns the union of two intervals.
    ```python
@@ -114,15 +95,6 @@ Both classes support interval arithmetic:
    [0,2]
    >>> I.closed(0, 1) | I.closed(2, 3)
    [0,1] | [2,3]
-   ```
- - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval. Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
-   ```python
-   >>> 2 in I.closed(0, 2)
-   True
-   >>> 2 in I.open(0, 2)
-   False
-   >> I.open(0, 1) in I.closed(0, 2)
-   True
    ```
  - ``x.complement(other)`` or ``~x`` returns the complement of the interval.
    ```python
@@ -145,6 +117,50 @@ Both classes support interval arithmetic:
    >>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
    True
    ```
+ - ``x.is_empty()`` tests if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).is_empty()
+   False
+   >>> I.closed(0, 0).is_empty()
+   False
+   >>> I.openclosed(0, 0).is_empty()
+   True
+   >>> I.empty().is_empty()
+   True
+   ```
+ - ``x.overlaps(other)`` test if there is an overlap between two intervals. This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
+   ```python
+   >>> I.closed(1, 2).overlaps(I.closed(2, 3))
+   True
+   >>> I.closed(1, 2).overlaps(I.open(2, 3))
+   False
+   >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
+   True
+   ```
+ - ``x.contains(other)`` or ``other in x`` returns True if given item is contained in the interval. Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
+   ```python
+   >>> 2 in I.closed(0, 2)
+   True
+   >>> 2 in I.open(0, 2)
+   False
+   >> I.open(0, 1) in I.closed(0, 2)
+   True
+   ```
+
+Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using ``==, !=, <, <=, >`` and ``>=``.
+The comparison is based on the full interval, not only on one bound or the other:
+
+```python
+>>> I.closed(0, 2) < I.closed(3, 4)
+True
+>>> I.closed(0, 2) < I.closed(2, 3)
+False
+>>> I.closed(0, 2) <= I.closed(2, 3)
+False
+>>> I.closed(0, 2) | I.closed(5, 6) <= I.closed(3, 4)
+False
+```
+
 
 Additionally, an ``Interval`` provides:
 
@@ -186,6 +202,7 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 ** Unreleased**
 
+ - Both ``AtomicInterval`` and ``Interval`` are fully comparable.
  - Add ``singleton(x)`` to create a singleton interval [x].
  - Add ``empty()`` to create an empty interval.
  - Add ``Interval.enclosure()`` that returns the smallest interval that includes the current one.

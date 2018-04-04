@@ -38,6 +38,20 @@ def test_creation():
     assert I.empty() == I.Interval()
 
 
+def test_hash():
+    assert hash(I.closed(0, 1).to_atomic()) is not None
+    assert hash(I.closed(0, 1)) is not None
+
+    # Even for unhashable bounds
+    with pytest.raises(TypeError):
+        hash(I.inf)
+    with pytest.raises(TypeError):
+        hash(-I.inf)
+
+    assert hash(I.closed(-I.inf, I.inf).to_atomic()) is not None
+    assert hash(I.closed(-I.inf, I.inf)) is not None
+
+
 def test_to_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
     for interval in intervals:
@@ -76,6 +90,79 @@ def test_emptyness():
     assert not I.closed(1, 1).is_empty()
     assert I.Interval().is_empty()
     assert I.empty().is_empty()
+
+
+def test_atomic_comparisons():
+    i1, i2, i3 = I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)
+    i1, i2, i3 = i1.to_atomic(), i2.to_atomic(), i3.to_atomic()
+
+    assert i1 == i1
+    assert i1 != i2
+    assert i1 != i3
+
+    assert i1 < i3
+    assert i1 <= i3
+    assert not (i1 < i2)
+    assert not (i1 <= i2)
+    assert i3 > i1
+    assert i3 >= i1
+    assert not (i2 > i1)
+    assert not (i2 >= i1)
+
+    assert not i1 == 1
+
+    with pytest.raises(TypeError):
+        i1 > 1
+    with pytest.raises(TypeError):
+        i1 >= 1
+    with pytest.raises(TypeError):
+        i1 < 1
+    with pytest.raises(TypeError):
+        i1 <= 1
+
+
+def test_comparisons():
+    i1, i2, i3 = I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)
+
+    assert i1 == i1
+    assert i1 != i2
+    assert i1 != i3
+
+    assert i1 < i3
+    assert i1 <= i3
+    assert not (i1 < i2)
+    assert not (i1 <= i2)
+    assert i3 > i1
+    assert i3 >= i1
+    assert not (i2 > i1)
+    assert not (i2 >= i1)
+
+    i4 = i1 | i3
+
+    assert i4 != i2
+    assert not i4 < i2
+    assert not i4 <= i2
+    assert not i4 > i2
+    assert not i4 >= i2
+
+    i5 = I.closed(5, 6) | I.closed(7, 8)
+
+    assert i4 != i5
+    assert i4 < i5
+    assert i4 <= i5
+    assert not i4 > i5
+    assert not i4 >= i5
+
+    assert not i1 == 1
+
+    with pytest.raises(TypeError):
+        i1 > 1
+    with pytest.raises(TypeError):
+        i1 >= 1
+    with pytest.raises(TypeError):
+        i1 < 1
+    with pytest.raises(TypeError):
+        i1 <= 1
 
 
 def test_containment():
