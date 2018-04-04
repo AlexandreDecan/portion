@@ -36,7 +36,7 @@ projects without the need for an explicit dependency (hint: don't do that!).
 
 ## Documentation & usage
 
-### Interval instantiation
+### Interval creation
 
 Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the following functions:
 
@@ -90,7 +90,6 @@ When infinites are used as a lower or upper bound, the corresponding boundary is
 ### Arithmetic operations
 
 Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic operations:
-
 
  - ``x.is_empty()`` tests if the interval is empty.
    ```python
