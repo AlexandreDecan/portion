@@ -1,5 +1,5 @@
 __name__ = 'python-intervals'
-__version__ = '1.0.4'
+__version__ = '1.1.0'
 __author__ = 'Alexandre Decan'
 __author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'
