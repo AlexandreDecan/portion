@@ -47,6 +47,9 @@ def test_to_interval_to_atomic():
     assert I.closed(0, 1) | I.closed(2, 3) != I.closed(0, 3)
     assert (I.closed(0, 1) | I.closed(2, 3)).to_atomic() == I.closed(0, 3)
 
+    assert I.closed(0, 1).to_atomic() == I.closed(0, 1).enclosure()
+    assert (I.closed(0, 1) | I.closed(2, 3)).enclosure() == I.closed(0, 3)
+
 
 def test_overlaps():
     assert I.closed(0, 1).overlaps(I.closed(0, 1))
@@ -121,11 +124,6 @@ def test_intersection():
     assert I.openclosed(0, 1) & I.closedopen(0, 1) == I.open(0, 1)
     assert (I.closed(0, 1) & I.closed(2, 3)).is_empty()
 
-    with pytest.raises(TypeError):
-        I.closed(0, 1) & 1
-    with pytest.raises(TypeError):
-        I.closed(0, 1).to_atomic() & 1
-
 
 def test_union():
     assert I.closed(1, 2).to_atomic() | I.closed(1, 2).to_atomic() == I.closed(1, 2).to_atomic()
@@ -155,11 +153,6 @@ def test_union():
     assert (I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)).is_atomic()
     assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
 
-    with pytest.raises(TypeError):
-        I.closed(0, 1) | 1
-    with pytest.raises(TypeError):
-        I.closed(0, 1).to_atomic() | 1
-
 
 def test_complement():
     assert ~I.closed(1, 2) == I.open(-I.inf, 1) | I.open(2, I.inf)
@@ -180,10 +173,35 @@ def test_difference():
     assert I.closed(0, 1) - I.closed(2, 3) == I.closed(0, 1)
     assert I.closed(0, 4) - I.closed(2, 3) == I.closedopen(0, 2) | I.openclosed(3, 4)
 
+
+def test_proxy_methods():
+    i1, i2 = I.closed(0, 1), I.closed(2, 3)
+    assert i1 & i2 == i1.intersection(i2)
+    assert i1 | i2 == i1.union(i2)
+    assert (i1 in i2) == i2.contains(i1)
+    assert ~i1 == i1.complement()
+    assert i1 - i2 == i1.difference(i2)
+
     with pytest.raises(TypeError):
-        I.closed(0, 1) - 1
+        i1 & 1
     with pytest.raises(TypeError):
-        I.closed(0, 1).to_atomic() - 1
+        i1 | 1
+    with pytest.raises(TypeError):
+        i1 - 1
+
+    i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+    assert i1 & i2 == i1.intersection(i2)
+    assert i1 | i2 == i1.union(i2)
+    assert (i1 in i2) == i2.contains(i1)
+    assert ~i1 == i1.complement()
+    assert i1 - i2 == i1.difference(i2)
+
+    with pytest.raises(TypeError):
+        i1 & 1
+    with pytest.raises(TypeError):
+        i1 | 1
+    with pytest.raises(TypeError):
+        i1 - 1
 
 
 def test_example():

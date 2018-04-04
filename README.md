@@ -148,8 +148,18 @@ Both classes support interval arithmetic:
 
 Additionally, an ``Interval`` provides:
 
+ - ``x.enclosure()`` returns the smallest interval that includes the current one.
+   ```python
+   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
+   [0,3]
+   ```
  - ``x.is_atomic()`` evaluates to ``True`` if interval is the union of a single (possibly empty) atomic interval.
- - ``x.to_atomic()`` returns the smallest ``AtomicInterval`` that contains the interval(s).
+   ```python
+   >>> I.closed(0, 2).is_atomic(), (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   (True, False)
+   ```
+ - ``x.to_atomic()`` returns the smallest ``AtomicInterval`` that contains the interval(s). Is equivalent to ``x.enclosure()``
+ but returns an ``AtomicInterval`` instead of an ``Interval`` object.
  - Iteration protocol for the underlying set of ``AtomicInterval``, sorted by their lower bound value.
 
 The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed with its ``left``, ``right``, ``lower`` and ``upper`` attribute.
@@ -176,7 +186,11 @@ LGPLv3 - GNU Lesser General Public License, version 3
 
 ** Unreleased**
 
- - Add ``singleton`` and ``empty`` helpers to create singletons and empty intervals.
+ - Add ``singleton(x)`` to create a singleton interval [x].
+ - Add ``empty()`` to create an empty interval.
+ - Add ``Interval.enclosure()`` that returns the smallest interval that includes the current one.
+ - Interval simplification is in O(n) instead of O(n*m).
+ - ``AtomicInterval`` in an ``Interval`` are sorted by lower bound.
 
 
 **1.0.4** (2018-04-03)

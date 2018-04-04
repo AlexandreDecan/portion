@@ -1,7 +1,3 @@
-from itertools import combinations, permutations
-import operator
-
-
 __name__ = 'python-intervals'
 __version__ = '1.0.4'
 __author__ = 'Alexandre Decan'
@@ -181,6 +177,21 @@ class AtomicInterval:
         return first._upper > second._lower
 
     def intersection(self, other):
+        return self & other
+
+    def union(self, other):
+        return self | other
+
+    def contains(self, item):
+        return item in self
+
+    def complement(self):
+        return ~self
+
+    def difference(self, other):
+        return self - other
+
+    def __and__(self, other):
         if isinstance(other, AtomicInterval):
             if self._lower == other._lower:
                 lower = self._lower
@@ -203,9 +214,9 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return other & self
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
+            return NotImplemented
 
-    def union(self, other):
+    def __or__(self, other):
         if isinstance(other, AtomicInterval):
             if self.overlaps(other, permissive=True):
                 if self._lower == other._lower:
@@ -228,9 +239,9 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return other | self
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
+            return NotImplemented
 
-    def contains(self, item):
+    def __contains__(self, item):
         """
         Return True if given item is contained in this atomic interval.
         Item must be either a value, an AtomicInterval or an Interval.
@@ -253,42 +264,19 @@ class AtomicInterval:
             right = (item <= self._upper) if self._right == CLOSED else (item < self._upper)
             return left and right
 
-    def complement(self):
+    def __invert__(self):
         inverted_left = OPEN if self._left == CLOSED else CLOSED
         inverted_right = OPEN if self._right == CLOSED else CLOSED
+
         return Interval(
             AtomicInterval(OPEN, -inf, self._lower, inverted_left),
             AtomicInterval(inverted_right, self._upper, inf, OPEN)
         )
 
-    def difference(self, other):
+    def __sub__(self, other):
         if isinstance(other, AtomicInterval):
             return self & ~other
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
-
-    def __and__(self, other):
-        try:
-            return self.intersection(other)
-        except TypeError:
-            return NotImplemented
-
-    def __or__(self, other):
-        try:
-            return self.union(other)
-        except TypeError:
-            return NotImplemented
-
-    def __contains__(self, item):
-        return self.contains(item)
-
-    def __invert__(self):
-        return self.complement()
-
-    def __sub__(self, other):
-        try:
-            return self.difference(other)
-        except TypeError:
             return NotImplemented
 
     def __eq__(self, other):
@@ -329,40 +317,38 @@ class Interval:
     """
 
     def __init__(self, *intervals):
-        self._intervals = set()
+        self._intervals = list()
 
         for interval in intervals:
             if not interval.is_empty():
-                self._intervals.add(interval)
+                self._intervals.append(interval)
 
         if len(self._intervals) == 0:
-            self._intervals.add(AtomicInterval(OPEN, inf, inf, OPEN))
+            # So we have at least one (empty) interval
+            self._intervals.append(AtomicInterval(OPEN, inf, inf, OPEN))
         else:
-            self._simplify()
+            # Sort intervals by lower bound
+            self._intervals.sort(key=lambda i: i.lower)
 
-    def _simplify(self):
-        # Merge contiguous intervals
-        to_remove = set()
-        to_add = set()
-        for i1, i2 in combinations(self._intervals, 2):
-            if i1 not in to_remove and i2 not in to_remove and i1.overlaps(i2, permissive=True):
-                # Merge i1 and i2
-                i3 = i1 | i2
-                assert isinstance(i3, AtomicInterval)
-                to_remove.add(i1)
-                to_remove.add(i2)
-                to_add.add(i3)
+            i = 0
+            # Attempt to merge consecutive intervals
+            while i < len(self._intervals) - 1:
+                current = self._intervals[i]
+                successor = self._intervals[i + 1]
 
-        # Do until nothing change
-        self._intervals = self._intervals.difference(to_remove).union(to_add)
-        if len(to_remove) + len(to_add) > 0:
-            self._simplify()
+                if current.overlaps(successor, permissive=True):
+                    interval = current | successor
+                    self._intervals.pop(i)
+                    self._intervals.pop(i)
+                    self._intervals.insert(i, interval)
+                else:
+                    i = i + 1
 
     def is_empty(self):
         """
         :return: True if interval is empty.
         """
-        return self.is_atomic() and next(iter(self._intervals)).is_empty()
+        return self.is_atomic() and self._intervals[0].is_empty()
 
     def is_atomic(self):
         """
@@ -375,7 +361,7 @@ class Interval:
         Return an AtomicInterval instance that contains this Interval.
         :return: An AtomicInterval instance that contains this Interval.
         """
-        first = next(iter(self._intervals))
+        first = self._intervals[0]
 
         lower = first.lower
         left = first.left
@@ -398,6 +384,12 @@ class Interval:
                     right = CLOSED
 
         return AtomicInterval(left, lower, upper, right)
+
+    def enclosure(self):
+        """
+        :return: Smallest interval that include the current one.
+        """
+        return Interval(self.to_atomic())
 
     def overlaps(self, other, permissive=False):
         """
@@ -423,6 +415,44 @@ class Interval:
         :param other: Other Interval or AtomicInterval
         :return: Intersection between the two intervals
         """
+        return self & other
+
+    def union(self, other):
+        """
+        :param other: Other Interval or AtomicInterval
+        :return: Union of given intervals
+        """
+        return self | other
+
+    def contains(self, item):
+        """
+        Return True if given item is contained in this interval.
+        Item must be either a value, an AtomicInterval or an Interval.
+        :param item: a value, an AtomicInterval or an Interval
+        :return: True if given item is contained in this interval.
+        """
+        return item in self
+
+    def complement(self):
+        """
+        :return: The complement for this interval.
+        """
+        return ~self
+
+    def difference(self, other):
+        """
+        :param other: Other Interval or AtomicInterval
+        :return: Difference betwen given intervals.
+        """
+        return self - other
+
+    def __len__(self):
+        return len([i for i in self._intervals if not i.is_empty()])
+
+    def __iter__(self):
+        return iter([i for i in self._intervals if not i.is_empty()])
+
+    def __and__(self, other):
         if isinstance(other, (AtomicInterval, Interval)):
             if isinstance(other, AtomicInterval):
                 intervals = [other]
@@ -434,27 +464,17 @@ class Interval:
                     new_intervals.append(interval & o_interval)
             return Interval(*new_intervals)
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
+            return NotImplemented
 
-    def union(self, other):
-        """
-        :param other: Other Interval or AtomicInterval
-        :return: Union of given intervals
-        """
+    def __or__(self, other):
         if isinstance(other, AtomicInterval):
             return self | Interval(other)
         elif isinstance(other, Interval):
             return Interval(*(list(self._intervals) + list(other._intervals)))
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
+            return NotImplemented
 
-    def contains(self, item):
-        """
-        Return True if given item is contained in this interval.
-        Item must be either a value, an AtomicInterval or an Interval.
-        :param item: a value, an AtomicInterval or an Interval
-        :return: True if given item is contained in this interval.
-        """
+    def __contains__(self, item):
         if isinstance(item, Interval):
             for o_interval in item._intervals:
                 if o_interval not in self:
@@ -471,59 +491,17 @@ class Interval:
                     return True
             return False
 
-    def complement(self):
-        """
-        :return: The complement for this interval.
-        """
-        complements = map(operator.invert, self._intervals)
-        intersection = next(iter(complements))
+    def __invert__(self):
+        complements = [~i for i in self._intervals]
+        intersection = complements[0]
         for interval in complements:
             intersection = intersection & interval
         return intersection
 
-    def difference(self, other):
-        """
-        :param other: Other Interval or AtomicInterval
-        :return: Difference betwen given intervals.
-        """
+    def __sub__(self, other):
         if isinstance(other, (AtomicInterval, Interval)):
             return self & ~other
         else:
-            raise TypeError('Unsupported type {} for {}'.format(type(other), other))
-
-    def __len__(self):
-        return len([i for i in self._intervals if not i.is_empty()])
-
-    def __iter__(self):
-        return iter(
-            sorted(
-                [i for i in self._intervals if not i.is_empty()]
-                , key=lambda i: i.lower
-            )
-        )
-
-    def __and__(self, other):
-        try:
-            return self.intersection(other)
-        except TypeError:
-            return NotImplemented
-
-    def __or__(self, other):
-        try:
-            return self.union(other)
-        except TypeError:
-            return NotImplemented
-
-    def __contains__(self, item):
-        return self.contains(item)
-
-    def __invert__(self):
-        return self.complement()
-
-    def __sub__(self, other):
-        try:
-            return self.difference(other)
-        except TypeError:
             return NotImplemented
 
     def __eq__(self, other):
@@ -532,10 +510,10 @@ class Interval:
         elif isinstance(other, Interval):
             return self._intervals == other._intervals
         else:
-            return NotImplemented
+            return False
 
     def __hash__(self):
-        return hash(next(iter(self._intervals)))
+        return hash(self._intervals[0])
 
     def __repr__(self):
         return ' | '.join(repr(i) for i in self._intervals)
