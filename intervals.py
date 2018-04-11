@@ -1,13 +1,12 @@
-__name__ = 'python-intervals'
+__package__ = 'python-intervals'
 __version__ = '1.3.0'
-__author__ = 'Alexandre Decan'
-__author_email__ = 'alexandre.decan@lexpage.net'
 __licence__ = 'LGPL3'
-__description__ = 'Python Intervals Arithmetic'
+__author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
+__description__ = 'Interval arithmetic for Python'
 
 
-__ALL__ = [
+__all__ = [
     'inf', 'CLOSED', 'OPEN',
     'Interval', 'AtomicInterval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
@@ -16,7 +15,7 @@ __ALL__ = [
 
 class _PInf:
     """
-    Use to represent positive infinity.
+    Represent positive infinity.
     """
 
     def __neg__(self): return _NInf()
@@ -36,7 +35,7 @@ class _PInf:
 
 class _NInf:
     """
-    Use to represent negative infinity.
+    Represent negative infinity.
     """
 
     def __neg__(self): return _PInf()
@@ -54,10 +53,12 @@ class _NInf:
     def __repr__(self): return '-inf'
 
 
+# Positive infinity
 inf = _PInf()
 
-OPEN = False
+# Boundary types (True for inclusive, False for exclusive)
 CLOSED = True
+OPEN = False
 
 
 def open(lower, upper):
@@ -90,75 +91,93 @@ def closedopen(lower, upper):
 
 def singleton(value):
     """
-    Create a singleton
+    Create a singleton.
     """
     return Interval(AtomicInterval(CLOSED, value, value, CLOSED))
 
 
 def empty():
     """
-    Create an empty set
+    Create an empty set.
     """
     return Interval(AtomicInterval(OPEN, inf, inf, OPEN))
 
 
 class AtomicInterval:
     """
-    Represent an (open/closed) interval.
+    This class represents an atomic interval.
+
+    An atomic interval is a single interval, with a lower and upper bounds, and two (closed or open) boundaries.
     """
 
     def __init__(self, left, lower, upper, right):
+        """
+        Create an atomic interval.
+
+        If a bound is set to infinity (regardless of its sign), the corresponding boundary will be exclusive.
+
+        :param left: Boolean indicating whether the left boundary is inclusive (True) or exclusive (False).
+        :param lower: lower bound value.
+        :param upper: upper bound value. Must be greater or equal to lower bound.
+        :param right: Boolean indicating whether the right boundary is inclusive (True) or exclusive (False).
+        """
         if lower > upper:
             raise ValueError(
-                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'.format(lower, upper))
+                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'
+                .format(lower, upper)
+            )
 
-        self._left = left if lower != -inf else OPEN
+        self._left = left if lower not in [inf, -inf] else OPEN
         self._lower = lower
         self._upper = upper
-        self._right = right if upper != inf else OPEN
+        self._right = right if upper not in [inf, -inf] else OPEN
 
     @property
     def left(self):
         """
-        Left boundary, either CLOSED or OPEN.
+        Boolean indicating whether the left boundary is inclusive (True) or exclusive (False).
         """
         return self._left
 
     @property
     def lower(self):
         """
-        Lower bound.
+        Lower bound value.
         """
         return self._lower
 
     @property
     def upper(self):
         """
-        Upper bound.
+        Upper bound value.
         """
         return self._upper
 
     @property
     def right(self):
         """
-        Right boundary, either CLOSED or OPEN.
+        Boolean indicating whether the right boundary is inclusive (True) or exclusive (False).
         """
         return self._right
 
     def is_empty(self):
         """
-        :return: True if interval is empty
+        Test interval emptiness.
+
+        :return: True if interval is empty, False otherwise.
         """
         return self._lower == self._upper and (self._left == OPEN or self._right == OPEN)
 
     def overlaps(self, other, permissive=False):
         """
-        Return True if sets have any overlapping value.
+        Test if intervals have any overlapping value.
 
-        If 'permissive' is set to True, it considers [1, 2) and [2, 3] as an
-        overlap on value 2, not [1, 2) and (2, 3].
+        If 'permissive' is set to True (default is False), then [1, 2) and [2, 3] are considered as having
+        an overlap on value 2 (but not [1, 2) and (2, 3]).
 
-        Only supports AtomicInterval.
+        :param other: an atomic interval.
+        :param permissive: set to True to consider contiguous intervals as well.
+        :return True if intervals overlap, False otherwise.
         """
         if not isinstance(other, AtomicInterval):
             raise TypeError('Only AtomicInterval instances are supported.')
@@ -177,18 +196,52 @@ class AtomicInterval:
         return first._upper > second._lower
 
     def intersection(self, other):
+        """
+        Return the intersection of two intervals.
+
+        :param other: an interval.
+        :return: the intersection of the intervals.
+        """
         return self & other
 
     def union(self, other):
+        """
+        Return the union of two intervals. If the union cannot be represented using a single atomic interval,
+        return an Interval instance (which corresponds to an union of atomic intervals).
+
+        :param other: an interval.
+        :return: the union of the intervals.
+        """
         return self | other
 
     def contains(self, item):
+        """
+        Test if given item is contained in this interval.
+        This method accepts atomic intervals, intervals and arbitrary values.
+
+        :param item: an atomic interval, an interval or any arbitrary value.
+        :return: True if given item is contained, False otherwise.
+        """
         return item in self
 
     def complement(self):
+        """
+        Return the complement of this interval.
+
+        Complementing an interval always results in an Interval instance, even if the complement
+        can be encoded as a single atomic interval.
+
+        :return: the complement of this interval.
+        """
         return ~self
 
     def difference(self, other):
+        """
+        Return the difference of two atomic intervals.
+
+        :param other: an atomic interval.
+        :return: the difference of the intervals.
+        """
         return self - other
 
     def __and__(self, other):
@@ -342,12 +395,21 @@ class AtomicInterval:
 
 class Interval:
     """
-    Represent an interval (union of atomic intervals).
-    Can be instanciated by providing AtomicIntervals, but consider using one of the helpers
-    to create Interval objects (open, closed, openclosed, closedopen, singleton, or empty).
+    This class represents an interval.
+
+    An interval is an (automatically simplified) union of atomic intervals.
+    It can be created either by passing atomic intervals, or by using one of the helpers
+    provided in this module (open(..), closed(..), etc).
+
+    Unless explicitly specified, all operations on an Interval instance return Interval instances.
     """
 
     def __init__(self, *intervals):
+        """
+        Create an interval from a list of atomic intervals.
+
+        :param intervals: a list of atomic intervals.
+        """
         self._intervals = list()
 
         for interval in intervals:
@@ -377,20 +439,25 @@ class Interval:
 
     def is_empty(self):
         """
-        :return: True if interval is empty.
+        Test interval emptiness.
+
+        :return: True iff interval is empty.
         """
         return self.is_atomic() and self._intervals[0].is_empty()
 
     def is_atomic(self):
         """
-        :return: True if interval is atomic (ie. union of a single (possibly empty) atomic interval).
+        Test interval atomicity. An interval is atomic if it is composed of a single atomic interval.
+
+        :return: True if this interval is atomic, False otherwise.
         """
         return len(self._intervals) == 1
 
     def to_atomic(self):
         """
-        Return an AtomicInterval instance that contains this Interval.
-        :return: An AtomicInterval instance that contains this Interval.
+        Return the smallest atomic interval containing this interval.
+
+        :return: an AtomicInterval instance.
         """
         lower = self._intervals[0].lower
         left = self._intervals[0].left
@@ -401,15 +468,23 @@ class Interval:
 
     def enclosure(self):
         """
-        :return: Smallest interval that include the current one.
+        Return the smallest interval composed of a single atomic interval that encloses the current interval.
+        Is equivalent to Interval(self.to_atomic())
+
+        :return: an Interval instance.
         """
         return Interval(self.to_atomic())
 
     def overlaps(self, other, permissive=False):
         """
-        Return True if intervals have any overlapping value.
-        If 'permissive' is set to True, it considers [1, 2) and [2, 3] as an
-        overlap on value 2, not [1, 2) and (2, 3].
+        Test if intervals have any overlapping value.
+
+        If 'permissive' is set to True (default is False), then [1, 2) and [2, 3] are considered as having
+        an overlap on value 2 (but not [1, 2) and (2, 3]).
+
+        :param other: an interval or atomic interval.
+        :param permissive: set to True to consider contiguous intervals as well.
+        :return True if intervals overlap, False otherwise.
         """
         if isinstance(other, AtomicInterval):
             for interval in self._intervals:
@@ -426,37 +501,46 @@ class Interval:
 
     def intersection(self, other):
         """
-        :param other: Other Interval or AtomicInterval
-        :return: Intersection between the two intervals
+        Return the intersection of two intervals.
+
+        :param other: an interval or atomic interval.
+        :return: the intersection of the intervals.
         """
         return self & other
 
     def union(self, other):
         """
-        :param other: Other Interval or AtomicInterval
-        :return: Union of given intervals
+        Return the union of two intervals.
+
+        :param other: an interval or atomic interval.
+        :return: the union of the intervals.
         """
         return self | other
 
     def contains(self, item):
         """
-        Return True if given item is contained in this interval.
-        Item must be either a value, an AtomicInterval or an Interval.
-        :param item: a value, an AtomicInterval or an Interval
-        :return: True if given item is contained in this interval.
+        Test if given item is contained in this interval.
+        This method accepts atomic intervals, intervals and arbitrary values.
+
+        :param item: an atomic interval, an interval or any arbitrary value.
+        :return: True if given item is contained, False otherwise.
         """
         return item in self
 
     def complement(self):
         """
-        :return: The complement for this interval.
+        Return the complement of this interval.
+
+        :return: the complement of this interval.
         """
         return ~self
 
     def difference(self, other):
         """
-        :param other: Other Interval or AtomicInterval
-        :return: Difference betwen given intervals.
+        Return the difference of two intervals.
+
+        :param other: an interval or an atomic interval.
+        :return: the difference of the intervals.
         """
         return self - other
 

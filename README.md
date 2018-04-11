@@ -1,5 +1,3 @@
-
-
 # Interval arithmetic for Python
 
 [![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
