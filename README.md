@@ -51,7 +51,6 @@ following helpers:
 >>> I.empty()
 ()
 
-
 ```
 
 Intervals created with this library are ``Interval`` instances.
