@@ -237,9 +237,9 @@ class AtomicInterval:
 
     def difference(self, other):
         """
-        Return the difference of two atomic intervals.
+        Return the difference of two intervals.
 
-        :param other: an atomic interval.
+        :param other: an interval.
         :return: the difference of the intervals.
         """
         return self - other
@@ -264,8 +264,6 @@ class AtomicInterval:
                 return AtomicInterval(left, lower, upper, right)
             else:
                 return AtomicInterval(OPEN, lower, lower, OPEN)
-        elif isinstance(other, Interval):
-            return other & self
         else:
             return NotImplemented
 
@@ -289,8 +287,6 @@ class AtomicInterval:
                 return AtomicInterval(left, lower, upper, right)
             else:
                 return Interval(self, other)
-        elif isinstance(other, Interval):
-            return other | self
         else:
             return NotImplemented
 
@@ -576,6 +572,9 @@ class Interval:
         else:
             return NotImplemented
 
+    def __rand__(self, other):
+        return self & other
+
     def __or__(self, other):
         if isinstance(other, AtomicInterval):
             return self | Interval(other)
@@ -583,6 +582,9 @@ class Interval:
             return Interval(*(list(self._intervals) + list(other._intervals)))
         else:
             return NotImplemented
+
+    def __ror__(self, other):
+        return self | other
 
     def __contains__(self, item):
         if isinstance(item, Interval):
@@ -613,6 +615,9 @@ class Interval:
             return self & ~other
         else:
             return NotImplemented
+
+    def __rsub__(self, other):
+        return other & ~self
 
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
