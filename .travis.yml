@@ -3,7 +3,6 @@ python:
 - 3.4
 - 3.5
 - 3.6
-- nightly
 install:
 - pip install pip -U
 - pip install coverage pytest coveralls
@@ -22,6 +21,3 @@ deploy:
     branch: master
     tags: true
     python: '3.5'
-matrix:
-  allow_failures:
-  - python: nightly
