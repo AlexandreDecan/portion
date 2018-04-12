@@ -2,7 +2,7 @@
 
 [![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/python-intervals/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)
-[![PyPi](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
+[![PyPI](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 
 This library provides interval arithmetic for Python 3.4+.
@@ -23,7 +23,7 @@ You can use ``pip`` to install this library:
 
 ``pip install python-intervals``
 
-This will install the latest available version from *pypi* branch.
+This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
 Prereleases are available from the *master* branch.
 
 For convenience, the library is contained within a single Python file, and can thus be easily integrated in other

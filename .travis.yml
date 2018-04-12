@@ -19,7 +19,8 @@ deploy:
   password:
     secure: NeDtvSrMFndtVsaDfXl65OIhH4VNKRSqae3Cm7EeD1ZKEzsj4z80N51BtT7TAqB8raGEqv/AktZUzyf66k/JWSUQqRUNnFw8MpxkSLHwbh3RbyDTqCyXTZOs2KoWKcH+tubPq/RtbeMJVlTD1ysCtVLHeoBVAXFXo6maNA8eSYRKjCOLtuto60ltPOfPcWyRcvRv9uulScc7Mgepke8i2X2gkMDoNSiDT7BMOxY7gvecJ9FMQ+os6d+pTF9xCRx+7eS8s7s8nM29N5t9MV9WM4xq5xbmCD3BTYuNupvP3/6kSwr5RO9qLn+M9SZKZgqqT6Wi+CwAQtKxdnym07MKcBEXYiB7flUkJOOpqmWJw8Fm9yfNkXEyWdaBh54CZl84dHmnJ6OsPYk1RTQPuUE84Z8VKb/TKZJ47L6vob+627wAmpNqH2ASu165IlMaTfdpHRzC89z/TDsC5G+u8mqOKBWQ3ZonPbR/R2EAHAwtQESnGTMN2kiqJGA2gFu+dVKnUtXUm9kewzQgkM5zLv9YY5JPMI9d4LDVFtov69wzQuSGGIsvP7F7g9uiyuWSbtua4L8KwE7efdtLOrHHj4cBU71fgCN1lIo0sB/okWTsxi662EZxvL7MSywyjP93Xsk2gYl/rW02Ri1qxyOsNcLcNgsXCJYjXYTFLaIOWuNES8k=
   on:
-    branch: pypi
+    branch: master
+    tags: true
     python: '3.5'
 matrix:
   allow_failures:
