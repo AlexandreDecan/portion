@@ -269,6 +269,10 @@ def test_difference():
     assert I.closed(0, 1) - I.closed(2, 3) == I.closed(0, 1)
     assert I.closed(0, 4) - I.closed(2, 3) == I.closedopen(0, 2) | I.openclosed(3, 4)
 
+    assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4).to_atomic() - I.closed(2, 3)
+    assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4).to_atomic() - I.closed(2, 3).to_atomic()
+    assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4) - I.closed(2, 3).to_atomic()
+
 
 def test_proxy_methods():
     i1, i2 = I.closed(0, 1), I.closed(2, 3)
