@@ -311,7 +311,7 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**Unreleased**
+**1.3.1** (2018-04-12)
 
  - Define `__slots__` to lower memory usage, and to speed up attribute access.
  - Define `Interval.__rand__` (and other magic methods) to support `Interval` from `AtomicInterval` instead of

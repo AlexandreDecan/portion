@@ -1,5 +1,5 @@
 __package__ = 'python-intervals'
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
