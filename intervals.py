@@ -8,7 +8,7 @@ __description__ = 'Interval arithmetic for Python'
 
 __all__ = [
     'inf', 'CLOSED', 'OPEN',
-    'Interval', 'AtomicInterval',
+    'Interval',  # 'AtomicInterval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
 ]
 

@@ -299,6 +299,9 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
+**Unreleased**
+
+ - Fix `__all__`.
 
 **1.3.0** (2018-04-04)
 
