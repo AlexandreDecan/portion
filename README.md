@@ -24,7 +24,7 @@ You can use ``pip`` to install this library:
 ``pip install python-intervals``
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
-Prereleases are available from the *master* branch.
+Prereleases are available from its *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
 
 For convenience, the library is contained within a single Python file, and can thus be easily integrated in other
 projects without the need for an explicit dependency (hint: don't do that!).
