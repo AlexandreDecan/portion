@@ -110,6 +110,8 @@ class AtomicInterval:
     An atomic interval is a single interval, with a lower and upper bounds, and two (closed or open) boundaries.
     """
 
+    __slots__ = ('_left', '_lower', '_upper', '_right')
+
     def __init__(self, left, lower, upper, right):
         """
         Create an atomic interval.
@@ -399,6 +401,8 @@ class Interval:
 
     Unless explicitly specified, all operations on an Interval instance return Interval instances.
     """
+
+    __slots__ = ('_intervals',)
 
     def __init__(self, *intervals):
         """

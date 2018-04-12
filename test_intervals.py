@@ -326,7 +326,7 @@ def test_example():
     failure = None
 
     try:
-        doctest.testfile('README.md', raise_on_error=True)
+        doctest.testfile('README.md', raise_on_error=True, globs={'I': I})
     except doctest.DocTestFailure as e:
         failure = e.example.want, e.got, e.example.source
 

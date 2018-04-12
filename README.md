@@ -34,25 +34,23 @@ projects without the need for an explicit dependency (hint: don't do that!).
 
 ### Interval creation
 
-Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the following functions:
-
- - ``I.open(1, 2)`` corresponds to ``(1,2)``;
- - ``I.closed(1, 2)`` corresponds to ``[1,2]``;
- - ``I.openclosed(1, 2)`` corresponds to ``(1,2]``;
- - ``I.closedopen(1, 2)`` corresponds to ``[1,2)``;
- - ``I.singleton(1)`` corresponds to ``[1,1]``;
- - ``I.empty()`` corresponds to the empty interval ``()``.
+Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the
+following helpers:
 
 ```python
->>> import intervals as I
->>> I.closed(0, 3)
-[0,3]
->>> I.openclosed('a', 'z')
-('a','z']
->>> I.singleton(2.5)
-[2.5]
+>>> I.open(1, 2)
+(1,2)
+>>> I.closed(1, 2)
+[1,2]
+>>> I.openclosed(1, 2)
+(1,2]
+>>> I.closedopen(1, 2)
+[1,2)
+>>> I.singleton(1)
+[1]
 >>> I.empty()
 ()
+
 
 ```
 
@@ -87,6 +85,18 @@ When infinites are used as a lower or upper bound, the corresponding boundary is
 
 ```
 
+The bounds of an interval can be any arbitrary values, as long as they are comparable:
+
+```python
+>>> I.closed(1.2, 2.4)
+[1.2,2.4]
+>>> I.closed('a', 'z')
+['a','z']
+>>> from datetime import date
+>>> I.closed(date(2011, 3, 15), date(2013, 10, 10))
+[datetime.date(2011, 3, 15),datetime.date(2013, 10, 10)]
+
+```
 
 Note that discrete intervals are **not** supported, e.g., combining ``[0,1]`` with ``[2,3]`` will **not** result
 in ``[0,3]`` even if there is no integer between ``1`` and ``2``.
@@ -207,8 +217,9 @@ The ``left`` and ``right`` bounds are either ``I.CLOSED`` (``True``) or ``I.OPEN
 ```python
 >> I.CLOSED, I.OPEN
 True, False
->>> [getattr(I.closedopen(0, 1).to_atomic(), attr) for attr in ['left', 'lower', 'upper', 'right']]
-[True, 0, 1, False]
+>>> x = I.closedopen(0, 1).to_atomic()
+>>> x.left, x.lower, x.upper, x.right
+(True, 0, 1, False)
 
 ```
 
@@ -300,13 +311,23 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**Unreleased**
+
+ - Define `__slots__` to lower memory usage, and to speed up attribute access.
+ - Define `Interval.__rand__` (and other magic methods) to support `Interval` from `AtomicInterval` instead of
+ having a dedicated piece of code in `AtomicInterval`.
+ - Fix `__all__`.
+
+
 **1.3.0** (2018-04-04)
 
  - Meaningful ``<=`` and ``>=`` comparisons for intervals.
 
+
 **1.2.0** (2018-04-04)
 
  - ``Interval`` supports indexing to retrieve the underlying ``AtomicInterval`` objects.
+
 
 **1.1.0** (2018-04-04)
 
@@ -317,14 +338,17 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Interval simplification is in O(n) instead of O(n*m).
  - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower and upper bounds.
 
+
 **1.0.4** (2018-04-03)
 
  - All operations of ``AtomicInterval`` (except overlaps) accept ``Interval``.
  - Raise ``TypeError`` instead of ``ValueError`` if type is not supported (coherent with ``NotImplemented``).
 
+
 **1.0.3** (2018-04-03)
 
  - Initial working release on PyPi.
+
 
 **1.0.0** (2018-04-03)
 
