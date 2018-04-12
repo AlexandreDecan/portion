@@ -317,6 +317,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Define `Interval.__rand__` (and other magic methods) to support `Interval` from `AtomicInterval` instead of
  having a dedicated piece of code in `AtomicInterval`.
  - Fix `__all__`.
+ - More tests to cover all comparisons.
 
 
 **1.3.0** (2018-04-04)

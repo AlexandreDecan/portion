@@ -82,6 +82,8 @@ def test_overlaps():
     # Overlaps should reject non supported types
     with pytest.raises(TypeError):
         I.closed(0, 1).to_atomic().overlaps(1)
+    with pytest.raises(TypeError):
+        I.closed(0, 1).overlaps(1)
 
 
 def test_emptyness():
@@ -93,23 +95,26 @@ def test_emptyness():
     assert I.empty().is_empty()
 
 
-def test_atomic_comparisons():
-    i1, i2, i3 = I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)
-    i1, i2, i3 = i1.to_atomic(), i2.to_atomic(), i3.to_atomic()
-
+@pytest.mark.parametrize('i1,i2,i3', [
+    (I.closed(0, 1).to_atomic(), I.closed(1, 2).to_atomic(), I.closed(2, 3).to_atomic()),
+    (I.open(0, 2).to_atomic(), I.open(1, 3).to_atomic(), I.open(2, 4).to_atomic()),
+    (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)),
+    (I.open(0, 2), I.open(1, 3), I.open(2, 4)),
+    (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3).to_atomic()),
+    (I.open(0, 2), I.open(1, 3), I.open(2, 4).to_atomic()),
+    (I.closed(0, 1).to_atomic(), I.closed(1, 2), I.closed(2, 3)),
+    (I.open(0, 2).to_atomic(), I.open(1, 3), I.open(2, 4)),
+])
+def test_atomic_comparisons(i1, i2, i3):
     assert i1 == i1
-    assert i1 != i2
-    assert i1 != i3
+    assert i1 != i2 and i2 != i1
+    assert i1 != i3 and i3 != i1
+    assert i2 != i3 and i3 != i2
 
-    assert i1 < i3
-    assert i1 <= i2
-    assert i1 <= i3
-    assert not (i1 < i2)
-
-    assert i2 >= i1
-    assert i3 > i1
-    assert i3 >= i1
-    assert not (i2 > i1)
+    assert i1 < i3 and i3 > i1
+    assert i1 <= i2 and i2 >= i1
+    assert i1 <= i3 and i3 >= i1
+    assert not i1 < i2 and not i2 > i1
 
     assert not i1 == 1
 
@@ -123,55 +128,28 @@ def test_atomic_comparisons():
         i1 <= 1
 
 
-def test_comparisons():
+def test_comparisons_of_unions():
     i1, i2, i3 = I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)
-
-    assert i1 == i1
-    assert i1 != i2
-    assert i1 != i3
-
-    assert i1 < i3
-    assert not (i1 < i2)
-    assert i1 <= i2
-    assert i1 <= i3
-    assert not (i2 <= i1)
-
-    assert i3 > i1
-    assert not (i2 > i1)
-    assert i2 >= i1
-    assert i3 >= i1
-    assert not (i1 >= i2)
 
     i4 = i1 | i3
 
-    assert i4 != i2
-    assert not i4 < i2
+    assert i4 != i2 and i2 != i4
+    assert not i4 < i2 and not i2 > i4
+    assert not i4 > i2 and not i2 < i4
     assert not i4 <= i2
-    assert not i4 > i2
     assert not i4 >= i2
     assert i2 <= i4
     assert i2 >= i4
 
     i5 = I.closed(5, 6) | I.closed(7, 8)
 
-    assert i4 != i5
-    assert i4 < i5
+    assert i4 != i5 and i5 != i4
+    assert i4 < i5 and i5 > i4
+    assert not i4 > i5 and not i5 < i4
     assert i4 <= i5
     assert i5 >= i4
-    assert not i4 > i5
     assert not i4 >= i5
     assert not i5 <= i4
-
-    assert not i1 == 1
-
-    with pytest.raises(TypeError):
-        i1 > 1
-    with pytest.raises(TypeError):
-        i1 >= 1
-    with pytest.raises(TypeError):
-        i1 < 1
-    with pytest.raises(TypeError):
-        i1 <= 1
 
 
 def test_containment():
