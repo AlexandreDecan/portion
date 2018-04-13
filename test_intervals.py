@@ -4,25 +4,32 @@ import pytest
 import sys
 
 
-def test_infinity():
-    assert I.inf == I.inf
-    assert I.inf >= I.inf
-    assert I.inf <= I.inf
-    assert not (I.inf > I.inf)
-    assert not (I.inf < I.inf)
-    assert not (I.inf != I.inf)
-
-    assert -I.inf == -I.inf
-    assert -I.inf >= -I.inf
-    assert -I.inf <= -I.inf
-    assert not (-I.inf > -I.inf)
-    assert not (-I.inf < -I.inf)
-    assert not (-I.inf != -I.inf)
-
+def test_infinity_comparisons():
     assert I.inf > -I.inf
     assert -I.inf < I.inf
     assert -I.inf != I.inf
     assert not (-I.inf == I.inf)
+
+
+@pytest.mark.parametrize('inf', [I.inf, -I.inf])
+def test_infinity_comparisons_with_self(inf):
+    assert inf == inf
+    assert inf >= inf
+    assert inf <= inf
+    assert not (inf > inf)
+    assert not (inf < inf)
+    assert not (inf != inf)
+
+
+@pytest.mark.parametrize('o', [0, 1, 1.0, 'a', list(), tuple(), dict(), I.closed(0, 1)])
+def test_infinity_comparisons_with_objects(o):
+    assert o != I.inf and not (o == I.inf)
+    assert o < I.inf and I.inf > o
+    assert o <= I.inf and I.inf >= o
+
+    assert o != -I.inf and not (o == -I.inf)
+    assert o > -I.inf and -I.inf < o
+    assert o >= -I.inf and -I.inf <= o
 
 
 def test_creation():
@@ -54,7 +61,7 @@ def test_hash():
     assert hash(I.closed(-I.inf, I.inf)) is not None
 
 
-def test_to_interval_to_atomic():
+def test_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
     for interval in intervals:
         assert interval == I.Interval(interval.to_atomic())
@@ -87,7 +94,7 @@ def test_overlaps():
         I.closed(0, 1).overlaps(1)
 
 
-def test_emptyness():
+def test_emptiness():
     assert I.openclosed(1, 1).is_empty()
     assert I.closedopen(1, 1).is_empty()
     assert I.open(1, 1).is_empty()
@@ -157,7 +164,7 @@ def test_comparisons_of_unions():
     assert not i5 <= i4
 
 
-def test_containment():
+def test_containment_for_values():
     # Values
     assert 1 in I.closed(0, 2)
     assert 1 in I.closed(1, 2)
@@ -173,6 +180,8 @@ def test_containment():
     assert 1 not in I.closed(-I.inf, 0)
     assert 1 not in I.closed(2, I.inf)
 
+
+def test_containment_for_intervals():
     # Intervals
     assert I.closed(1, 2) in I.closed(0, 3)
     assert I.closed(1, 2) in I.closed(1, 2)
@@ -184,6 +193,8 @@ def test_containment():
     assert I.closed(0, 1) in I.closed(-I.inf, I.inf)
     assert I.closed(-I.inf, I.inf) not in I.closed(0, 1)
 
+
+def test_containment_for_atomic_intervals():
     # AtomicIntervals
     assert I.closed(1, 2) in I.closed(0, 3).to_atomic()
     assert I.closed(1, 2) in I.closed(1, 2).to_atomic()
@@ -318,7 +329,7 @@ def test_example():
         failure = e.example.want, e.got, e.example.source
 
     if failure:
-        # Make pytest display it, outside the "except" block to avoid a noisy traceback
+        # Make pytest display it outside the "except" block, to avoid a noisy traceback
         want, got, example = failure
         assert want.strip() == got.strip(), 'DocTest failure in "{}"'.format(example.strip())
         assert False  # In case .strip() removed something useful
