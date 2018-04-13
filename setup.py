@@ -32,15 +32,15 @@ setup(
 
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
 
-        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='interval arithmetic range math',
 
     py_modules=['intervals'],
-    python_requires='>=3.4',
 
     include_package_data=True,
     zip_safe=True,

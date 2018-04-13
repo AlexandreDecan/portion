@@ -1,6 +1,7 @@
-import pytest
-import intervals as I
 import doctest
+import intervals as I
+import pytest
+import sys
 
 
 def test_infinity():
@@ -118,6 +119,10 @@ def test_atomic_comparisons(i1, i2, i3):
 
     assert not i1 == 1
 
+
+@pytest.mark.parametrize('i1', [I.closed(0, 1).to_atomic(), I.closed(0, 1)])
+@pytest.mark.xfail(sys.version_info < (3, 0), reason='Python 2 does not raise TypeError for unsupported comparisons')
+def test_comparisons_for_unsupported_types(i1):
     with pytest.raises(TypeError):
         i1 > 1
     with pytest.raises(TypeError):

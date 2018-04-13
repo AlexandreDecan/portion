@@ -5,7 +5,7 @@
 [![PyPI](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 
-This library provides interval arithmetic for Python 3.4+.
+This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 
 
 ## Features
@@ -19,9 +19,7 @@ This library provides interval arithmetic for Python 3.4+.
 
 ## Installation
 
-You can use ``pip`` to install this library:
-
-``pip install python-intervals``
+You can use ``pip`` to install it, as usual: ``pip install python-intervals``.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
 Prereleases are available from its *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
@@ -308,6 +306,11 @@ Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+
+**1.3.2** (2018-04-13)
+
+ - Support for Python 2.7.
 
 
 **1.3.1** (2018-04-12)

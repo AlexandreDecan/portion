@@ -1,5 +1,5 @@
 __package__ = 'python-intervals'
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -30,6 +30,8 @@ class _PInf:
 
     def __eq__(self, o): return isinstance(o, _PInf)
 
+    def __ne__(self, o): return not self == o  # Required for Python 2
+
     def __repr__(self): return '+inf'
 
 
@@ -49,6 +51,8 @@ class _NInf:
     def __ge__(self, o): return isinstance(o, _NInf)
 
     def __eq__(self, o): return isinstance(o, _NInf)
+
+    def __ne__(self, o): return not self == o  # Required for Python 2
 
     def __repr__(self): return '-inf'
 
@@ -334,6 +338,9 @@ class AtomicInterval:
             )
         else:
             return NotImplemented
+
+    def __ne__(self, other):
+        return not self == other  # Required for Python 2
 
     def __lt__(self, other):
         if isinstance(other, AtomicInterval):
@@ -630,6 +637,9 @@ class Interval:
             return self._intervals == other._intervals
         else:
             return NotImplemented
+
+    def __ne__(self, other):
+        return not self == other  # Required for Python 2
 
     def __lt__(self, other):
         if isinstance(other, AtomicInterval):
