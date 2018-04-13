@@ -1,2 +1,3 @@
 include README.md
-include LICENSE
+include LICENSE.txt
+include test_intervals.py

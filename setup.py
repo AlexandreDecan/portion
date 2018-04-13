@@ -41,7 +41,6 @@ setup(
     keywords='interval arithmetic range math',
 
     py_modules=['intervals'],
-
-    include_package_data=True,
+    tests_require=['pytest'],
     zip_safe=True,
 )

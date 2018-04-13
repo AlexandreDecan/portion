@@ -300,7 +300,7 @@ Feel free to report bugs or suggest new features using GitHub issues and/or pull
 
 ## Licence
 
-Distributed under LGPLv3 - GNU Lesser General Public License, version 3.
+Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt).
 
 
 ## Changelog
