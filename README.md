@@ -19,7 +19,7 @@ This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 
 ## Installation
 
-You can use ``pip`` to install it, as usual: ``pip install python-intervals``.
+You can use `pip` to install it, as usual: `pip install python-intervals`.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
 Prereleases are available from its *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
@@ -32,7 +32,7 @@ projects without the need for an explicit dependency (hint: don't do that!).
 
 ### Interval creation
 
-Assuming this library is imported using ``import intervals as I``, intervals can be easily created using one of the
+Assuming this library is imported using `import intervals as I`, intervals can be easily created using one of the
 following helpers:
 
 ```python
@@ -51,9 +51,9 @@ following helpers:
 
 ```
 
-Intervals created with this library are ``Interval`` instances.
-An ``Interval`` object is a disjunction of atomic intervals that represent single intervals (e.g. ``[1,2]``) corresponding to ``AtomicInterval`` instances.
-Except when atomic intervals are explicitly created or retrieved, only ``Interval`` instances are exposed
+Intervals created with this library are `Interval` instances.
+An `Interval` object is a disjunction of atomic intervals that represent single intervals (e.g. `[1,2]`) corresponding to `AtomicInterval` instances.
+Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed
 
 For convenience, intervals are automatically simplified:
 ```python
@@ -68,7 +68,7 @@ For convenience, intervals are automatically simplified:
 
 ```
 
-Infinite and semi-infinite intervals are supported using ``I.inf`` and ``-I.inf`` as upper or lower bounds.
+Infinite and semi-infinite intervals are supported using `I.inf` and `-I.inf` as upper or lower bounds.
 These two objects support comparison with any other object.
 When infinites are used as a lower or upper bound, the corresponding boundary is automatically converted to an open one.
 
@@ -95,15 +95,15 @@ The bounds of an interval can be any arbitrary values, as long as they are compa
 
 ```
 
-Note that discrete intervals are **not** supported, e.g., combining ``[0,1]`` with ``[2,3]`` will **not** result
-in ``[0,3]`` even if there is no integer between ``1`` and ``2``.
+Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with `[2,3]` will **not** result
+in `[0,3]` even if there is no integer between `1` and `2`.
 
 
 ### Arithmetic operations
 
-Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic operations:
+Both `Interval` and `AtomicInterval` support following interval arithmetic operations:
 
- - ``x.is_empty()`` tests if the interval is empty.
+ - `x.is_empty()` tests if the interval is empty.
    ```python
    >>> I.closed(0, 1).is_empty()
    False
@@ -116,7 +116,7 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.intersection(other)`` or ``x & other`` return the intersection of two intervals.
+ - `x.intersection(other)` or `x & other` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
    [1,2]
@@ -129,7 +129,7 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.union(other)`` or ``x | other`` return the union of two intervals.
+ - `x.union(other)` or `x | other` return the union of two intervals.
    ```python
    >>> I.closed(0, 1) | I.closed(1, 2)
    [0,2]
@@ -138,7 +138,7 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.complement(other)`` or ``~x`` return the complement of the interval.
+ - `x.complement(other)` or `~x` return the complement of the interval.
    ```python
    >>> ~I.closed(0, 1)
    (-inf,0) | (1,+inf)
@@ -149,7 +149,7 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.difference(other)`` or ``x - other`` return the difference between ``x`` and ``other``.
+ - `x.difference(other)` or `x - other` return the difference between `x` and `other`.
    ```python
    >>> I.closed(0,2) - I.closed(1,2)
    [0,1)
@@ -158,8 +158,8 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.contains(other)`` or ``other in x`` return True if given item is contained in the interval.
- Support ``Interval``, ``AtomicInterval`` and arbitrary comparable values.
+ - `x.contains(other)` or `other in x` return True if given item is contained in the interval.
+ Support `Interval`, `AtomicInterval` and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
    True
@@ -170,8 +170,8 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
    ```
 
- - ``x.overlaps(other)`` tests if there is an overlap between two intervals.
- This method accepts a ``permissive`` parameter which defaults to ``False``. If ``True``, it considers that [1, 2) and
+ - `x.overlaps(other)` tests if there is an overlap between two intervals.
+ This method accepts a `permissive` parameter which defaults to `False`. If `True`, it considers that [1, 2) and
  [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
@@ -185,18 +185,18 @@ Both ``Interval`` and ``AtomicInterval`` support following interval arithmetic o
 
 ### Other methods and attributes
 
-The following methods are only available for ``Interval`` instances:
+The following methods are only available for `Interval` instances:
 
- - ``x.enclosure()`` returns the smallest interval that includes the current one.
+ - `x.enclosure()` returns the smallest interval that includes the current one.
    ```python
    >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
    [0,3]
 
    ```
 
- - ``x.to_atomic()`` is equivalent to ``x.enclosure()`` but returns an ``AtomicInterval`` instead of an ``Interval`` object.
+ - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
 
- - ``x.is_atomic()`` evaluates to ``True`` if interval is composed of a single (possibly empty) atomic interval.
+ - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
    ```python
    >>> I.closed(0, 2).is_atomic()
    True
@@ -207,9 +207,9 @@ The following methods are only available for ``Interval`` instances:
 
    ```
 
-The left and right boundaries, and the lower and upper bound of an ``AtomicInterval`` can be respectively accessed
-with its ``left``, ``right``, ``lower`` and ``upper`` attributes.
-The ``left`` and ``right`` bounds are either ``I.CLOSED`` (``True``) or ``I.OPEN`` (``False``).
+The left and right boundaries, and the lower and upper bound of an `AtomicInterval` can be respectively accessed
+with its `left`, `right`, `lower` and `upper` attributes.
+The `left` and `right` bounds are either `I.CLOSED` (`True`) or `I.OPEN` (`False`).
 
 ```python
 >> I.CLOSED, I.OPEN
@@ -223,7 +223,7 @@ True, False
 
 ### Comparison operators
 
-Equality between intervals can be checked using the classical ``==`` operator:
+Equality between intervals can be checked using the classical `==` operator:
 
 ```python
 >>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
@@ -233,10 +233,10 @@ True
 
 ```
 
-Moreover, both ``Interval`` and ``AtomicInterval`` are comparable using e.g. ``>``, ``>=``, ``<`` or ``<=``.
+Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
 The comparison is based on the interval itself, not on its lower or upper bound only.
-For instance, ``a < b`` holds if ``a`` is entirely on the left of ``b`` and ``a > b`` holds if ``a`` is entirely
-on the right of ``b``.
+For instance, `a < b` holds if `a` is entirely on the left of `b` and `a > b` holds if `a` is entirely
+on the right of `b`.
 
 ```python
 >>> I.closed(0, 1) < I.closed(2, 3)
@@ -246,8 +246,8 @@ False
 
 ```
 
-Similarly, ``a <= b`` holds if ``a`` is entirely on the left of the upper bound of ``b``, and ``a >= b``
-holds if ``a`` is entirely on the right of the lower bound of ``b``.
+Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
+holds if `a` is entirely on the right of the lower bound of `b`.
 
 ```python
 >>> I.closed(0, 1) <= I.closed(2, 3)
@@ -273,7 +273,7 @@ False
 
 ### Iteration & indexing
 
-Intervals can be iterated to access the underlying ``AtomicInterval`` objects, sorted by their lower and upper bounds.
+Intervals can be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
 
 ```python
 >>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
@@ -281,7 +281,7 @@ Intervals can be iterated to access the underlying ``AtomicInterval`` objects, s
 
 ```
 
-The ``AtomicInterval`` objects of an ``Interval`` can also be accessed using their indexes:
+The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
 
 ```python
 >>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
@@ -290,6 +290,70 @@ The ``AtomicInterval`` objects of an ``Interval`` can also be accessed using the
 (2,3)
 
 ```
+
+### Import and export to string
+
+Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
+
+```python
+>>> I.to_string(I.closedopen(0, 1))
+'[0,1)'
+
+```
+
+This function accepts both `Interval` and `AtomicInterval` instances.
+The way string representations are built can be easily parametrized using the various parameters supported by
+`to_string`:
+
+```python
+>>> x = I.closed(0, 1) | I.closed(2, 3)
+>>> I.to_string(x, disj=' or ', sep=' - ', left_closed='<', right_closed='>', repr=lambda v: '"{}"'.format(v))
+'<"0" - "1"> or <"2" - "3">'
+
+```
+
+Similarly, intervals can be created from a string using the `from_string` function:
+```python
+>>> I.from_string('[0, 1]') == I.closed(0, 1)
+True
+>>> I.from_string('[1.2]') == I.singleton(1.2)
+True
+
+```
+
+Note that by default, `from_string` relies on `eval` to convert bounds to objects.
+As it means that arbitrary Python code could be evaluated, you shouldn't use `from_string` on untrusted inputs unless
+you provide your own conversion function:
+
+
+```python
+>>> from datetime import datetime
+>>> converter = lambda s: datetime.strptime(s, '%Y/%m/%d')
+>>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
+[datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0)]
+
+```
+
+Similarly to `to_string`, function `from_string` can be parametrized to deal with more elaborated inputs:
+
+```python
+>>> s = '<"0" - "1"> or <"2" - "3">'
+>>> converter = lambda v: int(v[1:-1])
+>>> I.from_string(s, conv=converter, disj=' or ', sep=' - ', left_closed='<', right_closed='>')
+[0,1] | [2,3]
+
+```
+
+When a bound contains a comma or has a representation that cannot be automatically parsed with `from_string`,
+the `bound` parameter can be used to specify the regular expression that should be used to match its representation.
+
+```python
+>>> s = '[(0, 1), (2, 3)]'  # Bounds are expected to be tuples
+>>> I.from_string(s, bound=r'\(.+?\)')
+[(0, 1),(2, 3)]
+
+```
+
 
 
 ## Contributions
@@ -308,6 +372,12 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**Unreleased**
+
+ - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
+ - Function `I.from_string` to create an interval from a string, with many options to customize the parsing.
+
+
 **1.3.2** (2018-04-13)
 
  - Support for Python 2.7.
@@ -324,28 +394,28 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 **1.3.0** (2018-04-04)
 
- - Meaningful ``<=`` and ``>=`` comparisons for intervals.
+ - Meaningful `<=` and `>=` comparisons for intervals.
 
 
 **1.2.0** (2018-04-04)
 
- - ``Interval`` supports indexing to retrieve the underlying ``AtomicInterval`` objects.
+ - `Interval` supports indexing to retrieve the underlying `AtomicInterval` objects.
 
 
 **1.1.0** (2018-04-04)
 
- - Both ``AtomicInterval`` and ``Interval`` are fully comparable.
- - Add ``singleton(x)`` to create a singleton interval [x].
- - Add ``empty()`` to create an empty interval.
- - Add ``Interval.enclosure()`` that returns the smallest interval that includes the current one.
+ - Both `AtomicInterval` and `Interval` are fully comparable.
+ - Add `singleton(x)` to create a singleton interval [x].
+ - Add `empty()` to create an empty interval.
+ - Add `Interval.enclosure()` that returns the smallest interval that includes the current one.
  - Interval simplification is in O(n) instead of O(n*m).
- - ``AtomicInterval`` objects in an ``Interval`` are sorted by lower and upper bounds.
+ - `AtomicInterval` objects in an `Interval` are sorted by lower and upper bounds.
 
 
 **1.0.4** (2018-04-03)
 
- - All operations of ``AtomicInterval`` (except overlaps) accept ``Interval``.
- - Raise ``TypeError`` instead of ``ValueError`` if type is not supported (coherent with ``NotImplemented``).
+ - All operations of `AtomicInterval` (except overlaps) accept `Interval`.
+ - Raise `TypeError` instead of `ValueError` if type is not supported (coherent with `NotImplemented`).
 
 
 **1.0.3** (2018-04-03)
