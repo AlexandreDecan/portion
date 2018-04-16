@@ -307,26 +307,19 @@ The way string representations are built can be easily parametrized using the va
 
 ```python
 >>> x = I.closed(0, 1) | I.closed(2, 3)
->>> I.to_string(x, disj=' or ', sep=' - ', left_closed='<', right_closed='>', repr=lambda v: '"{}"'.format(v))
+>>> I.to_string(x, disj=' or ', sep=' - ', left_closed='<', right_closed='>', conv=lambda v: '"{}"'.format(v))
 '<"0" - "1"> or <"2" - "3">'
 
 ```
 
-Similarly, intervals can be created from a string using the `from_string` function:
-```python
->>> I.from_string('[0, 1]') == I.closed(0, 1)
-True
->>> I.from_string('[1.2]') == I.singleton(1.2)
-True
-
-```
-
-Note that by default, `from_string` relies on `eval` to convert bounds to objects.
-As it means that arbitrary Python code could be evaluated, you shouldn't use `from_string` on untrusted inputs unless
-you provide your own conversion function:
-
+Similarly, intervals can be created from a string using the `from_string` function.
+A conversion function (`conv` parameter) has to be provided to convert a bound (as string) to a value.
 
 ```python
+>>> I.from_string('[0, 1]', conv=int) == I.closed(0, 1)
+True
+>>> I.from_string('[1.2]', conv=float) == I.singleton(1.2)
+True
 >>> from datetime import datetime
 >>> converter = lambda s: datetime.strptime(s, '%Y/%m/%d')
 >>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
@@ -349,7 +342,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 
 ```python
 >>> s = '[(0, 1), (2, 3)]'  # Bounds are expected to be tuples
->>> I.from_string(s, bound=r'\(.+?\)')
+>>> I.from_string(s, conv=eval, bound=r'\(.+?\)')
 [(0, 1),(2, 3)]
 
 ```

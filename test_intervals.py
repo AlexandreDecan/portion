@@ -84,7 +84,7 @@ def test_to_string_customized():
         'left_closed': '<',
         'right_open': '!>',
         'right_closed': '>',
-        'repr': lambda s: '"{}"'.format(s)
+        'conv': lambda s: '"{}"'.format(s)
     }
 
     assert I.to_string(i1, **params) == '<"0"-"1">'
@@ -101,15 +101,18 @@ def test_to_string_customized():
 def test_from_string():
     i1, i2, i3, i4 = '[0,1]', '(0,1]', '[0,1)', '(0,1)'
 
-    assert I.from_string(i1) == I.closed(0, 1)
-    assert I.from_string(i2) == I.openclosed(0, 1)
-    assert I.from_string(i3) == I.closedopen(0, 1)
-    assert I.from_string(i4) == I.open(0, 1)
+    assert I.from_string(i1, int) == I.closed(0, 1)
+    assert I.from_string(i2, int) == I.openclosed(0, 1)
+    assert I.from_string(i3, int) == I.closedopen(0, 1)
+    assert I.from_string(i4, int) == I.open(0, 1)
 
-    assert I.from_string('()') == I.empty()
-    assert I.from_string('[1]') == I.singleton(1)
+    assert I.from_string('()', int) == I.empty()
+    assert I.from_string('[1]', int) == I.singleton(1)
 
-    assert I.from_string('[0,1] | [2,3]') == I.closed(0, 1) | I.closed(2, 3)
+    assert I.from_string('[0,1] | [2,3]', int) == I.closed(0, 1) | I.closed(2, 3)
+
+    with pytest.raises(Exception):
+        I.from_string('[1,2]', None)
 
 
 def test_from_string_customized():

@@ -109,20 +109,13 @@ def empty():
     return Interval(AtomicInterval(OPEN, inf, inf, OPEN))
 
 
-def from_string(string, *,
-                conv=eval,
-                bound=r'.+?',
-                disj=r' ?\| ?',
-                sep=r', ?',
-                left_open=r'\(',
-                left_closed=r'\[',
-                right_open=r'\)',
-                right_closed=r'\]'):
+def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]'):
     """
     Parse given string and create an Interval instance.
+    A converter function has to be provided to convert a bound (as string) to a value.
 
     :param string: string to parse.
-    :param conv: function that converts a bound (as string) to an object (default is `eval`).
+    :param conv: function that converts a bound (as string) to an object.
     :param bound: regular expression that matches a value.
     :param disj: regular expression that matches the disjunctive operator (default matches '|').
     :param sep: regular expression that matches bound separator (default matches ',').
@@ -163,19 +156,12 @@ def from_string(string, *,
     return Interval(*intervals)
 
 
-def to_string(interval, *,
-              repr=repr,
-              disj=' | ',
-              sep=',',
-              left_open='(',
-              left_closed='[',
-              right_open=')',
-              right_closed=']'):
+def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_closed='[', right_open=')', right_closed=']'):
     """
     Export given interval (or atomic interval) to string.
 
     :param interval: an Interval or AtomicInterval instance.
-    :param repr: function that is used to represent a bound (default is `repr`).
+    :param conv: function that is used to represent a bound (default is `repr`).
     :param disj: string representing disjunctive operator (default is ' | ').
     :param sep: string representing bound separator (default is ',').
     :param left_open: string representing left open boundary (default is '(').
@@ -193,8 +179,9 @@ def to_string(interval, *,
     for item in interval:
         left = left_open if item.left == OPEN else left_closed
         right = right_open if item.right == OPEN else right_closed
-        lower = repr(item.lower)
-        upper = repr(item.upper)
+
+        lower = conv(item.lower)
+        upper = conv(item.upper)
 
         if item.lower == item.upper:
             exported_intervals.append('{}{}{}'.format(left, lower, right))
