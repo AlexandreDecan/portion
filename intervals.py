@@ -142,8 +142,8 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
         else:
             group = match.groupdict()
 
-            left = re.fullmatch(left_closed, group['left']) is not None
-            right = re.fullmatch(right_closed, group['right']) is not None
+            left = re.match(left_closed + '$', group['left']) is not None
+            right = re.match(right_closed + '$', group['right']) is not None
 
             lower = group.get('lower', None)
             upper = group.get('upper', None)
