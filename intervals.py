@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.3.2'
+__version__ = '1.4.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -12,6 +12,7 @@ __all__ = [
     'inf', 'CLOSED', 'OPEN',
     'Interval',  # 'AtomicInterval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
+    'from_string', 'to_string',
 ]
 
 

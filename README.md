@@ -365,7 +365,7 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**Unreleased**
+**1.4.0** (2018-04-17)
 
  - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
  - Function `I.from_string` to create an interval from a string, with many options to customize the parsing.
