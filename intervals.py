@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.4.0'
+__version__ = '1.5.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -488,7 +488,7 @@ class Interval:
     This class represents an interval.
 
     An interval is an (automatically simplified) union of atomic intervals.
-    It can be created either by passing atomic intervals, or by using one of the helpers
+    It can be created either by passing (atomic) intervals, or by using one of the helpers
     provided in this module (open(..), closed(..), etc).
 
     Unless explicitly specified, all operations on an Interval instance return Interval instances.
@@ -498,15 +498,20 @@ class Interval:
 
     def __init__(self, *intervals):
         """
-        Create an interval from a list of atomic intervals.
+        Create an interval from a list of (atomic or not) intervals.
 
-        :param intervals: a list of atomic intervals.
+        :param intervals: a list of (atomic or not) intervals.
         """
         self._intervals = list()
 
         for interval in intervals:
-            if not interval.is_empty():
-                self._intervals.append(interval)
+            if isinstance(interval, Interval):
+                self._intervals.extend(interval)
+            elif isinstance(interval, AtomicInterval):
+                if not interval.is_empty():
+                    self._intervals.append(interval)
+            else:
+                raise TypeError('Parameters must be Interval or AtomicInterval instances')
 
         if len(self._intervals) == 0:
             # So we have at least one (empty) interval

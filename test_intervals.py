@@ -46,6 +46,14 @@ def test_creation():
     assert I.Interval() == I.open(0, 0)
     assert I.empty() == I.Interval()
 
+    assert I.Interval(I.closed(0, 1).to_atomic()) == I.closed(0, 1)
+    assert I.Interval(I.closed(0, 1)) == I.closed(0, 1)
+    assert I.Interval(I.closed(0, 1).to_atomic(), I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
+    assert I.Interval(I.closed(0, 1) | I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
+
+    with pytest.raises(TypeError):
+        I.Interval(1)
+
 
 def test_hash():
     assert hash(I.closed(0, 1).to_atomic()) is not None

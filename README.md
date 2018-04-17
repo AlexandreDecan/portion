@@ -365,6 +365,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**1.5.0** (2018-04-17)
+
+ - `Interval.__init__` accepts `Interval` instances in addition to `AtomicInterval` ones.
+
+
 **1.4.0** (2018-04-17)
 
  - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
