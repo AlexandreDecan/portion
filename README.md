@@ -291,6 +291,63 @@ The `AtomicInterval` objects of an `Interval` can also be accessed using their i
 
 ```
 
+### Import and export to string
+
+Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
+
+```python
+>>> I.to_string(I.closedopen(0, 1))
+'[0,1)'
+
+```
+
+This function accepts both `Interval` and `AtomicInterval` instances.
+The way string representations are built can be easily parametrized using the various parameters supported by
+`to_string`:
+
+```python
+>>> x = I.closed(0, 1) | I.closed(2, 3)
+>>> I.to_string(x, disj=' or ', sep=' - ', left_closed='<', right_closed='>', conv=lambda v: '"{}"'.format(v))
+'<"0" - "1"> or <"2" - "3">'
+
+```
+
+Similarly, intervals can be created from a string using the `from_string` function.
+A conversion function (`conv` parameter) has to be provided to convert a bound (as string) to a value.
+
+```python
+>>> I.from_string('[0, 1]', conv=int) == I.closed(0, 1)
+True
+>>> I.from_string('[1.2]', conv=float) == I.singleton(1.2)
+True
+>>> from datetime import datetime
+>>> converter = lambda s: datetime.strptime(s, '%Y/%m/%d')
+>>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
+[datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0)]
+
+```
+
+Similarly to `to_string`, function `from_string` can be parametrized to deal with more elaborated inputs:
+
+```python
+>>> s = '<"0" - "1"> or <"2" - "3">'
+>>> converter = lambda v: int(v[1:-1])
+>>> I.from_string(s, conv=converter, disj=' or ', sep=' - ', left_closed='<', right_closed='>')
+[0,1] | [2,3]
+
+```
+
+When a bound contains a comma or has a representation that cannot be automatically parsed with `from_string`,
+the `bound` parameter can be used to specify the regular expression that should be used to match its representation.
+
+```python
+>>> s = '[(0, 1), (2, 3)]'  # Bounds are expected to be tuples
+>>> I.from_string(s, conv=eval, bound=r'\(.+?\)')
+[(0, 1),(2, 3)]
+
+```
+
+
 
 ## Contributions
 
@@ -306,6 +363,12 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+
+**Unreleased**
+
+ - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
+ - Function `I.from_string` to create an interval from a string, with many options to customize the parsing.
 
 
 **1.3.2** (2018-04-13)

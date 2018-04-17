@@ -1,3 +1,5 @@
+import re
+
 __package__ = 'python-intervals'
 __version__ = '1.3.2'
 __licence__ = 'LGPL3'
@@ -105,6 +107,88 @@ def empty():
     Create an empty set.
     """
     return Interval(AtomicInterval(OPEN, inf, inf, OPEN))
+
+
+def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]'):
+    """
+    Parse given string and create an Interval instance.
+    A converter function has to be provided to convert a bound (as string) to a value.
+
+    :param string: string to parse.
+    :param conv: function that converts a bound (as string) to an object.
+    :param bound: regular expression that matches a value.
+    :param disj: regular expression that matches the disjunctive operator (default matches '|').
+    :param sep: regular expression that matches bound separator (default matches ',').
+    :param left_open: regular expression that matches a left open boundary (default matches '(').
+    :param left_closed: regular expression that matches a left closed boundary (default matches '[').
+    :param right_open: regular expression that matches a right open boundary (default matches ')').
+    :param right_closed: regular expression that matches a right closed boundary (default matches ']').
+    :return: an Interval instance.
+    """
+
+    re_left_boundary = r'(?P<left>{}|{})'.format(left_open, left_closed)
+    re_right_boundary = r'(?P<right>{}|{})'.format(right_open, right_closed)
+    re_bounds = r'(?P<lower>{bound})({sep}(?P<upper>{bound}))?'.format(bound=bound, sep=sep)
+    re_interval = r'{}(|{}){}'.format(re_left_boundary, re_bounds, re_right_boundary)
+    re_intervals = r'{}(?P<disj>{})?'.format(re_interval, disj)
+
+    intervals = []
+    has_more = True
+
+    while has_more:
+        match = re.match(re_intervals, string)
+        if match is None:
+            has_more = False
+        else:
+            group = match.groupdict()
+
+            left = re.match(left_closed + '$', group['left']) is not None
+            right = re.match(right_closed + '$', group['right']) is not None
+
+            lower = group.get('lower', None)
+            upper = group.get('upper', None)
+            lower = conv(lower) if lower is not None else inf
+            upper = conv(upper) if upper is not None else lower
+
+            intervals.append(AtomicInterval(left, lower, upper, right))
+            string = string[match.end():]
+
+    return Interval(*intervals)
+
+
+def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_closed='[', right_open=')', right_closed=']'):
+    """
+    Export given interval (or atomic interval) to string.
+
+    :param interval: an Interval or AtomicInterval instance.
+    :param conv: function that is used to represent a bound (default is `repr`).
+    :param disj: string representing disjunctive operator (default is ' | ').
+    :param sep: string representing bound separator (default is ',').
+    :param left_open: string representing left open boundary (default is '(').
+    :param left_closed: string representing left closed boundary (default is '[').
+    :param right_open: string representing right open boundary (default is ')').
+    :param right_closed: string representing right closed boundary (default is ']').
+    :return: a string representation for given interval.
+    """
+    interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
+
+    if interval.is_empty():
+        return '{}{}'.format(left_open, right_open)
+
+    exported_intervals = []
+    for item in interval:
+        left = left_open if item.left == OPEN else left_closed
+        right = right_open if item.right == OPEN else right_closed
+
+        lower = conv(item.lower)
+        upper = conv(item.upper)
+
+        if item.lower == item.upper:
+            exported_intervals.append('{}{}{}'.format(left, lower, right))
+        else:
+            exported_intervals.append('{}{}{}{}{}'.format(left, lower, sep, upper, right))
+
+    return disj.join(exported_intervals)
 
 
 class AtomicInterval:

@@ -61,6 +61,83 @@ def test_hash():
     assert hash(I.closed(-I.inf, I.inf)) is not None
 
 
+def test_to_string():
+    i1, i2, i3, i4 = I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1)
+
+    assert I.to_string(i1) == '[0,1]'
+    assert I.to_string(i2) == '(0,1]'
+    assert I.to_string(i3) == '[0,1)'
+    assert I.to_string(i4) == '(0,1)'
+
+    assert I.to_string(I.empty()) == '()'
+    assert I.to_string(I.singleton(1)) == '[1]'
+
+    assert I.to_string(I.closed(0, 1) | I.closed(2, 3)) == '[0,1] | [2,3]'
+
+
+def test_to_string_customized():
+    i1, i2, i3, i4 = I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1)
+    params = {
+        'disj': ' or ',
+        'sep': '-',
+        'left_open': '<!',
+        'left_closed': '<',
+        'right_open': '!>',
+        'right_closed': '>',
+        'conv': lambda s: '"{}"'.format(s)
+    }
+
+    assert I.to_string(i1, **params) == '<"0"-"1">'
+    assert I.to_string(i2, **params) == '<!"0"-"1">'
+    assert I.to_string(i3, **params) == '<"0"-"1"!>'
+    assert I.to_string(i4, **params) == '<!"0"-"1"!>'
+
+    assert I.to_string(I.empty(), **params) == '<!!>'
+    assert I.to_string(I.singleton(1), **params) == '<"1">'
+
+    assert I.to_string(I.closed(0, 1) | I.closed(2, 3), **params) == '<"0"-"1"> or <"2"-"3">'
+
+
+def test_from_string():
+    i1, i2, i3, i4 = '[0,1]', '(0,1]', '[0,1)', '(0,1)'
+
+    assert I.from_string(i1, int) == I.closed(0, 1)
+    assert I.from_string(i2, int) == I.openclosed(0, 1)
+    assert I.from_string(i3, int) == I.closedopen(0, 1)
+    assert I.from_string(i4, int) == I.open(0, 1)
+
+    assert I.from_string('()', int) == I.empty()
+    assert I.from_string('[1]', int) == I.singleton(1)
+
+    assert I.from_string('[0,1] | [2,3]', int) == I.closed(0, 1) | I.closed(2, 3)
+
+    with pytest.raises(Exception):
+        I.from_string('[1,2]', None)
+
+
+def test_from_string_customized():
+    i1, i2, i3, i4 = '<"0"-"1">', '<!"0"-"1">', '<"0"-"1"!>', '<!"0"-"1"!>'
+    params = {
+        'conv': lambda s: int(s[1:-1]),
+        'disj': ' or ',
+        'sep': '-',
+        'left_open': '<!',
+        'left_closed': '<',
+        'right_open': '!>',
+        'right_closed': '>',
+    }
+
+    assert I.from_string(i1, **params) == I.closed(0, 1)
+    assert I.from_string(i2, **params) == I.openclosed(0, 1)
+    assert I.from_string(i3, **params) == I.closedopen(0, 1)
+    assert I.from_string(i4, **params) == I.open(0, 1)
+
+    assert I.from_string('<!!>', **params) == I.empty()
+    assert I.from_string('<"1">', **params) == I.singleton(1)
+
+    assert I.from_string('<"0"-"1"> or <"2"-"3">', **params) == I.closed(0, 1) | I.closed(2, 3)
+
+
 def test_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
     for interval in intervals:
