@@ -95,6 +95,18 @@ The bounds of an interval can be any arbitrary values, as long as they are compa
 
 ```
 
+Empty intervals always resolve to `(I.inf, -I.inf)`, regardless of the provided bounds:
+
+```python
+>>> I.empty() == I.open(I.inf, -I.inf)
+True
+>>> I.closed(4, 3) == I.open(I.inf, -I.inf)
+True
+>>> I.openclosed('a', 'a') == I.open(I.inf, -I.inf)
+True
+
+```
+
 Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with `[2,3]` will **not** result
 in `[0,3]` even if there is no integer between `1` and `2`.
 
@@ -267,6 +279,8 @@ As a consequence, some intervals are never comparable in the classical sense, as
 False
 >>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
 False
+>>> I.empty() < I.empty()
+True
 
 ```
 
@@ -363,6 +377,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+
+**1.5.1** (2018-04-25)
+
+ - Fix [#1](https://github.com/AlexandreDecan/python-intervals/issues/1) by making empty intervals always resolving to `(I.inf, -I.inf)`.
 
 
 **1.5.0** (2018-04-17)

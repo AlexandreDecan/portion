@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -107,7 +107,7 @@ def empty():
     """
     Create an empty set.
     """
-    return Interval(AtomicInterval(OPEN, inf, inf, OPEN))
+    return Interval(AtomicInterval(OPEN, inf, -inf, OPEN))
 
 
 def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]'):
@@ -209,19 +209,19 @@ class AtomicInterval:
 
         :param left: Boolean indicating whether the left boundary is inclusive (True) or exclusive (False).
         :param lower: lower bound value.
-        :param upper: upper bound value. Must be greater or equal to lower bound.
+        :param upper: upper bound value.
         :param right: Boolean indicating whether the right boundary is inclusive (True) or exclusive (False).
         """
-        if lower > upper:
-            raise ValueError(
-                'Bounds are not ordered correctly: lower bound {} must be smaller than upper bound {}'
-                .format(lower, upper)
-            )
-
         self._left = left if lower not in [inf, -inf] else OPEN
         self._lower = lower
         self._upper = upper
         self._right = right if upper not in [inf, -inf] else OPEN
+
+        if self.is_empty():
+            self._left = OPEN
+            self._lower = inf
+            self._upper = -inf
+            self._right = OPEN
 
     @property
     def left(self):
@@ -257,7 +257,10 @@ class AtomicInterval:
 
         :return: True if interval is empty, False otherwise.
         """
-        return self._lower == self._upper and (self._left == OPEN or self._right == OPEN)
+        return (
+            self._lower > self._upper or
+            (self._lower == self._upper and (self._left == OPEN or self._right == OPEN))
+        )
 
     def overlaps(self, other, permissive=False):
         """
@@ -515,7 +518,7 @@ class Interval:
 
         if len(self._intervals) == 0:
             # So we have at least one (empty) interval
-            self._intervals.append(AtomicInterval(OPEN, inf, inf, OPEN))
+            self._intervals.append(AtomicInterval(OPEN, inf, -inf, OPEN))
         else:
             # Sort intervals by lower bound
             self._intervals.sort(key=lambda i: i.lower)

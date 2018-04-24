@@ -39,12 +39,11 @@ def test_creation():
     assert I.closedopen(0, 1) == I.AtomicInterval(I.CLOSED, 0, 1, I.OPEN)
     assert I.closed(-I.inf, I.inf) == I.open(-I.inf, I.inf)
 
-    with pytest.raises(ValueError):
-        I.closed(1, -1)
-
     assert I.singleton(2) == I.closed(2, 2)
     assert I.Interval() == I.open(0, 0)
     assert I.empty() == I.Interval()
+    assert I.closed(3, -3) == I.empty()
+    assert I.openclosed(3, 3) == I.empty()
 
     assert I.Interval(I.closed(0, 1).to_atomic()) == I.closed(0, 1)
     assert I.Interval(I.closed(0, 1)) == I.closed(0, 1)
@@ -58,6 +57,7 @@ def test_creation():
 def test_hash():
     assert hash(I.closed(0, 1).to_atomic()) is not None
     assert hash(I.closed(0, 1)) is not None
+    assert hash(I.empty()) is not None
 
     # Even for unhashable bounds
     with pytest.raises(TypeError):
@@ -158,6 +158,8 @@ def test_interval_to_atomic():
     assert I.closed(0, 1).to_atomic() == I.closed(0, 1).enclosure()
     assert (I.closed(0, 1) | I.closed(2, 3)).enclosure() == I.closed(0, 3)
 
+    assert I.empty().to_atomic() == I.AtomicInterval(False, I.inf, -I.inf, False)
+
 
 def test_overlaps():
     assert I.closed(0, 1).overlaps(I.closed(0, 1))
@@ -165,12 +167,16 @@ def test_overlaps():
     assert I.closed(0, 1).overlaps(I.closed(1, 2))
     assert not I.closed(0, 1).overlaps(I.closed(3, 4))
     assert not I.closed(0, 1).overlaps(I.open(1, 2))
+    assert not I.empty().overlaps(I.open(-I.inf, I.inf))
+    assert not I.open(-I.inf, I.inf).overlaps(I.empty())
 
     assert I.closed(0, 1).overlaps(I.closed(0, 1), permissive=True)
     assert I.closed(0, 1).overlaps(I.open(0, 1), permissive=True)
     assert I.closed(0, 1).overlaps(I.closed(1, 2), permissive=True)
     assert not I.closed(0, 1).overlaps(I.closed(3, 4), permissive=True)
     assert I.closed(0, 1).overlaps(I.open(1, 2), permissive=True)
+    assert not I.empty().overlaps(I.open(-I.inf, I.inf), permissive=True)
+    assert not I.open(-I.inf, I.inf).overlaps(I.empty(), permissive=True)
 
     # Overlaps should reject non supported types
     with pytest.raises(TypeError):
@@ -249,6 +255,18 @@ def test_comparisons_of_unions():
     assert not i5 <= i4
 
 
+def test_comparisons_of_empty():
+    assert I.empty() < I.empty()
+    assert I.empty() <= I.empty()
+    assert I.empty() > I.empty()
+    assert I.empty() >= I.empty()
+
+    assert I.empty() < I.closed(2, 3)
+    assert I.empty() <= I.closed(2, 3)
+    assert I.empty() > I.closed(2, 3)
+    assert I.empty() >= I.closed(2, 3)
+
+
 def test_containment_for_values():
     # Values
     assert 1 in I.closed(0, 2)
@@ -265,6 +283,10 @@ def test_containment_for_values():
     assert 1 not in I.closed(-I.inf, 0)
     assert 1 not in I.closed(2, I.inf)
 
+    assert 1 not in I.empty()
+    assert I.inf not in I.empty()
+    assert -I.inf not in I.empty()
+
 
 def test_containment_for_intervals():
     # Intervals
@@ -277,6 +299,10 @@ def test_containment_for_intervals():
     assert I.closed(-I.inf, I.inf) in I.closed(-I.inf, I.inf)
     assert I.closed(0, 1) in I.closed(-I.inf, I.inf)
     assert I.closed(-I.inf, I.inf) not in I.closed(0, 1)
+
+    assert I.empty() in I.closed(0, 3)
+    assert I.empty() in I.empty()
+    assert I.closed(0, 0) not in I.empty()
 
 
 def test_containment_for_atomic_intervals():
@@ -298,6 +324,8 @@ def test_intersection():
     assert I.closed(0, 1) & I.open(0, 1) == I.open(0, 1)
     assert I.openclosed(0, 1) & I.closedopen(0, 1) == I.open(0, 1)
     assert (I.closed(0, 1) & I.closed(2, 3)).is_empty()
+
+    assert I.closed(0, 1) & I.empty() == I.empty()
 
 
 def test_union():
@@ -327,6 +355,8 @@ def test_union():
 
     assert (I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)).is_atomic()
     assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
+
+    assert I.closed(0, 1) | I.empty() == I.closed(0, 1)
 
 
 def test_iteration():
@@ -361,6 +391,8 @@ def test_complement():
     assert ~I.open(1, 1) == I.open(-I.inf, I.inf)
     assert (~I.closed(-I.inf, I.inf)).is_empty()
 
+    assert ~I.empty() == I.open(-I.inf, I.inf)
+
 
 def test_difference():
     assert I.closed(1, 4) - I.closed(1, 3) == I.openclosed(3, 4)
@@ -373,6 +405,9 @@ def test_difference():
     assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4).to_atomic() - I.closed(2, 3)
     assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4).to_atomic() - I.closed(2, 3).to_atomic()
     assert I.closed(0, 4) - I.closed(2, 3) == I.closed(0, 4) - I.closed(2, 3).to_atomic()
+
+    assert I.closed(0, 4) - I.empty() == I.closed(0, 4)
+    assert I.empty() - I.closed(0, 4) == I.empty()
 
 
 def test_proxy_methods():
