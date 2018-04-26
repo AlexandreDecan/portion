@@ -55,18 +55,19 @@ Intervals created with this library are `Interval` instances.
 An `Interval` object is a disjunction of atomic intervals that represent single intervals (e.g. `[1,2]`) corresponding to `AtomicInterval` instances.
 Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed
 
-For convenience, intervals are automatically simplified:
+The bounds of an interval can be any arbitrary values, as long as they are comparable:
+
 ```python
->>> I.closed(0, 2) | I.closed(2, 4)
-[0,4]
->>> I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)
-[1,4]
->>> I.empty() | I.closed(0, 1)
-[0,1]
->>> I.closed(1, 2) | I.closed(2, 3) | I.closed(4, 5)
-[1,3] | [4,5]
+>>> I.closed(1.2, 2.4)
+[1.2,2.4]
+>>> I.closed('a', 'z')
+['a','z']
+>>> from datetime import date
+>>> I.closed(date(2011, 3, 15), date(2013, 10, 10))
+[datetime.date(2011, 3, 15),datetime.date(2013, 10, 10)]
 
 ```
+
 
 Infinite and semi-infinite intervals are supported using `I.inf` and `-I.inf` as upper or lower bounds.
 These two objects support comparison with any other object.
@@ -82,19 +83,6 @@ When infinites are used as a lower or upper bound, the corresponding boundary is
 
 ```
 
-The bounds of an interval can be any arbitrary values, as long as they are comparable:
-
-```python
->>> I.closed(1.2, 2.4)
-[1.2,2.4]
->>> I.closed('a', 'z')
-['a','z']
->>> from datetime import date
->>> I.closed(date(2011, 3, 15), date(2013, 10, 10))
-[datetime.date(2011, 3, 15),datetime.date(2013, 10, 10)]
-
-```
-
 Empty intervals always resolve to `(I.inf, -I.inf)`, regardless of the provided bounds:
 
 ```python
@@ -107,8 +95,23 @@ True
 
 ```
 
+For convenience, intervals are automatically simplified:
+```python
+>>> I.closed(0, 2) | I.closed(2, 4)
+[0,4]
+>>> I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)
+[1,4]
+>>> I.empty() | I.closed(0, 1)
+[0,1]
+>>> I.closed(1, 2) | I.closed(2, 3) | I.closed(4, 5)
+[1,3] | [4,5]
+
+```
+
 Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with `[2,3]` will **not** result
 in `[0,3]` even if there is no integer between `1` and `2`.
+
+
 
 
 ### Arithmetic operations
