@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -431,6 +431,9 @@ class AtomicInterval:
         return not self == other  # Required for Python 2
 
     def __lt__(self, other):
+        if isinstance(other, Interval):
+            other = other.to_atomic()
+
         if isinstance(other, AtomicInterval):
             if self._right == OPEN:
                 return self._upper <= other._lower
@@ -440,6 +443,9 @@ class AtomicInterval:
             return NotImplemented
 
     def __gt__(self, other):
+        if isinstance(other, Interval):
+            other = other.to_atomic()
+
         if isinstance(other, AtomicInterval):
             if self._left == OPEN:
                 return self._lower >= other._upper
@@ -449,6 +455,9 @@ class AtomicInterval:
             return NotImplemented
 
     def __le__(self, other):
+        if isinstance(other, Interval):
+            other = other.to_atomic()
+
         if isinstance(other, AtomicInterval):
             if self._right == OPEN:
                 return self._upper <= other._upper
@@ -458,6 +467,9 @@ class AtomicInterval:
             return NotImplemented
 
     def __ge__(self, other):
+        if isinstance(other, Interval):
+            other = other.to_atomic()
+
         if isinstance(other, AtomicInterval):
             if self._left == OPEN:
                 return self._lower >= other._lower

@@ -382,6 +382,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**1.5.2** (2018-06-15)
+
+ - Fix invalid comparisons when both `Interval` and `AtomicInterval` are compared.
+
+
 **1.5.1** (2018-04-25)
 
  - Fix [#1](https://github.com/AlexandreDecan/python-intervals/issues/1) by making empty intervals always resolving to `(I.inf, -I.inf)`.
