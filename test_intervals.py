@@ -267,6 +267,14 @@ def test_comparisons_of_empty():
     assert I.empty() >= I.closed(2, 3)
 
 
+def test_comparisons_mixed_intervals():
+    # Bug introduced in 1.3.0, fixed in 1.5.2
+    assert I.closed(1, 2).to_atomic() <= I.closed(0, 3)
+    assert I.closed(1, 2) >= I.closed(0, 3).to_atomic()
+    assert I.closed(1, 2) <= I.closed(0, 3).to_atomic()
+    assert I.closed(1, 2).to_atomic() >= I.closed(0, 3)
+
+
 def test_containment_for_values():
     # Values
     assert 1 in I.closed(0, 2)
