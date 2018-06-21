@@ -382,6 +382,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**1.5.3** (2018-06-21)
+
+ - Fix invalid `repr` for atomic singleton intervals.
+ 
+
 **1.5.2** (2018-06-15)
 
  - Fix invalid comparisons when both `Interval` and `AtomicInterval` are compared.

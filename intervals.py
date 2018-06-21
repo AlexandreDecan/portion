@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.2'
+__version__ = '1.5.3'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -488,7 +488,7 @@ class AtomicInterval:
         if self.is_empty():
             return '()'
         elif self._lower == self._upper:
-            return '[{}]'.format(self._lower)
+            return '[{}]'.format(repr(self._lower))
         else:
             return '{}{},{}{}'.format(
                 '[' if self._left == CLOSED else '(',
