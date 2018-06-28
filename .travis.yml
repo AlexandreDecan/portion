@@ -4,8 +4,7 @@ python:
 - 3.4
 - 3.5
 - 3.6
-- 3.7
-- 3.8-dev
+- 3.7-dev
 install:
 - pip install pip -U
 - pip install coverage pytest coveralls
