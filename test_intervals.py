@@ -170,6 +170,15 @@ def test_overlaps():
     assert not I.empty().overlaps(I.open(-I.inf, I.inf))
     assert not I.open(-I.inf, I.inf).overlaps(I.empty())
 
+    # Contiguous intervals, issue #2
+    assert I.closed(1, 2).overlaps(I.closed(2, 3)) 
+    assert I.closed(1, 2).overlaps(I.closedopen(2, 3))
+    assert I.closed(1, 2).overlaps(I.closed(2, I.inf))
+    assert I.closed(2, I.inf).overlaps(I.closed(1,2))
+    assert I.closed(2, 3).overlaps(I.closed(1,2))
+    assert I.closedopen(2, 3).overlaps(I.closed(1,2))
+
+    # Permissive
     assert I.closed(0, 1).overlaps(I.closed(0, 1), permissive=True)
     assert I.closed(0, 1).overlaps(I.open(0, 1), permissive=True)
     assert I.closed(0, 1).overlaps(I.closed(1, 2), permissive=True)
@@ -183,6 +192,8 @@ def test_overlaps():
         I.closed(0, 1).to_atomic().overlaps(1)
     with pytest.raises(TypeError):
         I.closed(0, 1).overlaps(1)
+
+
 
 
 def test_emptiness():
