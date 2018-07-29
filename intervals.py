@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.3'
+__version__ = '1.5.4'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -283,9 +283,9 @@ class AtomicInterval:
 
         if first._upper == second._lower:
             if permissive:
-                return first._right == CLOSED or second._right == CLOSED
+                return first._right == CLOSED or second._left == CLOSED
             else:
-                return first._right == CLOSED and second._right == CLOSED
+                return first._right == CLOSED and second._left == CLOSED
 
         return first._upper > second._lower
 

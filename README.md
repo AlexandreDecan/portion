@@ -382,6 +382,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
+**1.5.4** (2018-07-29)
+
+ - Fix `.overlaps` ([#2](https://github.com/AlexandreDecan/python-intervals/issues/2)).
+
+
 **1.5.3** (2018-06-21)
 
  - Fix invalid `repr` for atomic singleton intervals.
