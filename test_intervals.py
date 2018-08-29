@@ -80,6 +80,9 @@ def test_to_string():
     assert I.to_string(I.empty()) == '()'
     assert I.to_string(I.singleton(1)) == '[1]'
 
+    assert I.to_string(I.openclosed(-I.inf, 1)) == '(-inf,1]'
+    assert I.to_string(I.closedopen(1, I.inf)) == '[1,+inf)'
+
     assert I.to_string(I.closed(0, 1) | I.closed(2, 3)) == '[0,1] | [2,3]'
 
 
@@ -92,7 +95,9 @@ def test_to_string_customized():
         'left_closed': '<',
         'right_open': '!>',
         'right_closed': '>',
-        'conv': lambda s: '"{}"'.format(s)
+        'conv': lambda s: '"{}"'.format(s),
+        'pinf': '+oo',
+        'ninf': '-oo',
     }
 
     assert I.to_string(i1, **params) == '<"0"-"1">'
@@ -102,6 +107,9 @@ def test_to_string_customized():
 
     assert I.to_string(I.empty(), **params) == '<!!>'
     assert I.to_string(I.singleton(1), **params) == '<"1">'
+
+    assert I.to_string(I.openclosed(-I.inf, 1), **params) == '<!-oo-"1">'
+    assert I.to_string(I.closedopen(1, I.inf), **params) == '<"1"-+oo!>'
 
     assert I.to_string(I.closed(0, 1) | I.closed(2, 3), **params) == '<"0"-"1"> or <"2"-"3">'
 
@@ -116,6 +124,9 @@ def test_from_string():
 
     assert I.from_string('()', int) == I.empty()
     assert I.from_string('[1]', int) == I.singleton(1)
+
+    assert I.from_string('(-inf,1]', int) == I.openclosed(-I.inf, 1)
+    assert I.from_string('[1,+inf)', int) == I.closedopen(1, I.inf)
 
     assert I.from_string('[0,1] | [2,3]', int) == I.closed(0, 1) | I.closed(2, 3)
 
@@ -133,6 +144,8 @@ def test_from_string_customized():
         'left_closed': '<',
         'right_open': '!>',
         'right_closed': '>',
+        'pinf': r'\+oo',
+        'ninf': '-oo',
     }
 
     assert I.from_string(i1, **params) == I.closed(0, 1)
@@ -142,6 +155,9 @@ def test_from_string_customized():
 
     assert I.from_string('<!!>', **params) == I.empty()
     assert I.from_string('<"1">', **params) == I.singleton(1)
+
+    assert I.from_string('<!-oo-"1">', **params) == I.openclosed(-I.inf, 1)
+    assert I.from_string('<"1"-+oo!>', **params) == I.closedopen(1, I.inf)
 
     assert I.from_string('<"0"-"1"> or <"2"-"3">', **params) == I.closed(0, 1) | I.closed(2, 3)
 

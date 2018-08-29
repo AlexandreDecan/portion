@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.4'
+__version__ = '1.6.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -110,20 +110,23 @@ def empty():
     return Interval(AtomicInterval(OPEN, inf, -inf, OPEN))
 
 
-def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]'):
+def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', 
+                left_closed=r'\[', right_open=r'\)', right_closed=r'\]', pinf=r'\+inf', ninf=r'-inf'):
     """
     Parse given string and create an Interval instance.
     A converter function has to be provided to convert a bound (as string) to a value.
 
     :param string: string to parse.
     :param conv: function that converts a bound (as string) to an object.
-    :param bound: regular expression that matches a value.
-    :param disj: regular expression that matches the disjunctive operator (default matches '|').
-    :param sep: regular expression that matches bound separator (default matches ',').
-    :param left_open: regular expression that matches a left open boundary (default matches '(').
-    :param left_closed: regular expression that matches a left closed boundary (default matches '[').
-    :param right_open: regular expression that matches a right open boundary (default matches ')').
-    :param right_closed: regular expression that matches a right closed boundary (default matches ']').
+    :param bound: pattern that matches a value.
+    :param disj: pattern that matches the disjunctive operator (default matches '|').
+    :param sep: pattern that matches a bounds separator (default matches ',').
+    :param left_open: pattern that matches a left open boundary (default matches '(').
+    :param left_closed: pattern that matches a left closed boundary (default matches '[').
+    :param right_open: pattern that matches a right open boundary (default matches ')').
+    :param right_closed: pattern that matches a right closed boundary (default matches ']').
+    :param pinf: pattern that matches a positive infinity (default matches '+inf').
+    :param ninf: pattern that matches a negative infinity (default matches '-inf').
     :return: an Interval instance.
     """
 
@@ -135,6 +138,14 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
 
     intervals = []
     has_more = True
+
+    def _convert(bound):
+        if re.match(pinf, bound):
+            return inf
+        elif re.match(ninf, bound):
+            return -inf
+        else:
+            return conv(bound)
 
     while has_more:
         match = re.match(re_intervals, string)
@@ -148,8 +159,8 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
 
             lower = group.get('lower', None)
             upper = group.get('upper', None)
-            lower = conv(lower) if lower is not None else inf
-            upper = conv(upper) if upper is not None else lower
+            lower = _convert(lower) if lower is not None else inf
+            upper = _convert(upper) if upper is not None else lower
 
             intervals.append(AtomicInterval(left, lower, upper, right))
             string = string[match.end():]
@@ -157,7 +168,8 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
     return Interval(*intervals)
 
 
-def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_closed='[', right_open=')', right_closed=']'):
+def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', 
+              left_closed='[', right_open=')', right_closed=']', pinf='+inf', ninf='-inf'):
     """
     Export given interval (or atomic interval) to string.
 
@@ -169,6 +181,8 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_clos
     :param left_closed: string representing left closed boundary (default is '[').
     :param right_open: string representing right open boundary (default is ')').
     :param right_closed: string representing right closed boundary (default is ']').
+    :param pinf: string representing a positive infinity (default is '+inf').
+    :param ninf: string representing a negative infinity (default is '-inf').
     :return: a string representation for given interval.
     """
     interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
@@ -176,13 +190,21 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_clos
     if interval.is_empty():
         return '{}{}'.format(left_open, right_open)
 
+    def _convert(bound):
+        if bound == inf:
+            return pinf
+        elif bound == -inf:
+            return ninf
+        else:
+            return conv(bound)
+
     exported_intervals = []
     for item in interval:
         left = left_open if item.left == OPEN else left_closed
         right = right_open if item.right == OPEN else right_closed
 
-        lower = conv(item.lower)
-        upper = conv(item.upper)
+        lower = _convert(item.lower)
+        upper = _convert(item.upper)
 
         if item.lower == item.upper:
             exported_intervals.append('{}{}{}'.format(left, lower, right))

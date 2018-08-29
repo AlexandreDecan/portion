@@ -323,9 +323,20 @@ The way string representations are built can be easily parametrized using the va
 `to_string`:
 
 ```python
->>> x = I.closed(0, 1) | I.closed(2, 3)
->>> I.to_string(x, disj=' or ', sep=' - ', left_closed='<', right_closed='>', conv=lambda v: '"{}"'.format(v))
-'<"0" - "1"> or <"2" - "3">'
+>>> x = I.openclosed(0, 1) | I.closed(2, I.inf)
+>>> params = {
+...   'disj': ' or ',
+...   'sep': ' - ',
+...   'left_closed': '<',
+...   'right_closed': '>',
+...   'left_open': '..',
+...   'right_open': '..',
+...   'pinf': '+oo',
+...   'ninf': '-oo',
+...   'conv': lambda v: '"{}"'.format(v),
+... }
+>>> I.to_string(x, **params)
+'.."0" - "1"> or <"2" - +oo..'
 
 ```
 
@@ -344,13 +355,24 @@ True
 
 ```
 
-Similarly to `to_string`, function `from_string` can be parametrized to deal with more elaborated inputs:
+Similarly to `to_string`, function `from_string` can be parametrized to deal with more elaborated inputs.
+Notice that as `from_string` expects regular expression patterns, we need to escape some characters.
 
 ```python
->>> s = '<"0" - "1"> or <"2" - "3">'
->>> converter = lambda v: int(v[1:-1])
->>> I.from_string(s, conv=converter, disj=' or ', sep=' - ', left_closed='<', right_closed='>')
-[0,1] | [2,3]
+>>> s = '.."0" - "1"> or <"2" - +oo..'
+>>> params = {
+...   'disj': ' or ',
+...   'sep': ' - ',
+...   'left_closed': '<',
+...   'right_closed': '>',
+...   'left_open': r'\.\.',  # from_string expects regular expression patterns
+...   'right_open': r'\.\.',  # from_string expects regular expression patterns
+...   'pinf': r'\+oo',  # from_string expects regular expression patterns
+...   'ninf': '-oo',
+...   'conv': lambda v: int(v[1:-1]),
+... }
+>>> I.from_string(s, **params)
+(0,1] | [2,+inf)
 
 ```
 
@@ -380,6 +402,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+
+**1.6.0** (2018-08-29)
+
+ - Add support for customized infinity representation in `to_string` and `from_string` ([#3](https://github.com/AlexandreDecan/python-intervals/issues/3)).
 
 
 **1.5.4** (2018-07-29)
