@@ -364,7 +364,12 @@ the `bound` parameter can be used to specify the regular expression that should 
 
 ```
 
+Infinity can be expressed as `inf`, `-inf`, or `+inf`, and will be mapped accordingly.
 
+```python
+>>> I.from_string('(10,inf)', conv=int) == I.open(10, I.inf)
+True
+```
 
 ## Contributions
 
@@ -390,7 +395,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **1.5.3** (2018-06-21)
 
  - Fix invalid `repr` for atomic singleton intervals.
- 
+
 
 **1.5.2** (2018-06-15)
 

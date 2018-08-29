@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.5.4'
+__version__ = '1.5.5'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -148,8 +148,9 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
 
             lower = group.get('lower', None)
             upper = group.get('upper', None)
-            lower = conv(lower) if lower is not None else inf
-            upper = conv(upper) if upper is not None else lower
+
+            lower = __conv_with_infinity(lower, conv) if lower is not None else inf
+            upper = __conv_with_infinity(upper, conv) if upper is not None else lower
 
             intervals.append(AtomicInterval(left, lower, upper, right))
             string = string[match.end():]
@@ -190,6 +191,15 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', left_clos
             exported_intervals.append('{}{}{}{}{}'.format(left, lower, sep, upper, right))
 
     return disj.join(exported_intervals)
+
+
+def __conv_with_infinity(value, conv):
+    if value == 'inf' or value == '+inf':
+        return inf
+    elif value == '-inf':
+        return -inf
+    else:
+        return conv(value)
 
 
 class AtomicInterval:
