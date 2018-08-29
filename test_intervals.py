@@ -117,6 +117,10 @@ def test_from_string():
     assert I.from_string('()', int) == I.empty()
     assert I.from_string('[1]', int) == I.singleton(1)
 
+    assert I.from_string('[1,inf)', int) == I.closed(1, I.inf)
+    assert I.from_string('(1,+inf)', int) == I.open(1, I.inf)
+    assert I.from_string('(-inf,1)', int) == I.open(-I.inf, 1)
+
     assert I.from_string('[0,1] | [2,3]', int) == I.closed(0, 1) | I.closed(2, 3)
 
     with pytest.raises(Exception):
@@ -167,16 +171,16 @@ def test_overlaps():
         I.closed(0, 1).to_atomic().overlaps(1)
     with pytest.raises(TypeError):
         I.closed(0, 1).overlaps(1)
-        
+
     assert I.closed(0, 1).overlaps(I.closed(0, 1))
     assert I.closed(0, 1).overlaps(I.open(0, 1))
     assert I.open(0, 1).overlaps(I.closed(0, 1))
     assert I.closed(0, 1).overlaps(I.openclosed(0, 1))
     assert I.closed(0, 1).overlaps(I.closedopen(0, 1))
 
-    assert I.closed(1, 2).overlaps(I.closed(2, 3)) 
+    assert I.closed(1, 2).overlaps(I.closed(2, 3))
     assert I.closed(1, 2).overlaps(I.closedopen(2, 3))
-    assert I.openclosed(1, 2).overlaps(I.closed(2, 3)) 
+    assert I.openclosed(1, 2).overlaps(I.closed(2, 3))
     assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3))
 
     assert not I.closed(0, 1).overlaps(I.closed(3, 4))
@@ -201,9 +205,9 @@ def test_overlaps_permissive():
     assert I.closed(0, 1).overlaps(I.openclosed(0, 1), permissive=True)
     assert I.closed(0, 1).overlaps(I.closedopen(0, 1), permissive=True)
 
-    assert I.closed(1, 2).overlaps(I.closed(2, 3), permissive=True) 
+    assert I.closed(1, 2).overlaps(I.closed(2, 3), permissive=True)
     assert I.closed(1, 2).overlaps(I.closedopen(2, 3), permissive=True)
-    assert I.openclosed(1, 2).overlaps(I.closed(2, 3), permissive=True) 
+    assert I.openclosed(1, 2).overlaps(I.closed(2, 3), permissive=True)
     assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3), permissive=True)
 
     assert not I.closed(0, 1).overlaps(I.closed(3, 4), permissive=True)
@@ -219,7 +223,7 @@ def test_overlaps_permissive():
 
     assert not I.empty().overlaps(I.open(-I.inf, I.inf), permissive=True)
     assert not I.open(-I.inf, I.inf).overlaps(I.empty(), permissive=True)
-    
+
 
 def test_emptiness():
     assert I.openclosed(1, 1).is_empty()
