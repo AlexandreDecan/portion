@@ -116,7 +116,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
 ### Arithmetic operations
 
-Both `Interval` and `AtomicInterval` support following interval arithmetic operations:
+Both `Interval` and `AtomicInterval` support following interval operations:
 
  - `x.is_empty()` tests if the interval is empty.
    ```python
@@ -222,7 +222,7 @@ The following methods are only available for `Interval` instances:
 
    ```
 
-The left and right boundaries, and the lower and upper bound of an `AtomicInterval` can be respectively accessed
+The left and right boundaries, and the lower and upper bounds of an `AtomicInterval` can be respectively accessed
 with its `left`, `right`, `lower` and `upper` attributes.
 The `left` and `right` bounds are either `I.CLOSED` (`True`) or `I.OPEN` (`False`).
 
@@ -238,7 +238,7 @@ True, False
 
 ### Comparison operators
 
-Equality between intervals can be checked using the classical `==` operator:
+Equality between intervals can be checked with the classical `==` operator:
 
 ```python
 >>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
@@ -274,7 +274,7 @@ False
 
 ```
 
-Note that this semantics differ from classical comparison operators.
+Note that these semantics differ from classical comparison operators.
 As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
 
 ```python
@@ -323,7 +323,6 @@ The way string representations are built can be easily parametrized using the va
 `to_string`:
 
 ```python
->>> x = I.openclosed(0, 1) | I.closed(2, I.inf)
 >>> params = {
 ...   'disj': ' or ',
 ...   'sep': ' - ',
@@ -335,6 +334,7 @@ The way string representations are built can be easily parametrized using the va
 ...   'ninf': '-oo',
 ...   'conv': lambda v: '"{}"'.format(v),
 ... }
+>>> x = I.openclosed(0, 1) | I.closed(2, I.inf)
 >>> I.to_string(x, **params)
 '.."0" - "1"> or <"2" - +oo..'
 
