@@ -15,6 +15,7 @@ This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
  - Atomic intervals and interval sets are supported.
  - Automatic simplification of intervals.
  - Support iteration, comparison, intersection, union, complement, difference and containment.
+ - Import and export intervals to strings and to Python built-in data types.
 
 
 ## Installation
