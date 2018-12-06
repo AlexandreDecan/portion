@@ -308,7 +308,7 @@ The `AtomicInterval` objects of an `Interval` can also be accessed using their i
 
 ```
 
-### Import and export to string
+### Import and export intervals to strings
 
 Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
 
@@ -348,8 +348,8 @@ A conversion function (`conv` parameter) has to be provided to convert a bound (
 True
 >>> I.from_string('[1.2]', conv=float) == I.singleton(1.2)
 True
->>> from datetime import datetime
->>> converter = lambda s: datetime.strptime(s, '%Y/%m/%d')
+>>> import datetime
+>>> converter = lambda s: datetime.datetime.strptime(s, '%Y/%m/%d')
 >>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
 [datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0)]
 
@@ -387,6 +387,38 @@ the `bound` parameter can be used to specify the regular expression that should 
 ```
 
 
+### Import and export intervals to a list of 4-uples
+
+Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
+
+```python
+>>> x = I.openclosed(0, 1) | I.closedopen(2, I.inf)
+>>> I.to_data(x)
+[(False, 0, 1, True), (True, 2, inf, False)]
+
+```
+
+The function that is used to convert bounds can be specified with the `conv` parameter.
+The values that must be used to represent positive and negative infinities can be specified with
+`pinf` and `ninf`, respectively.
+
+```python
+>>> x = I.closedopen(datetime.datetime(2011, 1, 1), I.inf)
+>>> I.to_data(x, conv=lambda v: v.year, pinf=datetime.MAXYEAR)
+[(True, 2011, 9999, False)]
+
+```
+
+Intervals can be imported from such a list of 4-uples with `from_data`. 
+The same set of parameters can be used to specify how bounds and infinities are converted.
+
+```python
+>>> x = [(True, 2011, 9999, False), (False, 1998, 1999, True)]
+>>> I.from_data(x, conv=lambda v: datetime.datetime(v, 1, 1), pinf=datetime.MAXYEAR)
+(datetime.datetime(1998, 1, 1, 0, 0),datetime.datetime(1999, 1, 1, 0, 0)] | [datetime.datetime(2011, 1, 1, 0, 0),+inf)
+
+```
+
 
 ## Contributions
 
@@ -402,6 +434,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+
+**1.7.0** (2018-12-06)
+
+ - Import from and export to list of 4-uples with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
 
 
 **1.6.0** (2018-08-29)
