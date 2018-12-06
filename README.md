@@ -437,7 +437,7 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**1.7.0** (2018-12-06)
+**1.7.0** (unreleased)
 
  - Import from and export to list of 4-uples with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
 
