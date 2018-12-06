@@ -400,12 +400,12 @@ Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to sup
 
 The function that is used to convert bounds can be specified with the `conv` parameter.
 The values that must be used to represent positive and negative infinities can be specified with
-`pinf` and `ninf`, respectively.
+`pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
 ```python
->>> x = I.closedopen(datetime.datetime(2011, 1, 1), I.inf)
->>> I.to_data(x, conv=lambda v: v.year, pinf=datetime.MAXYEAR)
-[(True, 2011, 9999, False)]
+>>> x = I.closed(datetime.datetime(2011, 3, 15), datetime.datetime(2013, 10, 10))
+>>> I.to_data(x, conv=lambda v: (v.year, v.month, v.day))
+[(True, (2011, 3, 15), (2013, 10, 10), True)]
 
 ```
 
@@ -413,9 +413,9 @@ Intervals can be imported from such a list of 4-uples with `from_data`.
 The same set of parameters can be used to specify how bounds and infinities are converted.
 
 ```python
->>> x = [(True, 2011, 9999, False), (False, 1998, 1999, True)]
->>> I.from_data(x, conv=lambda v: datetime.datetime(v, 1, 1), pinf=datetime.MAXYEAR)
-(datetime.datetime(1998, 1, 1, 0, 0),datetime.datetime(1999, 1, 1, 0, 0)] | [datetime.datetime(2011, 1, 1, 0, 0),+inf)
+>>> x = [(True, (2011, 3, 15), (2013, 10, 10), False)]
+>>> I.from_data(x, conv=lambda v: datetime.datetime(*v))
+[datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0))
 
 ```
 
