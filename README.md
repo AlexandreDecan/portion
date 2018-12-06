@@ -54,7 +54,7 @@ following helpers:
 
 Intervals created with this library are `Interval` instances.
 An `Interval` object is a disjunction of atomic intervals that represent single intervals (e.g. `[1,2]`) corresponding to `AtomicInterval` instances.
-Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed
+Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed. 
 
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
@@ -63,8 +63,8 @@ The bounds of an interval can be any arbitrary values, as long as they are compa
 [1.2,2.4]
 >>> I.closed('a', 'z')
 ['a','z']
->>> from datetime import date
->>> I.closed(date(2011, 3, 15), date(2013, 10, 10))
+>>> import datetime
+>>> I.closed(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
 [datetime.date(2011, 3, 15),datetime.date(2013, 10, 10)]
 
 ```
@@ -309,6 +309,38 @@ The `AtomicInterval` objects of an `Interval` can also be accessed using their i
 
 ```
 
+
+### Interval transformation
+
+Both `Interval` and `AtomicInterval` instances are expected to be immutable. 
+To apply an arbitrary transformation on an interval, it is necessary to create a new interval that
+is the result of applying the transformation on its bounds. 
+Because an interval supports iteration on its atomic intervals, this can be addressed with 
+a bit of Python code:
+
+```python
+>>> i = I.closed(2, 3) | I.open(4, 5)
+>>> # Increment bound values
+>>> I.Interval(*[I.AtomicInterval(x.left, x.lower + 1, x.upper + 1, x.right) for x in i])
+[3,4] | (5,6)
+>>> # Invert bounds
+>>> I.Interval(*[I.AtomicInterval(not x.left, x.lower, x.upper, not x.right) for x in i])
+(2,3) | [4,5]
+
+```
+
+Notice however that some extra attention could be required when a bound is `I.inf` or `-I.inf`:
+
+```python
+>>> i = I.openclosed(-I.inf, 3) | I.open(4, I.inf)
+>>> # Increment bound values
+>>> incr = lambda v: v + 1 if v not in [I.inf, -I.inf] else v
+>>> I.Interval(*[I.AtomicInterval(x.left, incr(x.lower), incr(x.upper), x.right) for x in i])
+(-inf,4] | (5,+inf)
+
+```
+
+
 ### Import and export intervals to strings
 
 Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
@@ -349,7 +381,6 @@ A conversion function (`conv` parameter) has to be provided to convert a bound (
 True
 >>> I.from_string('[1.2]', conv=float) == I.singleton(1.2)
 True
->>> import datetime
 >>> converter = lambda s: datetime.datetime.strptime(s, '%Y/%m/%d')
 >>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
 [datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0)]
@@ -388,7 +419,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 ```
 
 
-### Import and export intervals to a list of 4-uples
+### Import and export intervals to Python built-in data types
 
 Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
 
@@ -404,7 +435,7 @@ The values that must be used to represent positive and negative infinities can b
 `pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
 ```python
->>> x = I.closed(datetime.datetime(2011, 3, 15), datetime.datetime(2013, 10, 10))
+>>> x = I.closed(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
 >>> I.to_data(x, conv=lambda v: (v.year, v.month, v.day))
 [(True, (2011, 3, 15), (2013, 10, 10), True)]
 
@@ -415,8 +446,8 @@ The same set of parameters can be used to specify how bounds and infinities are 
 
 ```python
 >>> x = [(True, (2011, 3, 15), (2013, 10, 10), False)]
->>> I.from_data(x, conv=lambda v: datetime.datetime(*v))
-[datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0))
+>>> I.from_data(x, conv=lambda v: datetime.date(*v))
+[datetime.date(2011, 3, 15),datetime.date(2013, 10, 10))
 
 ```
 
@@ -437,9 +468,10 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**1.7.0** (unreleased)
+**1.7.0** (2018-12-06)
 
- - Import from and export to list of 4-uples with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
+ - Import from and export to Python built-in data types (a list of 4-uples) with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
+ - Add examples for arbitrary interval transformations.
 
 
 **1.6.0** (2018-08-29)
