@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -12,7 +12,7 @@ __all__ = [
     'inf', 'CLOSED', 'OPEN',
     'Interval',  # 'AtomicInterval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
-    'from_string', 'to_string',
+    'from_string', 'to_string', 'from_data', 'to_data',
 ]
 
 
@@ -212,6 +212,73 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(',
             exported_intervals.append('{}{}{}{}{}'.format(left, lower, sep, upper, right))
 
     return disj.join(exported_intervals)
+
+
+
+def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
+    """
+    Import an interval from a piece of data. 
+
+    :param data: a list of 4-uples (left, lower, upper, right).
+    :param conv: function that is used to convert "lower" and "upper" to bounds, default to identity.
+    :param pinf: value used to represent positive infinity.
+    :param ninf: value used to represent negative infinity.
+    :return: an Interval instance.
+    """
+    intervals = []
+    conv = (lambda v: v) if conv is None else conv
+
+    def _convert(bound):
+        if bound == pinf:
+            return inf
+        elif bound == ninf:
+            return -inf
+        else:
+            return conv(bound)
+
+    for item in data: 
+        left, lower, upper, right = item
+        intervals.append(AtomicInterval(
+            left, 
+            _convert(lower),
+            _convert(upper),
+            right
+        ))
+    return Interval(*intervals)
+
+
+def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
+    """
+    Export given interval (or atomic interval) to a list of 4-uples (left, lower,
+    upper, right). 
+
+    :param interval: an Interval or AtomicInterval instance.
+    :param conv: function that convert bounds to "lower" and "upper", default to identity.
+    :param pinf: value used to encode positive infinity.
+    :param ninf: value used to encode negative infinity.
+    :return: 
+    """
+    interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
+    conv = (lambda v: v) if conv is None else conv
+
+    data = []
+
+    def _convert(bound):
+        if bound == inf:
+            return pinf
+        elif bound == -inf:
+            return ninf
+        else:
+            return conv(bound)
+
+    for item in interval:
+        data.append((
+            item.left, 
+            _convert(item.lower), 
+            _convert(item.upper), 
+            item.right
+        ))
+    return data
 
 
 class AtomicInterval:

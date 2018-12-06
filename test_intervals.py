@@ -162,6 +162,29 @@ def test_from_string_customized():
     assert I.from_string('<"0"-"1"> or <"2"-"3">', **params) == I.closed(0, 1) | I.closed(2, 3)
 
 
+def test_to_data():
+    assert I.to_data(I.closedopen(2, 3)) == [(I.CLOSED, 2, 3, I.OPEN)]
+    assert I.to_data(I.openclosed(2, I.inf)) == [(I.OPEN, 2, float('inf'), I.OPEN)]
+    assert I.to_data(I.closed(-I.inf, 2)) == [(I.OPEN, float('-inf'), 2, I.CLOSED)]
+
+    i = I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
+    assert I.to_data(i) == [(I.OPEN, float('-inf'), 4, I.CLOSED), (I.CLOSED, 6, float('inf'), I.OPEN)]
+    assert I.to_data(i, conv=str, pinf='highest', ninf='lowest') == [(I.OPEN, 'lowest', '4', I.CLOSED), (I.CLOSED, '6', 'highest', I.OPEN)]
+
+
+def test_from_data():
+    assert I.from_data([(I.CLOSED, 2, 3, I.OPEN)]) == I.closedopen(2, 3)
+    assert I.from_data([(I.OPEN, 2, float('inf'), I.OPEN)]) == I.openclosed(2, I.inf)
+    assert I.from_data([(I.OPEN, float('-inf'), 2, I.CLOSED)]) == I.closed(-I.inf, 2)
+
+    d = [(I.OPEN, float('-inf'), 4, I.CLOSED), (I.CLOSED, 6, float('inf'), I.OPEN)]
+    assert I.from_data(d) == I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
+
+    d = [(I.OPEN, 'lowest', '4', I.CLOSED), (I.CLOSED, '6', 'highest', I.OPEN)]
+    assert I.from_data(d, conv=int, pinf='highest', ninf='lowest') == I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
+
+
+
 def test_interval_to_atomic():
     intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
     for interval in intervals:
