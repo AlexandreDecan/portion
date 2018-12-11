@@ -21,6 +21,19 @@ def test_infinity_comparisons_with_self(inf):
     assert not (inf != inf)
 
 
+@pytest.mark.skipif(sys.version_info < (3,0), reason='Not supported in Python 2')
+def test_infinities_are_singletons():
+    assert I._PInf() == I._PInf()
+    assert I._PInf() is I._PInf()
+    assert I._PInf() is -I._NInf()
+
+    assert I._NInf() == I._NInf()
+    assert I._NInf() is I._NInf()
+
+    assert I._PInf() is not I._NInf()
+    assert I._PInf() is not -I._PInf()
+
+
 @pytest.mark.parametrize('o', [0, 1, 1.0, 'a', list(), tuple(), dict(), I.closed(0, 1)])
 def test_infinity_comparisons_with_objects(o):
     assert o != I.inf and not (o == I.inf)
@@ -52,6 +65,40 @@ def test_creation():
 
     with pytest.raises(TypeError):
         I.Interval(1)
+
+
+def test_atomic_bounds():
+    i = I.openclosed(1, 2).to_atomic()
+    assert i.left == I.OPEN
+    assert i.right == I.CLOSED
+    assert i.lower == 1
+    assert i.upper == 2
+
+    i = I.openclosed(10, -10).to_atomic()
+    assert i.left == I.OPEN
+    assert i.right == I.OPEN
+    assert i.lower == I.inf
+    assert i.upper == -I.inf
+    
+
+def test_bounds():
+    i = I.openclosed(1, 2)
+    assert i.left == I.OPEN
+    assert i.right == I.CLOSED
+    assert i.lower == 1
+    assert i.upper == 2
+
+    i = I.openclosed(10, -10)
+    assert i.left == I.OPEN
+    assert i.right == I.OPEN
+    assert i.lower == I.inf
+    assert i.upper == -I.inf
+
+    i = I.open(0, 1) | I.closed(3, 4)
+    assert i.left == I.OPEN
+    assert i.right == I.CLOSED
+    assert i.lower == 0
+    assert i.upper == 4
 
 
 def test_hash():

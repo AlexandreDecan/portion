@@ -11,7 +11,7 @@ This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 ## Features
 
  - Support intervals of any (comparable) objects.
- - Closed or open, finite or infinite intervals.
+ - Closed or open, finite or (semi-) infinite intervals.
  - Atomic intervals and interval sets are supported.
  - Automatic simplification of intervals.
  - Support iteration, comparison, intersection, union, complement, difference and containment.
@@ -113,24 +113,9 @@ Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with
 in `[0,3]` even if there is no integer between `1` and `2`.
 
 
-
-
 ### Arithmetic operations
 
 Both `Interval` and `AtomicInterval` support following interval operations:
-
- - `x.is_empty()` tests if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).is_empty()
-   False
-   >>> I.closed(0, 0).is_empty()
-   False
-   >>> I.openclosed(0, 0).is_empty()
-   True
-   >>> I.empty().is_empty()
-   True
-
-   ```
 
  - `x.intersection(other)` or `x & other` return the intersection of two intervals.
    ```python
@@ -199,7 +184,6 @@ Both `Interval` and `AtomicInterval` support following interval operations:
 
    ```
 
-### Other methods and attributes
 
 The following methods are only available for `Interval` instances:
 
@@ -212,16 +196,8 @@ The following methods are only available for `Interval` instances:
 
  - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
 
- - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
-   ```python
-   >>> I.closed(0, 2).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
-   False
 
-   ```
+### Bounds of an interval
 
 The left and right boundaries, and the lower and upper bounds of an `AtomicInterval` can be respectively accessed
 with its `left`, `right`, `lower` and `upper` attributes.
@@ -236,55 +212,57 @@ True, False
 
 ```
 
-
-### Comparison operators
-
-Equality between intervals can be checked with the classical `==` operator:
+Similarly, the bounds of an `Interval` instance can be accessed with its `left`, `right`, 
+`lower` and `upper` attributes. In that case, `left` and `lower` refer to the lowest lower bound,
+while `right` and `upper` refer to the highest upper bound:
 
 ```python
->>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
-True
->>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
-True
+>>> x = I.open(0, 1) | I.closed(3, 4)
+>>> x.left, x.lower, x.upper, x.right
+(False, 0, 4, True)
 
 ```
 
-Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
-The comparison is based on the interval itself, not on its lower or upper bound only.
-For instance, `a < b` holds if `a` is entirely on the left of `b` and `a > b` holds if `a` is entirely
-on the right of `b`.
+
+### Interval properties
+
+ - `x.is_empty()` tests if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).is_empty()
+   False
+   >>> I.closed(0, 0).is_empty()
+   False
+   >>> I.openclosed(0, 0).is_empty()
+   True
+   >>> I.empty().is_empty()
+   True
+
+   ```
+
+ - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
+   ```python
+   >>> I.closed(0, 2).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   False
+
+   ```
+
+One can easily check for some interval properties based on the bounds of an interval:
 
 ```python
->>> I.closed(0, 1) < I.closed(2, 3)
-True
->>> I.closed(0, 1) < I.closed(1, 2)
+>>> x = I.openclosed(-I.inf, 0)
+>>> # Check that interval is left/right closed
+>>> x.left == I.CLOSED, x.right == I.CLOSED
+(False, True)
+>>> # Check that interval is left/right bounded
+>>> x.lower == -I.inf, x.upper == I.inf
+(True, False)
+>>> # Check for singleton
+>>> x.lower == x.upper
 False
-
-```
-
-Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
-holds if `a` is entirely on the right of the lower bound of `b`.
-
-```python
->>> I.closed(0, 1) <= I.closed(2, 3)
-True
->>> I.closed(0, 2) <= I.closed(1, 3)
-True
->>> I.closed(0, 3) <= I.closed(1, 2)
-False
-
-```
-
-Note that these semantics differ from classical comparison operators.
-As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
-
-```python
->>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
-False
->>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
-False
->>> I.empty() < I.empty()
-True
 
 ```
 
@@ -337,6 +315,58 @@ Notice however that some extra attention could be required when a bound is `I.in
 >>> incr = lambda v: v + 1 if v not in [I.inf, -I.inf] else v
 >>> I.Interval(*[I.AtomicInterval(x.left, incr(x.lower), incr(x.upper), x.right) for x in i])
 (-inf,4] | (5,+inf)
+
+```
+
+
+### Comparison operators
+
+Equality between intervals can be checked with the classical `==` operator:
+
+```python
+>>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
+True
+>>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
+True
+
+```
+
+Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
+The comparison is based on the interval itself, not on its lower or upper bound only.
+For instance, `a < b` holds if `a` is entirely on the left of `b` and `a > b` holds if `a` is entirely
+on the right of `b`.
+
+```python
+>>> I.closed(0, 1) < I.closed(2, 3)
+True
+>>> I.closed(0, 1) < I.closed(1, 2)
+False
+
+```
+
+Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
+holds if `a` is entirely on the right of the lower bound of `b`.
+
+```python
+>>> I.closed(0, 1) <= I.closed(2, 3)
+True
+>>> I.closed(0, 2) <= I.closed(1, 3)
+True
+>>> I.closed(0, 3) <= I.closed(1, 2)
+False
+
+```
+
+Note that these semantics differ from classical comparison operators.
+As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
+
+```python
+>>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
+False
+>>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
+False
+>>> I.empty() < I.empty()
+True
 
 ```
 
@@ -467,6 +497,10 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
+**1.8.0** (2018-12-11)
+
+ - `Interval` instances also have a `left`, `lower`, `upper`, and `right` attribute.
+ 
 
 **1.7.0** (2018-12-06)
 

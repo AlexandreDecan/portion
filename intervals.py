@@ -1,7 +1,7 @@
 import re
 
 __package__ = 'python-intervals'
-__version__ = '1.7.0'
+__version__ = '1.8.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -16,7 +16,15 @@ __all__ = [
 ]
 
 
-class _PInf:
+class _Singleton():
+    __instance = None
+    def __new__(cls, *args, **kwargs):
+        if not cls.__instance:
+            cls.__instance = super(_Singleton, cls).__new__(cls, *args, **kwargs)
+        return cls.__instance
+
+
+class _PInf(_Singleton):
     """
     Represent positive infinity.
     """
@@ -38,7 +46,7 @@ class _PInf:
     def __repr__(self): return '+inf'
 
 
-class _NInf:
+class _NInf(_Singleton):
     """
     Represent negative infinity.
     """
@@ -637,6 +645,33 @@ class Interval:
                     self._intervals.insert(i, interval)
                 else:
                     i = i + 1
+    @property
+    def left(self):
+        """
+        Boolean indicating whether the lowest left boundary is inclusive (True) or exclusive (False).
+        """
+        return self._intervals[0].left
+
+    @property
+    def lower(self):
+        """
+        Lowest lower bound value.
+        """
+        return self._intervals[0].lower
+
+    @property
+    def upper(self):
+        """
+        Highest upper bound value.
+        """
+        return self._intervals[-1].upper
+
+    @property
+    def right(self):
+        """
+        Boolean indicating whether the highest right boundary is inclusive (True) or exclusive (False).
+        """
+        return self._intervals[-1].right
 
     def is_empty(self):
         """
