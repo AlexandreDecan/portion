@@ -500,6 +500,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **1.8.0** (2018-12-11)
 
  - `Interval` instances also have a `left`, `lower`, `upper`, and `right` attribute.
+ - Infinities are singleton objects (Python 3+ only).
  
 
 **1.7.0** (2018-12-06)
