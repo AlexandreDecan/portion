@@ -223,6 +223,31 @@ while `right` and `upper` refer to the highest upper bound:
 
 ```
 
+Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that 
+can be used to create a new instance based on the current one. This method accepts four optional 
+parameters `left`, `lower`, `upper`, and `right`:
+
+```python
+>>> i = I.closed(2, 3)
+>>> i.replace(I.OPEN, 1, 2, I.CLOSED)
+(1,2)
+>>> i.replace(lower=1, right=I.OPEN)
+[1,3)
+
+```
+
+When applied on an `Interval` that is not atomic, it is either extended or restricted such that 
+its enclosure satisfies the new bounds. 
+
+```python
+>>> i = I.openclosed(0, 1) | I.closed(5, 10)
+>>> i.replace(I.CLOSED, -1, 8, I.OPEN)
+[-1,1] | [5,8)
+>>> i.replace(lower=4)
+(4,10]
+
+```
+
 
 ### Interval properties
 
@@ -267,6 +292,25 @@ False
 ```
 
 
+### Interval transformation
+
+To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method. 
+This method accepts a function that will be applied on each of the underlying atomic intervals to perform
+the desired transformation. 
+The function is expected to return a 4-uple `(left, lower, upper, right)` but for convenience, `Interval` and `AtomicInterval` instances can be returned as well. 
+
+```python
+>>> i = I.closed(2, 3) | I.open(4, 5)
+>>> # Increment bound values
+>>> i.apply(lambda x: (x.left, x.lower + 1, x.upper + 1, x.right))
+[3,4] | (5,6)
+>>> # Invert bounds
+>>> i.apply(lambda x: (not x.left, x.lower, x.upper, not x.right))
+(2,3) | [4,5]
+
+```
+
+
 ### Iteration & indexing
 
 Intervals can be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
@@ -284,37 +328,6 @@ The `AtomicInterval` objects of an `Interval` can also be accessed using their i
 [0,1]
 >>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
 (2,3)
-
-```
-
-
-### Interval transformation
-
-Both `Interval` and `AtomicInterval` instances are expected to be immutable. 
-To apply an arbitrary transformation on an interval, it is necessary to create a new interval that
-is the result of applying the transformation on its bounds. 
-Because an interval supports iteration on its atomic intervals, this can be addressed with 
-a bit of Python code:
-
-```python
->>> i = I.closed(2, 3) | I.open(4, 5)
->>> # Increment bound values
->>> I.Interval(*[I.AtomicInterval(x.left, x.lower + 1, x.upper + 1, x.right) for x in i])
-[3,4] | (5,6)
->>> # Invert bounds
->>> I.Interval(*[I.AtomicInterval(not x.left, x.lower, x.upper, not x.right) for x in i])
-(2,3) | [4,5]
-
-```
-
-Notice however that some extra attention could be required when a bound is `I.inf` or `-I.inf`:
-
-```python
->>> i = I.openclosed(-I.inf, 3) | I.open(4, I.inf)
->>> # Increment bound values
->>> incr = lambda v: v + 1 if v not in [I.inf, -I.inf] else v
->>> I.Interval(*[I.AtomicInterval(x.left, incr(x.lower), incr(x.upper), x.right) for x in i])
-(-inf,4] | (5,+inf)
 
 ```
 

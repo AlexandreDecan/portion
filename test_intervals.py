@@ -247,6 +247,40 @@ def test_interval_to_atomic():
     assert I.empty().to_atomic() == I.AtomicInterval(False, I.inf, -I.inf, False)
 
 
+def test_atomic_replace():
+    i = I.closed(0, 1).to_atomic()
+    assert i.replace() == i
+    assert i.replace(I.OPEN, 2, 3, I.OPEN) == I.open(2, 3)
+    assert i.replace(upper=2, left=I.OPEN) == I.openclosed(0, 2)
+
+
+def test_replace():
+    i = I.closed(0, 1) | I.open(2, 3)
+    assert i.replace() == i
+    assert i.replace(I.OPEN, -1, 4, I.OPEN) == I.openclosed(-1, 1) | I.open(2, 4)
+    assert i.replace(lower=2) == I.closedopen(2, 3)
+    assert i.replace(upper=1) == I.closed(0, 1)
+    assert i.replace(lower=5) == I.empty()
+    assert i.replace(upper=-5) == I.empty()
+
+
+def test_apply():
+    i = I.closed(0, 1)
+    assert i.apply(lambda s: s) == i
+    assert i.apply(lambda s: (False, -1, 2, False)) == I.open(-1, 2)
+    assert i.apply(lambda s: I.AtomicInterval(False, -1, 2, False)) == I.open(-1, 2)
+    assert i.apply(lambda s: I.open(-1, 2)) == I.open(-1, 2)
+
+    i = I.closed(0, 1) | I.closed(2, 3)
+    assert i.apply(lambda s: s) == i
+    assert i.apply(lambda s: (False, -1, 2, False)) == I.open(-1, 2)
+    assert i.apply(lambda s: (not s.left, s.lower - 1, s.upper - 1, not s.right)) == I.open(-1, 0) | I.open(1, 2)
+    assert i.apply(lambda s: I.AtomicInterval(False, -1, 2, False)) == I.open(-1, 2)
+    assert i.apply(lambda s: I.open(-1, 2)) == I.open(-1, 2)
+
+    assert i.apply(lambda s: (s.left, s.lower, s.upper * 2, s.right)) == I.closed(0, 6)
+
+
 def test_overlaps():
     # Overlaps should reject non supported types
     with pytest.raises(TypeError):

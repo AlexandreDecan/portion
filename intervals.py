@@ -359,6 +359,25 @@ class AtomicInterval:
             (self._lower == self._upper and (self._left == OPEN or self._right == OPEN))
         )
 
+    def replace(self, left=None, lower=None, upper=None, right=None):
+        """
+        Create a new interval based on the current one and the value provided. 
+
+        If current interval is not atomic, left/lower affect the lowest lower bound, while 
+        upper/right affect the highest upper bound.
+
+        :param left: left boundary of the lowest bound.
+        :param lower: value of the lowest bound.
+        :param upper: value of the highest bound.
+        :param right: right boundary of the highest bound.
+        :return: an Interval instance
+        """
+        left = self._left if left is None else left
+        lower = self._lower if lower is None else lower
+        upper = self._upper if upper is None else upper
+        right = self._right if right is None else right
+        return AtomicInterval(left, lower, upper, right)
+
     def overlaps(self, other, permissive=False):
         """
         Test if intervals have any overlapping value.
@@ -710,6 +729,47 @@ class Interval:
         :return: an Interval instance.
         """
         return Interval(self.to_atomic())
+
+    def replace(self, left=None, lower=None, upper=None, right=None):
+        """
+        Create a new interval based on the current one and the provided values. 
+
+        If current interval is not atomic, it is extended or restricted such that 
+        its enclosure satisfies the new bounds. In other words, its new enclosure
+        will be equal to self.to_atomic().replace(left, lower, upper, right).
+
+        :param left: left boundary.
+        :param lower: value of the lower bound.
+        :param upper: value of the upper bound.
+        :param right: right boundary.
+        :return: an Interval instance
+        """
+        ...
+
+    def apply(self, func):
+        """
+        Apply given function on each of the underlying AtomicInterval instances and return a new 
+        Interval instance.
+
+        The function is expected to return a 4-uple (left, lower, upper, right) but for convenience, 
+        an `Interval` or an `AtomicInterval` instance can be returned as well. 
+        
+        :param func: function to apply on each of the underlying AtomicInterval instances.
+        :return: an Interval instance.
+        """
+        intervals = []
+
+        for interval in self: 
+            value = func(interval)
+
+            if isinstance(value, (Interval, AtomicInterval)):
+                intervals.append(value)
+            elif isinstance(value, tuple):
+                intervals.append(AtomicInterval(*value))
+            else:
+                raise TypeError('Unsupported return type {} for {}'.format(type(value), value))
+        
+        return Interval(*intervals)
 
     def overlaps(self, other, permissive=False):
         """
