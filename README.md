@@ -293,13 +293,18 @@ parameters `left`, `lower`, `upper`, and `right`:
 ```
 
 Functions can be passed instead of values. If a function is passed, it is called with the current corresponding 
-value except if parameter `ignore_inf` if set (default) and the corresponding bound is an infinity. 
+value except if the corresponding bound is an infinity and parameter `ignore_inf` if set to `False`.
 
 ```python
 >>> I.closed(0, 2).replace(upper=lambda x: 2 * x)
 [0,4]
->>> I.closedopen(0, I.inf).replace(upper=lambda x: 2 * x)
+>>> i = I.closedopen(0, I.inf)
+>>> i.replace(upper=lambda x: 2 * x)
 [0,+inf)
+>>> i.replace(upper=lambda x: 10)  # No change, infinity is ignored
+[0,+inf)
+>>> i.replace(upper=lambda x: 10, ignore_inf=False)  # Infinity is not ignored
+[0,10)
 
 ```
 
@@ -348,6 +353,10 @@ conveniently used to transform intervals in presence of infinities.
 >>> # Invert bounds
 >>> i.apply(lambda x: x.replace(left=lambda v: not v, right=lambda v: not v))
 (-inf,0) | (3,4) | (8,+inf)
+>>> # Replace infinities with -10 and 10
+>>> conv = lambda v: -10 if v == -I.inf else (10 if v == I.inf else v)
+>>> i.apply(lambda x: x.replace(lower=conv, upper=conv, ignore_inf=False))
+(-10,0] | [3,4] | [8,10)
 
 ```
 
@@ -569,7 +578,7 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
-**1.8.0** (2018-12-11)
+**1.8.0** (unreleased)
 
  - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
  - Intervals have a `replace` method to create new intervals based on the current one. This method accepts both values and functions.
