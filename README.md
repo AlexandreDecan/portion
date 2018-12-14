@@ -512,8 +512,12 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 **1.8.0** (2018-12-11)
 
- - `Interval` instances also have a `left`, `lower`, `upper`, and `right` attribute.
- 
+ - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
+ - Intervals have a `replace` method to create new intervals based on the current one. 
+ - Intervals have an `apply` method to apply a function on the underlying atomic intervals. 
+ - `I.empty()` returns the same instance to save memory.
+ - Infinities are singleton objects. 
+
 
 **1.7.0** (2018-12-06)
 

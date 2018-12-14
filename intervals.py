@@ -115,7 +115,9 @@ def empty():
     """
     Create an empty set.
     """
-    return Interval(AtomicInterval(OPEN, inf, -inf, OPEN))
+    if not hasattr(empty, '_instance'):
+        empty._instance = Interval(AtomicInterval(OPEN, inf, -inf, OPEN))
+    return empty._instance
 
 
 def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', 

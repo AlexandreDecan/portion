@@ -58,6 +58,9 @@ def test_creation():
     assert I.closed(3, -3) == I.empty()
     assert I.openclosed(3, 3) == I.empty()
 
+    # I.empty() is a singleton
+    assert I.empty() is I.empty()
+
     assert I.Interval(I.closed(0, 1).to_atomic()) == I.closed(0, 1)
     assert I.Interval(I.closed(0, 1)) == I.closed(0, 1)
     assert I.Interval(I.closed(0, 1).to_atomic(), I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
