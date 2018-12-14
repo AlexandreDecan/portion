@@ -7,6 +7,21 @@
 
 This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 
+  * [Features](#features)
+  * [Installation](#installation)
+  * [Documentation & usage](#documentation--usage)
+      * [Interval creation](#interval-creation)
+      * [Arithmetic operations](#arithmetic-operations)
+      * [Bounds of an interval](#bounds-of-an-interval)
+      * [Interval transformation](#interval-transformation)
+      * [Iteration & indexing](#iteration--indexing)
+      * [Comparison operators](#comparison-operators)
+      * [Import & export intervals to strings](#import--export-intervals-to-strings)
+      * [Import & export intervals to Python built-in data types](#import--export-intervals-to-python-built-in-data-types)
+  * [Contributions](#contributions)
+  * [Licence](#licence)
+  * [Changelog](#changelog)
+
 
 ## Features
 
@@ -402,7 +417,7 @@ True
 ```
 
 
-### Import and export intervals to strings
+### Import & export intervals to strings
 
 Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
 
@@ -480,7 +495,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 ```
 
 
-### Import and export intervals to Python built-in data types
+### Import & export intervals to Python built-in data types
 
 Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
 
