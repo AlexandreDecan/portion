@@ -361,23 +361,41 @@ class AtomicInterval:
             (self._lower == self._upper and (self._left == OPEN or self._right == OPEN))
         )
 
-    def replace(self, left=None, lower=None, upper=None, right=None):
+    def replace(self, left=None, lower=None, upper=None, right=None, ignore_inf=True):
         """
-        Create a new interval based on the current one and the value provided. 
+        Create a new interval based on the current one and the provided values.
 
-        If current interval is not atomic, left/lower affect the lowest lower bound, while 
-        upper/right affect the highest upper bound.
+        Callable can be passed instead of values. In that case, it is called with the current
+        corresponding value except if ignore_inf if set (default) and the corresponding 
+        bound is an infinity. 
 
-        :param left: left boundary of the lowest bound.
-        :param lower: value of the lowest bound.
-        :param upper: value of the highest bound.
-        :param right: right boundary of the highest bound.
+        :param left: (a function of) left boundary.
+        :param lower: (a function of) value of the lower bound.
+        :param upper: (a function of) value of the upper bound.
+        :param right: (a function of) right boundary.
+        :param ignore_inf: ignore infinities if functions are provided (default is True).
         :return: an Interval instance
         """
-        left = self._left if left is None else left
-        lower = self._lower if lower is None else lower
-        upper = self._upper if upper is None else upper
-        right = self._right if right is None else right
+        if callable(left):
+            left = left(self._left)
+        else:
+            left = self._left if left is None else left
+
+        if callable(lower):
+            lower = self._lower if ignore_inf and self._lower in [-inf, inf] else lower(self._lower)
+        else:
+            lower = self._lower if lower is None else lower
+
+        if callable(upper):
+            upper = self._upper if ignore_inf and self._upper in [-inf, inf] else upper(self._upper)
+        else:
+            upper = self._upper if upper is None else upper
+
+        if callable(right):
+            right = right(self._right)
+        else:
+            right = self._right if right is None else right
+
         return AtomicInterval(left, lower, upper, right)
 
     def overlaps(self, other, permissive=False):
@@ -729,25 +747,46 @@ class Interval:
         """
         return Interval(self.to_atomic())
 
-    def replace(self, left=None, lower=None, upper=None, right=None):
+    def replace(self, left=None, lower=None, upper=None, right=None, ignore_inf=True):
         """
         Create a new interval based on the current one and the provided values. 
-
+           
         If current interval is not atomic, it is extended or restricted such that 
         its enclosure satisfies the new bounds. In other words, its new enclosure
         will be equal to self.to_atomic().replace(left, lower, upper, right).
 
-        :param left: left boundary.
-        :param lower: value of the lower bound.
-        :param upper: value of the upper bound.
-        :param right: right boundary.
+        Callable can be passed instead of values. In that case, it is called with the current
+        corresponding value except if ignore_inf if set (default) and the corresponding 
+        bound is an infinity. 
+
+        :param left: (a function of) left boundary.
+        :param lower: (a function of) value of the lower bound.
+        :param upper: (a function of) value of the upper bound.
+        :param right: (a function of) right boundary.
+        :param ignore_inf: ignore infinities if functions are provided (default is True).
         :return: an Interval instance
         """
         enclosure = self.to_atomic()
-        left = enclosure.left if left is None else left
-        lower = enclosure.lower if lower is None else lower
-        upper = enclosure.upper if upper is None else upper
-        right = enclosure.right if right is None else right
+
+        if callable(left):
+            left = left(enclosure._left)
+        else:
+            left = enclosure._left if left is None else left
+
+        if callable(lower):
+            lower = enclosure._lower if ignore_inf and enclosure._lower in [-inf, inf] else lower(enclosure._lower)
+        else:
+            lower = enclosure._lower if lower is None else lower
+
+        if callable(upper):
+            upper = enclosure._upper if ignore_inf and enclosure._upper in [-inf, inf] else upper(enclosure._upper)
+        else:
+            upper = enclosure._upper if upper is None else upper
+
+        if callable(right):
+            right = right(enclosure._right)
+        else:
+            right = enclosure._right if right is None else right
         
         n_interval = self & AtomicInterval(left, lower, upper, right)
 
@@ -761,10 +800,8 @@ class Interval:
     def apply(self, func):
         """
         Apply given function on each of the underlying AtomicInterval instances and return a new 
-        Interval instance.
-
-        The function is expected to return a 4-uple (left, lower, upper, right) but for convenience, 
-        an `Interval` or an `AtomicInterval` instance can be returned as well. 
+        Interval instance. The function is expected to return an AtomicInterval, an Interval
+        or a 4-uple (left, lower, upper, right). 
         
         :param func: function to apply on each of the underlying AtomicInterval instances.
         :return: an Interval instance.

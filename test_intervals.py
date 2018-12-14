@@ -250,14 +250,19 @@ def test_interval_to_atomic():
     assert I.empty().to_atomic() == I.AtomicInterval(False, I.inf, -I.inf, False)
 
 
-def test_atomic_replace():
+def test_replace():
     i = I.closed(0, 1).to_atomic()
     assert i.replace() == i
     assert i.replace(I.OPEN, 2, 3, I.OPEN) == I.open(2, 3)
     assert i.replace(upper=2, left=I.OPEN) == I.openclosed(0, 2)
 
+    assert i.replace(lower=lambda v: 1 + v) == I.singleton(1)
+    assert i.replace(left=lambda v: not v, right=lambda v: not v) == I.open(0, 1)
 
-def test_replace():
+    i = I.open(-I.inf, I.inf)
+    assert i.replace(lower=lambda v: 1, upper=lambda v: 1) == I.open(-I.inf, I.inf)
+    assert i.replace(lower=lambda v: 1, upper=lambda v: 2, ignore_inf=False) == I.open(1, 2)
+    
     i = I.closed(0, 1) | I.open(2, 3)
     assert i.replace() == i
     assert i.replace(I.OPEN, -1, 4, I.OPEN) == I.openclosed(-1, 1) | I.open(2, 4)

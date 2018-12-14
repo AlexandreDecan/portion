@@ -38,7 +38,7 @@ This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 You can use `pip` to install it, as usual: `pip install python-intervals`.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
-Prereleases are available from its *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
+Prereleases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
 
 For convenience, the library is contained within a single Python file, and can thus be easily integrated in other
 projects without the need for an explicit dependency (hint: don't do that!).
@@ -292,7 +292,18 @@ parameters `left`, `lower`, `upper`, and `right`:
 
 ```
 
-When applied on an `Interval` that is not atomic, it is extended and/or restricted such that 
+Functions can be passed instead of values. If a function is passed, it is called with the current corresponding 
+value except if parameter `ignore_inf` if set (default) and the corresponding bound is an infinity. 
+
+```python
+>>> I.closed(0, 2).replace(upper=lambda x: 2 * x)
+[0,4]
+>>> I.closedopen(0, I.inf).replace(upper=lambda x: 2 * x)
+[0,+inf)
+
+```
+
+When `replace` is applied on an `Interval` that is not atomic, it is extended and/or restricted such that 
 its enclosure satisfies the new bounds.
 
 ```python
@@ -309,8 +320,7 @@ its enclosure satisfies the new bounds.
 
 To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method. 
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation. 
-The function is expected to return a 4-uple `(left, lower, upper, right)` but for convenience, `Interval` 
-and `AtomicInterval` instances can be returned as well. 
+The function is expected to return an `AtomicInterval`, an `Interval` or a 4-uple `(left, lower, upper, right)`.
 
 ```python
 >>> i = I.closed(2, 3) | I.open(4, 5)
@@ -323,7 +333,23 @@ and `AtomicInterval` instances can be returned as well.
 
 ```
 
-Remember that bounds can be infinities, and that most operations do not apply on them.
+The `apply` method is very powerful when used in combination with `replace`. 
+Because the latter allows functions to be passed as parameters and can ignore infinities, it can be 
+conveniently used to transform intervals in presence of infinities.
+
+```python
+>>> i = I.openclosed(-I.inf, 0) | I.closed(3, 4) | I.closedopen(8, I.inf)
+>>> # Increment bound values
+>>> i.apply(lambda x: x.replace(upper=lambda v: v + 1))
+(-inf,1] | [3,5] | [8,+inf)
+>>> # Intervals are still automatically simplified
+>>> i.apply(lambda x: x.replace(lower=lambda v: v * 2))
+(-inf,0] | [16,+inf)
+>>> # Invert bounds
+>>> i.apply(lambda x: x.replace(left=lambda v: not v, right=lambda v: not v))
+(-inf,0) | (3,4) | (8,+inf)
+
+```
 
 
 ### Iteration & indexing
@@ -546,7 +572,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **1.8.0** (2018-12-11)
 
  - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
- - Intervals have a `replace` method to create new intervals based on the current one. 
+ - Intervals have a `replace` method to create new intervals based on the current one. This method accepts both values and functions.
  - Intervals have an `apply` method to apply a function on the underlying atomic intervals. 
  - Intervals can be compared with single values as well.
  - `I.empty()` returns the same instance to save memory.
