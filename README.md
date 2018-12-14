@@ -11,10 +11,10 @@ This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
 ## Features
 
  - Support intervals of any (comparable) objects.
- - Closed or open, finite or (semi-) infinite intervals.
+ - Closed or open, finite or (semi-)infinite intervals.
  - Atomic intervals and interval sets are supported.
  - Automatic simplification of intervals.
- - Support iteration, comparison, intersection, union, complement, difference and containment.
+ - Support iteration, comparison, transformation, intersection, union, complement, difference and containment.
  - Import and export intervals to strings and to Python built-in data types.
 
 
@@ -72,7 +72,7 @@ The bounds of an interval can be any arbitrary values, as long as they are compa
 
 Infinite and semi-infinite intervals are supported using `I.inf` and `-I.inf` as upper or lower bounds.
 These two objects support comparison with any other object.
-When infinites are used as a lower or upper bound, the corresponding boundary is automatically converted to an open one.
+When infinities are used as a lower or upper bound, the corresponding boundary is automatically converted to an open one.
 
 ```python
 >>> I.inf > 'a', I.inf > 0, I.inf > True
@@ -116,6 +116,19 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 ### Arithmetic operations
 
 Both `Interval` and `AtomicInterval` support following interval operations:
+ 
+ - `x.is_empty()` tests if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).is_empty()
+   False
+   >>> I.closed(0, 0).is_empty()
+   False
+   >>> I.openclosed(0, 0).is_empty()
+   True
+   >>> I.empty().is_empty()
+   True
+
+   ```
 
  - `x.intersection(other)` or `x & other` return the intersection of two intervals.
    ```python
@@ -196,6 +209,17 @@ The following methods are only available for `Interval` instances:
 
  - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
 
+ - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
+   ```python
+   >>> I.closed(0, 2).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
+   True
+   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   False
+
+   ```
+
 
 ### Bounds of an interval
 
@@ -223,58 +247,6 @@ while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```
 
-Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that 
-can be used to create a new instance based on the current one. This method accepts four optional 
-parameters `left`, `lower`, `upper`, and `right`:
-
-```python
->>> i = I.closed(2, 3)
->>> i.replace(I.OPEN, 1, 2, I.CLOSED)
-(1,2]
->>> i.replace(lower=1, right=I.OPEN)
-[1,3)
-
-```
-
-When applied on an `Interval` that is not atomic, it is either extended or restricted such that 
-its enclosure satisfies the new bounds.
-
-```python
->>> i = I.openclosed(0, 1) | I.closed(5, 10)
->>> i.replace(I.CLOSED, -1, 8, I.OPEN)
-[-1,1] | [5,8)
->>> i.replace(lower=4)
-(4,10]
-
-```
-
-
-### Interval properties
-
- - `x.is_empty()` tests if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).is_empty()
-   False
-   >>> I.closed(0, 0).is_empty()
-   False
-   >>> I.openclosed(0, 0).is_empty()
-   True
-   >>> I.empty().is_empty()
-   True
-
-   ```
-
- - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
-   ```python
-   >>> I.closed(0, 2).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
-   True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
-   False
-
-   ```
-
 One can easily check for some interval properties based on the bounds of an interval:
 
 ```python
@@ -292,12 +264,38 @@ False
 ```
 
 
+Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that 
+can be used to create a new instance based on the current one. This method accepts four optional 
+parameters `left`, `lower`, `upper`, and `right`:
+
+```python
+>>> i = I.closed(0, 2).to_atomic()
+>>> i.replace(I.OPEN, -1, 3, I.CLOSED)
+(-1,3]
+>>> i.replace(lower=1, right=I.OPEN)
+[1,2)
+
+```
+
+When applied on an `Interval` that is not atomic, it is extended and/or restricted such that 
+its enclosure satisfies the new bounds.
+
+```python
+>>> i = I.openclosed(0, 1) | I.closed(5, 10)
+>>> i.replace(I.CLOSED, -1, 8, I.OPEN)
+[-1,1] | [5,8)
+>>> i.replace(lower=4)
+(4,10]
+
+```
+
+
 ### Interval transformation
 
 To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method. 
-This method accepts a function that will be applied on each of the underlying atomic intervals to perform
-the desired transformation. 
-The function is expected to return a 4-uple `(left, lower, upper, right)` but for convenience, `Interval` and `AtomicInterval` instances can be returned as well. 
+This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation. 
+The function is expected to return a 4-uple `(left, lower, upper, right)` but for convenience, `Interval` 
+and `AtomicInterval` instances can be returned as well. 
 
 ```python
 >>> i = I.closed(2, 3) | I.open(4, 5)
@@ -309,6 +307,8 @@ The function is expected to return a 4-uple `(left, lower, upper, right)` but fo
 (2,3) | [4,5]
 
 ```
+
+Remember that bounds can be infinities, and that most operations do not apply on them.
 
 
 ### Iteration & indexing
@@ -345,9 +345,9 @@ True
 ```
 
 Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
-The comparison is based on the interval itself, not on its lower or upper bound only.
-For instance, `a < b` holds if `a` is entirely on the left of `b` and `a > b` holds if `a` is entirely
-on the right of `b`.
+These comparison operators have a different behaviour than the usual one. 
+For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
+on the right of the upper bound of `b`.
 
 ```python
 >>> I.closed(0, 1) < I.closed(2, 3)
@@ -369,6 +369,24 @@ True
 False
 
 ```
+
+Intervals can also be compared with single values. If `i` is an interval and `x` a value, then 
+`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the 
+left of the upper bound of `i`. This behaviour is similar to the one that could be obtained by first
+converting `x` to a singleton interval. 
+
+```python
+>>> 5 < I.closed(0, 10)
+False
+>>> 5 <= I.closed(0, 10)
+True
+>>> I.closed(0, 10) < 5
+False
+>>> I.closed(0, 10) <= 5
+True
+
+```
+
 
 Note that these semantics differ from classical comparison operators.
 As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
@@ -515,8 +533,10 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
  - Intervals have a `replace` method to create new intervals based on the current one. 
  - Intervals have an `apply` method to apply a function on the underlying atomic intervals. 
+ - Intervals can be compared with single values as well.
  - `I.empty()` returns the same instance to save memory.
  - Infinities are singleton objects. 
+ - Set `len(I.empty()) = 1` and `I.empty()[0] == I.empty().to_atomic()` for consistency.
 
 
 **1.7.0** (2018-12-06)

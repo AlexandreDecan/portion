@@ -549,52 +549,48 @@ class AtomicInterval:
         return not self == other  # Required for Python 2
 
     def __lt__(self, other):
-        if isinstance(other, Interval):
-            other = other.to_atomic()
-
         if isinstance(other, AtomicInterval):
             if self._right == OPEN:
                 return self._upper <= other._lower
             else:
                 return self._upper < other._lower or (self._upper == other._lower and other._left == OPEN)
+        elif isinstance(other, Interval):
+            return self < other.to_atomic()
         else:
-            return NotImplemented
+            return AtomicInterval(CLOSED, other, other, CLOSED) > self
 
     def __gt__(self, other):
-        if isinstance(other, Interval):
-            other = other.to_atomic()
-
         if isinstance(other, AtomicInterval):
             if self._left == OPEN:
                 return self._lower >= other._upper
             else:
                 return self._lower > other._upper or (self._lower == other._upper and other._right == OPEN)
+        elif isinstance(other, Interval):
+            return self > other.to_atomic()
         else:
-            return NotImplemented
+            return AtomicInterval(CLOSED, other, other, CLOSED) < self
 
     def __le__(self, other):
-        if isinstance(other, Interval):
-            other = other.to_atomic()
-
         if isinstance(other, AtomicInterval):
             if self._right == OPEN:
                 return self._upper <= other._upper
             else:
                 return self._upper < other._upper or (self._upper == other._upper and other._right == CLOSED)
+        elif isinstance(other, Interval):
+            return self <= other.to_atomic()
         else:
-            return NotImplemented
+            return AtomicInterval(CLOSED, other, other, CLOSED) >= self
 
     def __ge__(self, other):
-        if isinstance(other, Interval):
-            other = other.to_atomic()
-
         if isinstance(other, AtomicInterval):
             if self._left == OPEN:
                 return self._lower >= other._lower
             else:
                 return self._lower > other._lower or (self._lower == other._lower and other._left == CLOSED)
+        elif isinstance(other, Interval):
+            return self >= other.to_atomic()
         else:
-            return NotImplemented
+            return AtomicInterval(CLOSED, other, other, CLOSED) <= self
 
     def __hash__(self):
         try:
@@ -666,6 +662,7 @@ class Interval:
                     self._intervals.insert(i, interval)
                 else:
                     i = i + 1
+
     @property
     def left(self):
         """
@@ -759,8 +756,7 @@ class Interval:
             highest = n_interval[-1].replace(upper=upper, right=right)
             return Interval(*[lowest] + n_interval[1:-1] + [highest])
         else:
-            # Use ._intervals to avoid an IndexError if interval is empty
-            return Interval(n_interval._intervals[0].replace(left, lower, upper, right))
+            return Interval(n_interval[0].replace(left, lower, upper, right))
 
     def apply(self, func):
         """
@@ -857,22 +853,13 @@ class Interval:
         return self - other
 
     def __len__(self):
-        if self._intervals[0].is_empty():
-            return 0
-        else:
-            return len(self._intervals)
+        return len(self._intervals)
 
     def __iter__(self):
-        if self._intervals[0].is_empty():
-            return iter([])
-        else:
-            return iter(self._intervals)
+        return iter(self._intervals)
 
     def __getitem__(self, item):
-        if self._intervals[0].is_empty():
-            raise IndexError('Interval is empty')
-        else:
-            return self._intervals[item]
+        return self._intervals[item]
 
     def __and__(self, other):
         if isinstance(other, (AtomicInterval, Interval)):
@@ -947,37 +934,17 @@ class Interval:
         return not self == other  # Required for Python 2
 
     def __lt__(self, other):
-        if isinstance(other, AtomicInterval):
-            return self._intervals[-1] < other
-        elif isinstance(other, Interval):
-            return self._intervals[-1] < other._intervals[0]
-        else:
-            return NotImplemented
+        return self.to_atomic() < other
 
     def __gt__(self, other):
-        if isinstance(other, AtomicInterval):
-            return self._intervals[0] > other
-        elif isinstance(other, Interval):
-            return self._intervals[0] > other._intervals[-1]
-        else:
-            return NotImplemented
+        return self.to_atomic() > other
 
     def __le__(self, other):
-        if isinstance(other, AtomicInterval):
-            return self._intervals[-1] <= other
-        elif isinstance(other, Interval):
-            return self._intervals[-1] <= other._intervals[-1]
-        else:
-            return NotImplemented
-
+        return self.to_atomic() <= other
+        
     def __ge__(self, other):
-        if isinstance(other, AtomicInterval):
-            return self._intervals[0] >= other
-        elif isinstance(other, Interval):
-            return self._intervals[0] >= other._intervals[0]
-        else:
-            return NotImplemented
-
+        return self.to_atomic() >= other
+            
     def __hash__(self):
         return hash(self._intervals[0])
 
