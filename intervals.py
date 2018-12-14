@@ -744,7 +744,21 @@ class Interval:
         :param right: right boundary.
         :return: an Interval instance
         """
-        ...
+        enclosure = self.to_atomic()
+        left = enclosure.left if left is None else left
+        lower = enclosure.lower if lower is None else lower
+        upper = enclosure.upper if upper is None else upper
+        right = enclosure.right if right is None else right
+        
+        n_interval = self & AtomicInterval(left, lower, upper, right)
+
+        if len(n_interval) > 1:
+            lowest = n_interval[0].replace(left=left, lower=lower)
+            highest = n_interval[-1].replace(upper=upper, right=right)
+            return Interval(*[lowest] + n_interval[1:-1] + [highest])
+        else:
+            # Use ._intervals to avoid an IndexError if interval is empty
+            return Interval(n_interval._intervals[0].replace(left, lower, upper, right))
 
     def apply(self, func):
         """

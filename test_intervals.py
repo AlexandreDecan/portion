@@ -259,9 +259,11 @@ def test_replace():
     assert i.replace() == i
     assert i.replace(I.OPEN, -1, 4, I.OPEN) == I.openclosed(-1, 1) | I.open(2, 4)
     assert i.replace(lower=2) == I.closedopen(2, 3)
-    assert i.replace(upper=1) == I.closed(0, 1)
+    assert i.replace(upper=1) == I.closedopen(0, 1)
     assert i.replace(lower=5) == I.empty()
     assert i.replace(upper=-5) == I.empty()
+
+    assert I.empty().replace(lower=2, upper=4) == I.open(2, 4)
 
 
 def test_apply():

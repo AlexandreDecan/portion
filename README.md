@@ -213,8 +213,8 @@ True, False
 ```
 
 Similarly, the bounds of an `Interval` instance can be accessed with its `left`, `right`, 
-`lower` and `upper` attributes. In that case, `left` and `lower` refer to the lowest lower bound,
-while `right` and `upper` refer to the highest upper bound:
+`lower` and `upper` attributes. In that case, `left` and `lower` refer to the lower bound of its enclosure,
+while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```python
 >>> x = I.open(0, 1) | I.closed(3, 4)
@@ -230,14 +230,14 @@ parameters `left`, `lower`, `upper`, and `right`:
 ```python
 >>> i = I.closed(2, 3)
 >>> i.replace(I.OPEN, 1, 2, I.CLOSED)
-(1,2)
+(1,2]
 >>> i.replace(lower=1, right=I.OPEN)
 [1,3)
 
 ```
 
 When applied on an `Interval` that is not atomic, it is either extended or restricted such that 
-its enclosure satisfies the new bounds. 
+its enclosure satisfies the new bounds.
 
 ```python
 >>> i = I.openclosed(0, 1) | I.closed(5, 10)
