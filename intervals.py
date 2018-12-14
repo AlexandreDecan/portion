@@ -18,6 +18,7 @@ __all__ = [
 
 class _Singleton():
     __instance = None
+
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
             cls.__instance = super(_Singleton, cls).__new__(cls, *args, **kwargs)
@@ -120,7 +121,7 @@ def empty():
     return empty._instance
 
 
-def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(', 
+def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(',
                 left_closed=r'\[', right_open=r'\)', right_closed=r'\]', pinf=r'\+inf', ninf=r'-inf'):
     """
     Parse given string and create an Interval instance.
@@ -178,7 +179,7 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_ope
     return Interval(*intervals)
 
 
-def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(', 
+def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(',
               left_closed='[', right_open=')', right_closed=']', pinf='+inf', ninf='-inf'):
     """
     Export given interval (or atomic interval) to string.
@@ -224,10 +225,9 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(',
     return disj.join(exported_intervals)
 
 
-
 def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
     """
-    Import an interval from a piece of data. 
+    Import an interval from a piece of data.
 
     :param data: a list of 4-uples (left, lower, upper, right).
     :param conv: function that is used to convert "lower" and "upper" to bounds, default to identity.
@@ -246,10 +246,10 @@ def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
         else:
             return conv(bound)
 
-    for item in data: 
+    for item in data:
         left, lower, upper, right = item
         intervals.append(AtomicInterval(
-            left, 
+            left,
             _convert(lower),
             _convert(upper),
             right
@@ -260,13 +260,13 @@ def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
 def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     """
     Export given interval (or atomic interval) to a list of 4-uples (left, lower,
-    upper, right). 
+    upper, right).
 
     :param interval: an Interval or AtomicInterval instance.
     :param conv: function that convert bounds to "lower" and "upper", default to identity.
     :param pinf: value used to encode positive infinity.
     :param ninf: value used to encode negative infinity.
-    :return: 
+    :return: a list of 4-uples (left, lower, upper, right)
     """
     interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
     conv = (lambda v: v) if conv is None else conv
@@ -283,9 +283,9 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
 
     for item in interval:
         data.append((
-            item.left, 
-            _convert(item.lower), 
-            _convert(item.upper), 
+            item.left,
+            _convert(item.lower),
+            _convert(item.upper),
             item.right
         ))
     return data
@@ -295,7 +295,8 @@ class AtomicInterval:
     """
     This class represents an atomic interval.
 
-    An atomic interval is a single interval, with a lower and upper bounds, and two (closed or open) boundaries.
+    An atomic interval is a single interval, with a lower and upper bounds,
+    and two (closed or open) boundaries.
     """
 
     __slots__ = ('_left', '_lower', '_upper', '_right')
@@ -304,7 +305,8 @@ class AtomicInterval:
         """
         Create an atomic interval.
 
-        If a bound is set to infinity (regardless of its sign), the corresponding boundary will be exclusive.
+        If a bound is set to infinity (regardless of its sign), the corresponding boundary will
+        be exclusive.
 
         :param left: Boolean indicating whether the left boundary is inclusive (True) or exclusive (False).
         :param lower: lower bound value.
@@ -366,8 +368,8 @@ class AtomicInterval:
         Create a new interval based on the current one and the provided values.
 
         Callable can be passed instead of values. In that case, it is called with the current
-        corresponding value except if ignore_inf if set (default) and the corresponding 
-        bound is an infinity. 
+        corresponding value except if ignore_inf if set (default) and the corresponding
+        bound is an infinity.
 
         :param left: (a function of) left boundary.
         :param lower: (a function of) value of the lower bound.
@@ -749,15 +751,15 @@ class Interval:
 
     def replace(self, left=None, lower=None, upper=None, right=None, ignore_inf=True):
         """
-        Create a new interval based on the current one and the provided values. 
-           
-        If current interval is not atomic, it is extended or restricted such that 
+        Create a new interval based on the current one and the provided values.
+
+        If current interval is not atomic, it is extended or restricted such that
         its enclosure satisfies the new bounds. In other words, its new enclosure
         will be equal to self.to_atomic().replace(left, lower, upper, right).
 
         Callable can be passed instead of values. In that case, it is called with the current
-        corresponding value except if ignore_inf if set (default) and the corresponding 
-        bound is an infinity. 
+        corresponding value except if ignore_inf if set (default) and the corresponding
+        bound is an infinity.
 
         :param left: (a function of) left boundary.
         :param lower: (a function of) value of the lower bound.
@@ -787,7 +789,7 @@ class Interval:
             right = right(enclosure._right)
         else:
             right = enclosure._right if right is None else right
-        
+
         n_interval = self & AtomicInterval(left, lower, upper, right)
 
         if len(n_interval) > 1:
@@ -799,16 +801,16 @@ class Interval:
 
     def apply(self, func):
         """
-        Apply given function on each of the underlying AtomicInterval instances and return a new 
+        Apply given function on each of the underlying AtomicInterval instances and return a new
         Interval instance. The function is expected to return an AtomicInterval, an Interval
-        or a 4-uple (left, lower, upper, right). 
-        
+        or a 4-uple (left, lower, upper, right).
+
         :param func: function to apply on each of the underlying AtomicInterval instances.
         :return: an Interval instance.
         """
         intervals = []
 
-        for interval in self: 
+        for interval in self:
             value = func(interval)
 
             if isinstance(value, (Interval, AtomicInterval)):
@@ -817,7 +819,7 @@ class Interval:
                 intervals.append(AtomicInterval(*value))
             else:
                 raise TypeError('Unsupported return type {} for {}'.format(type(value), value))
-        
+
         return Interval(*intervals)
 
     def overlaps(self, other, permissive=False):
@@ -978,10 +980,10 @@ class Interval:
 
     def __le__(self, other):
         return self.to_atomic() <= other
-        
+
     def __ge__(self, other):
         return self.to_atomic() >= other
-            
+
     def __hash__(self):
         return hash(self._intervals[0])
 
