@@ -299,8 +299,6 @@ value except if the corresponding bound is an infinity and parameter `ignore_inf
 >>> I.closed(0, 2).replace(upper=lambda x: 2 * x)
 [0,4]
 >>> i = I.closedopen(0, I.inf)
->>> i.replace(upper=lambda x: 2 * x)
-[0,+inf)
 >>> i.replace(upper=lambda x: 10)  # No change, infinity is ignored
 [0,+inf)
 >>> i.replace(upper=lambda x: 10, ignore_inf=False)  # Infinity is not ignored
@@ -578,7 +576,7 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
-**1.8.0** (unreleased)
+**1.8.0** (2018-12-15)
 
  - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
  - Intervals have a `replace` method to create new intervals based on the current one. This method accepts both values and functions.

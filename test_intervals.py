@@ -82,7 +82,7 @@ def test_atomic_bounds():
     assert i.right == I.OPEN
     assert i.lower == I.inf
     assert i.upper == -I.inf
-    
+
 
 def test_bounds():
     i = I.openclosed(1, 2)
@@ -270,6 +270,7 @@ def test_replace():
     assert i.replace(upper=1) == I.closedopen(0, 1)
     assert i.replace(lower=5) == I.empty()
     assert i.replace(upper=-5) == I.empty()
+    assert i.replace(left=lambda v: not v, lower=lambda v: v - 1, upper=lambda v: v + 1, right=lambda v: not v) == I.openclosed(-1, 1) | I.openclosed(2, 4)
 
     assert I.empty().replace(lower=2, upper=4) == I.open(2, 4)
 
@@ -290,6 +291,12 @@ def test_apply():
 
     assert i.apply(lambda s: (s.left, s.lower, s.upper * 2, s.right)) == I.closed(0, 6)
 
+    with pytest.raises(TypeError):
+        i.apply(lambda s: None)
+
+    with pytest.raises(TypeError):
+        i.apply(lambda s: 'unsupported')
+        
 
 def test_overlaps():
     # Overlaps should reject non supported types
