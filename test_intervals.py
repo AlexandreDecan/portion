@@ -217,6 +217,8 @@ def test_to_data():
     assert I.to_data(I.openclosed(2, I.inf)) == [(I.OPEN, 2, float('inf'), I.OPEN)]
     assert I.to_data(I.closed(-I.inf, 2)) == [(I.OPEN, float('-inf'), 2, I.CLOSED)]
 
+    assert I.to_data(I.empty()) == [(I.OPEN, float('inf'), float('-inf'), I.OPEN)]
+
     i = I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
     assert I.to_data(i) == [(I.OPEN, float('-inf'), 4, I.CLOSED), (I.CLOSED, 6, float('inf'), I.OPEN)]
     assert I.to_data(i, conv=str, pinf='highest', ninf='lowest') == [(I.OPEN, 'lowest', '4', I.CLOSED), (I.CLOSED, '6', 'highest', I.OPEN)]
@@ -227,12 +229,13 @@ def test_from_data():
     assert I.from_data([(I.OPEN, 2, float('inf'), I.OPEN)]) == I.openclosed(2, I.inf)
     assert I.from_data([(I.OPEN, float('-inf'), 2, I.CLOSED)]) == I.closed(-I.inf, 2)
 
+    assert I.from_data([]) == I.empty()
+
     d = [(I.OPEN, float('-inf'), 4, I.CLOSED), (I.CLOSED, 6, float('inf'), I.OPEN)]
     assert I.from_data(d) == I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
 
     d = [(I.OPEN, 'lowest', '4', I.CLOSED), (I.CLOSED, '6', 'highest', I.OPEN)]
     assert I.from_data(d, conv=int, pinf='highest', ninf='lowest') == I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
-
 
 
 def test_interval_to_atomic():
@@ -250,7 +253,7 @@ def test_interval_to_atomic():
     assert I.empty().to_atomic() == I.AtomicInterval(False, I.inf, -I.inf, False)
 
 
-def test_replace():
+def test_replace_atomic():
     i = I.closed(0, 1).to_atomic()
     assert i.replace() == i
     assert i.replace(I.OPEN, 2, 3, I.OPEN) == I.open(2, 3)
@@ -259,10 +262,22 @@ def test_replace():
     assert i.replace(lower=lambda v: 1 + v) == I.singleton(1)
     assert i.replace(left=lambda v: not v, right=lambda v: not v) == I.open(0, 1)
 
+    assert I.empty().to_atomic().replace(left=I.CLOSED, right=I.CLOSED) == I.empty()
+    assert I.empty().to_atomic().replace(lower=1, upper=2) == I.open(1, 2)
+    assert I.empty().to_atomic().replace(lower=lambda v: 1, upper=lambda v: 2) == I.empty()
+    assert I.empty().to_atomic().replace(lower=lambda v: 1, upper=lambda v: 2, ignore_inf=False) == I.open(1, 2)
+
+
+def test_replace():
     i = I.open(-I.inf, I.inf)
     assert i.replace(lower=lambda v: 1, upper=lambda v: 1) == I.open(-I.inf, I.inf)
     assert i.replace(lower=lambda v: 1, upper=lambda v: 2, ignore_inf=False) == I.open(1, 2)
-    
+
+    assert I.empty().replace(left=I.CLOSED, right=I.CLOSED) == I.empty()
+    assert I.empty().replace(lower=1, upper=2) == I.open(1, 2)
+    assert I.empty().replace(lower=lambda v: 1, upper=lambda v: 2) == I.empty()
+    assert I.empty().replace(lower=lambda v: 1, upper=lambda v: 2, ignore_inf=False) == I.open(1, 2)
+
     i = I.closed(0, 1) | I.open(2, 3)
     assert i.replace() == i
     assert i.replace(I.OPEN, -1, 4, I.OPEN) == I.openclosed(-1, 1) | I.open(2, 4)
@@ -290,6 +305,8 @@ def test_apply():
     assert i.apply(lambda s: I.open(-1, 2)) == I.open(-1, 2)
 
     assert i.apply(lambda s: (s.left, s.lower, s.upper * 2, s.right)) == I.closed(0, 6)
+
+    assert I.empty().apply(lambda s: (I.CLOSED, 1, 2, I.CLOSED)) == I.closed(1, 2)
 
     with pytest.raises(TypeError):
         i.apply(lambda s: None)
