@@ -38,7 +38,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    keywords='interval arithmetic range math',
+    keywords='interval operation range math',
 
     py_modules=['intervals'],
     tests_require=['pytest'],

@@ -5,7 +5,7 @@ __version__ = '1.8.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
-__description__ = 'Interval arithmetic for Python'
+__description__ = 'Interval operations for Python'
 
 
 __all__ = [

@@ -1,17 +1,17 @@
-# Interval arithmetic for Python
+# Interval operations for Python
 
 [![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/python-intervals/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)
 [![PyPI](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 
-This library provides interval arithmetic for Python 2.7+ and Python 3.4+.
+This library provides data structure and operations for intervals in Python 2.7+ and Python 3.4+.
 
   * [Features](#features)
   * [Installation](#installation)
   * [Documentation & usage](#documentation--usage)
       * [Interval creation](#interval-creation)
-      * [Arithmetic operations](#arithmetic-operations)
+      * [Interval operations](#interval-operations)
       * [Bounds of an interval](#bounds-of-an-interval)
       * [Interval transformation](#interval-transformation)
       * [Iteration & indexing](#iteration--indexing)
@@ -128,7 +128,7 @@ Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with
 in `[0,3]` even if there is no integer between `1` and `2`.
 
 
-### Arithmetic operations
+### Interval operations
 
 Both `Interval` and `AtomicInterval` support following interval operations:
  
