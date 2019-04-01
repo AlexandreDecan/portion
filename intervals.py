@@ -677,8 +677,8 @@ class Interval:
 
                 if current.overlaps(successor, permissive=True):
                     interval = current | successor
-                    self._intervals.pop(i)
-                    self._intervals.pop(i)
+                    self._intervals.pop(i)  # pop current
+                    self._intervals.pop(i)  # pop successor
                     self._intervals.insert(i, interval)
                 else:
                     i = i + 1
@@ -742,8 +742,8 @@ class Interval:
 
     def enclosure(self):
         """
-        Return the smallest interval composed of a single atomic interval that encloses the current interval.
-        Is equivalent to Interval(self.to_atomic())
+        Return the smallest interval composed of a single atomic interval that encloses 
+        the current interval. This method is equivalent to Interval(self.to_atomic())
 
         :return: an Interval instance.
         """
@@ -826,8 +826,9 @@ class Interval:
         """
         Test if intervals have any overlapping value.
 
-        If 'permissive' is set to True (default is False), then [1, 2) and [2, 3] are considered as having
-        an overlap on value 2 (but not [1, 2) and (2, 3]).
+        If 'permissive' is set to True (default is False), then intervals that are contiguous 
+        are considered as overlapping intervals as well (e.g. [1, 2) and [2, 3], 
+        but not [1, 2) and (2, 3] because 2 is not part of their union). 
 
         :param other: an interval or atomic interval.
         :param permissive: set to True to consider contiguous intervals as well.

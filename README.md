@@ -200,8 +200,9 @@ Both `Interval` and `AtomicInterval` support following interval operations:
    ```
 
  - `x.overlaps(other)` tests if there is an overlap between two intervals.
- This method accepts a `permissive` parameter which defaults to `False`. If `True`, it considers that [1, 2) and
- [2, 3] have an overlap on 2 (but not [1, 2) and (2, 3]).
+ This method accepts a `permissive` parameter which defaults to `False`. 
+ If `True`, it considers contiguous intervals as well (e.g. [1, 2) and [2, 3] 
+ are considered to have an overlap on 2, which is not the case, e.g., for [1, 2) and (2, 3]).
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
    True
