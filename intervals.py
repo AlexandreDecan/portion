@@ -1,4 +1,6 @@
 import re
+import warnings
+
 
 __package__ = 'python-intervals'
 __version__ = '1.8.0'
@@ -400,17 +402,22 @@ class AtomicInterval:
 
         return AtomicInterval(left, lower, upper, right)
 
-    def overlaps(self, other, permissive=False):
+    def overlaps(self, other, adjacent=False, permissive=None):
         """
         Test if intervals have any overlapping value.
 
-        If 'permissive' is set to True (default is False), then it returns True for adjacent
+        If 'adjacent' is set to True (default is False), then it returns True for adjacent
         intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
 
         :param other: an atomic interval.
-        :param permissive: set to True to accept adjacent intervals as well.
+        :param adjacent: set to True to accept adjacent intervals as well.
+        :param permissive: deprecated, use adjacent instead.
         :return: True if intervals overlap, False otherwise.
         """
+        if permissive is not None:
+            adjacent = permissive
+            warnings.warn('`permissive` is deprecated, use `adjacent` instead.', DeprecationWarning)
+
         if not isinstance(other, AtomicInterval):
             raise TypeError('Only AtomicInterval instances are supported.')
 
@@ -420,7 +427,7 @@ class AtomicInterval:
             first, second = self, other
 
         if first._upper == second._lower:
-            if permissive:
+            if adjacent:
                 return first._right == CLOSED or second._left == CLOSED
             else:
                 return first._right == CLOSED and second._left == CLOSED
@@ -501,7 +508,7 @@ class AtomicInterval:
 
     def __or__(self, other):
         if isinstance(other, AtomicInterval):
-            if self.overlaps(other, permissive=True):
+            if self.overlaps(other, adjacent=True):
                 if self._lower == other._lower:
                     lower = self._lower
                     left = self._left if self._left == OPEN else other._left
@@ -675,7 +682,7 @@ class Interval:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
 
-                if current.overlaps(successor, permissive=True):
+                if current.overlaps(successor, adjacent=True):
                     interval = current | successor
                     self._intervals.pop(i)  # pop current
                     self._intervals.pop(i)  # pop successor
@@ -822,25 +829,30 @@ class Interval:
 
         return Interval(*intervals)
 
-    def overlaps(self, other, permissive=False):
+    def overlaps(self, other, adjacent=False, permissive=None):
         """
         Test if intervals have any overlapping value.
 
-        If 'permissive' is set to True (default is False), then it returns True for adjacent
+        If 'adjacent' is set to True (default is False), then it returns True for adjacent
         intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
 
         :param other: an interval or atomic interval.
-        :param permissive: set to True to accept adjacent intervals as well.
+        :param adjacent: set to True to accept adjacent intervals as well.
+        :param permissive: deprecated, use adjacent instead.
         :return: True if intervals overlap, False otherwise.
         """
+        if permissive is not None:
+            adjacent = permissive
+            warnings.warn('`permissive` is deprecated, use `adjacent` instead.', DeprecationWarning)
+
         if isinstance(other, AtomicInterval):
             for interval in self._intervals:
-                if interval.overlaps(other, permissive=permissive):
+                if interval.overlaps(other, adjacent=adjacent):
                     return True
             return False
         elif isinstance(other, Interval):
             for o_interval in other._intervals:
-                if self.overlaps(o_interval, permissive=permissive):
+                if self.overlaps(o_interval, adjacent=adjacent):
                     return True
             return False
         else:

@@ -200,7 +200,7 @@ Both `Interval` and `AtomicInterval` support following interval operations:
    ```
 
  - `x.overlaps(other)` tests if there is an overlap between two intervals.
- This method accepts a `permissive` parameter which defaults to `False`.
+ This method accepts a `adjacent` parameter which defaults to `False`.
  If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
  [1, 2) and (2, 3]).
    ```python
@@ -208,9 +208,9 @@ Both `Interval` and `AtomicInterval` support following interval operations:
    True
    >>> I.closed(1, 2).overlaps(I.open(2, 3))
    False
-   >>> I.closed(1, 2).overlaps(I.openclosed(2, 3), permissive=True)
+   >>> I.closed(1, 2).overlaps(I.openclosed(2, 3), adjacent=True)
    True
-   >>> I.closedopen(1, 2).overlaps(I.openclosed(2, 3), permissive=True)
+   >>> I.closedopen(1, 2).overlaps(I.openclosed(2, 3), adjacent=True)
    False
 
    ```
@@ -578,6 +578,11 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+**Unreleased**
+
+ - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
+
 
 **1.8.0** (2018-12-15)
 

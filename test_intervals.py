@@ -313,7 +313,7 @@ def test_apply():
 
     with pytest.raises(TypeError):
         i.apply(lambda s: 'unsupported')
-        
+
 
 def test_overlaps():
     # Overlaps should reject non supported types
@@ -321,16 +321,16 @@ def test_overlaps():
         I.closed(0, 1).to_atomic().overlaps(1)
     with pytest.raises(TypeError):
         I.closed(0, 1).overlaps(1)
-        
+
     assert I.closed(0, 1).overlaps(I.closed(0, 1))
     assert I.closed(0, 1).overlaps(I.open(0, 1))
     assert I.open(0, 1).overlaps(I.closed(0, 1))
     assert I.closed(0, 1).overlaps(I.openclosed(0, 1))
     assert I.closed(0, 1).overlaps(I.closedopen(0, 1))
 
-    assert I.closed(1, 2).overlaps(I.closed(2, 3)) 
+    assert I.closed(1, 2).overlaps(I.closed(2, 3))
     assert I.closed(1, 2).overlaps(I.closedopen(2, 3))
-    assert I.openclosed(1, 2).overlaps(I.closed(2, 3)) 
+    assert I.openclosed(1, 2).overlaps(I.closed(2, 3))
     assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3))
 
     assert not I.closed(0, 1).overlaps(I.closed(3, 4))
@@ -348,32 +348,32 @@ def test_overlaps():
     assert not I.open(-I.inf, I.inf).overlaps(I.empty())
 
 
-def test_overlaps_permissive():
-    assert I.closed(0, 1).overlaps(I.closed(0, 1), permissive=True)
-    assert I.closed(0, 1).overlaps(I.open(0, 1), permissive=True)
-    assert I.open(0, 1).overlaps(I.closed(0, 1), permissive=True)
-    assert I.closed(0, 1).overlaps(I.openclosed(0, 1), permissive=True)
-    assert I.closed(0, 1).overlaps(I.closedopen(0, 1), permissive=True)
+def test_overlaps_adjacent():
+    assert I.closed(0, 1).overlaps(I.closed(0, 1), adjacent=True)
+    assert I.closed(0, 1).overlaps(I.open(0, 1), adjacent=True)
+    assert I.open(0, 1).overlaps(I.closed(0, 1), adjacent=True)
+    assert I.closed(0, 1).overlaps(I.openclosed(0, 1), adjacent=True)
+    assert I.closed(0, 1).overlaps(I.closedopen(0, 1), adjacent=True)
 
-    assert I.closed(1, 2).overlaps(I.closed(2, 3), permissive=True) 
-    assert I.closed(1, 2).overlaps(I.closedopen(2, 3), permissive=True)
-    assert I.openclosed(1, 2).overlaps(I.closed(2, 3), permissive=True) 
-    assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3), permissive=True)
+    assert I.closed(1, 2).overlaps(I.closed(2, 3), adjacent=True)
+    assert I.closed(1, 2).overlaps(I.closedopen(2, 3), adjacent=True)
+    assert I.openclosed(1, 2).overlaps(I.closed(2, 3), adjacent=True)
+    assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3), adjacent=True)
 
-    assert not I.closed(0, 1).overlaps(I.closed(3, 4), permissive=True)
-    assert not I.closed(3, 4).overlaps(I.closed(0, 1), permissive=True)
+    assert not I.closed(0, 1).overlaps(I.closed(3, 4), adjacent=True)
+    assert not I.closed(3, 4).overlaps(I.closed(0, 1), adjacent=True)
 
-    assert I.closed(0, 1).overlaps(I.open(1, 2), permissive=True)
-    assert I.closed(0, 1).overlaps(I.openclosed(1, 2), permissive=True)
-    assert I.closedopen(0, 1).overlaps(I.closed(1, 2), permissive=True)
-    assert I.closedopen(0, 1).overlaps(I.closedopen(1, 2), permissive=True)
-    assert not I.closedopen(0, 1).overlaps(I.openclosed(1, 2), permissive=True)
-    assert not I.closedopen(0, 1).overlaps(I.open(1, 2), permissive=True)
-    assert not I.open(0, 1).overlaps(I.open(1, 2), permissive=True)
+    assert I.closed(0, 1).overlaps(I.open(1, 2), adjacent=True)
+    assert I.closed(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
+    assert I.closedopen(0, 1).overlaps(I.closed(1, 2), adjacent=True)
+    assert I.closedopen(0, 1).overlaps(I.closedopen(1, 2), adjacent=True)
+    assert not I.closedopen(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
+    assert not I.closedopen(0, 1).overlaps(I.open(1, 2), adjacent=True)
+    assert not I.open(0, 1).overlaps(I.open(1, 2), adjacent=True)
 
-    assert not I.empty().overlaps(I.open(-I.inf, I.inf), permissive=True)
-    assert not I.open(-I.inf, I.inf).overlaps(I.empty(), permissive=True)
-    
+    assert not I.empty().overlaps(I.open(-I.inf, I.inf), adjacent=True)
+    assert not I.open(-I.inf, I.inf).overlaps(I.empty(), adjacent=True)
+
 
 def test_emptiness():
     assert I.openclosed(1, 1).is_empty()
@@ -412,34 +412,34 @@ def test_atomic_comparisons(i1, i2, i3):
 def test_comparisons_with_values(i):
     assert -1 < i
     assert -1 <= i
-    assert not (0 < i) 
+    assert not (0 < i)
     assert 0 <= i
-    assert not (5 < i) 
+    assert not (5 < i)
     assert 5 <= i
-    assert not (10 < i) 
+    assert not (10 < i)
     assert not (10 <= i)
-    assert not (12 < i) 
+    assert not (12 < i)
     assert not (12 <= i)
 
-    assert 12 > i 
+    assert 12 > i
     assert 12 >= i
-    assert 10 > i 
+    assert 10 > i
     assert 10 >= i
-    assert not (8 > i) 
+    assert not (8 > i)
     assert 8 >= i
-    assert not (0 > i) 
+    assert not (0 > i)
     assert 0 >= i
-    assert not (-1 > i) 
+    assert not (-1 > i)
     assert not (-1 >= i)
 
-    assert -I.inf < i 
+    assert -I.inf < i
     assert -I.inf <= i
-    assert not (-I.inf > i) 
+    assert not (-I.inf > i)
     assert not (-I.inf >= i)
 
-    assert I.inf > i 
+    assert I.inf > i
     assert I.inf >= i
-    assert not (I.inf < i) 
+    assert not (I.inf < i)
     assert not (I.inf <= i)
 
 
