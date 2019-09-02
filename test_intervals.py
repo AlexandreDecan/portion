@@ -349,6 +349,12 @@ def test_overlaps():
 
 
 def test_overlaps_adjacent():
+    # Check warnings for "permissive"
+    with pytest.warns(DeprecationWarning, match='permissive'):
+        I.closed(0, 1).to_atomic().overlaps(I.open(3, 4).to_atomic(), permissive=True)
+    with pytest.warns(DeprecationWarning, match='permissive'):
+        I.closed(0, 1).overlaps(I.open(3, 4), permissive=True)
+
     assert I.closed(0, 1).overlaps(I.closed(0, 1), adjacent=True)
     assert I.closed(0, 1).overlaps(I.open(0, 1), adjacent=True)
     assert I.open(0, 1).overlaps(I.closed(0, 1), adjacent=True)
