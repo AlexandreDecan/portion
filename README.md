@@ -69,7 +69,7 @@ following helpers:
 
 Intervals created with this library are `Interval` instances.
 An `Interval` object is a disjunction of atomic intervals that represent single intervals (e.g. `[1,2]`) corresponding to `AtomicInterval` instances.
-Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed. 
+Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed.
 
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
@@ -131,7 +131,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 ### Interval operations
 
 Both `Interval` and `AtomicInterval` support following interval operations:
- 
+
  - `x.is_empty()` tests if the interval is empty.
    ```python
    >>> I.closed(0, 1).is_empty()
@@ -200,16 +200,18 @@ Both `Interval` and `AtomicInterval` support following interval operations:
    ```
 
  - `x.overlaps(other)` tests if there is an overlap between two intervals.
- This method accepts a `permissive` parameter which defaults to `False`. 
- If `True`, it considers contiguous intervals as well (e.g. [1, 2) and [2, 3] 
- are considered to have an overlap on 2, which is not the case, e.g., for [1, 2) and (2, 3]).
+ This method accepts a `permissive` parameter which defaults to `False`.
+ If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
+ [1, 2) and (2, 3]).
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
    True
    >>> I.closed(1, 2).overlaps(I.open(2, 3))
    False
-   >>> I.closed(1, 2).overlaps(I.open(2, 3), permissive=True)
+   >>> I.closed(1, 2).overlaps(I.openclosed(2, 3), permissive=True)
    True
+   >>> I.closedopen(1, 2).overlaps(I.openclosed(2, 3), permissive=True)
+   False
 
    ```
 
@@ -252,7 +254,7 @@ True, False
 
 ```
 
-Similarly, the bounds of an `Interval` instance can be accessed with its `left`, `right`, 
+Similarly, the bounds of an `Interval` instance can be accessed with its `left`, `right`,
 `lower` and `upper` attributes. In that case, `left` and `lower` refer to the lower bound of its enclosure,
 while `right` and `upper` refer to the upper bound of its enclosure:
 
@@ -280,8 +282,8 @@ False
 ```
 
 
-Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that 
-can be used to create a new instance based on the current one. This method accepts four optional 
+Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that
+can be used to create a new instance based on the current one. This method accepts four optional
 parameters `left`, `lower`, `upper`, and `right`:
 
 ```python
@@ -293,7 +295,7 @@ parameters `left`, `lower`, `upper`, and `right`:
 
 ```
 
-Functions can be passed instead of values. If a function is passed, it is called with the current corresponding 
+Functions can be passed instead of values. If a function is passed, it is called with the current corresponding
 value except if the corresponding bound is an infinity and parameter `ignore_inf` if set to `False`.
 
 ```python
@@ -307,7 +309,7 @@ value except if the corresponding bound is an infinity and parameter `ignore_inf
 
 ```
 
-When `replace` is applied on an `Interval` that is not atomic, it is extended and/or restricted such that 
+When `replace` is applied on an `Interval` that is not atomic, it is extended and/or restricted such that
 its enclosure satisfies the new bounds.
 
 ```python
@@ -322,8 +324,8 @@ its enclosure satisfies the new bounds.
 
 ### Interval transformation
 
-To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method. 
-This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation. 
+To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method.
+This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
 The function is expected to return an `AtomicInterval`, an `Interval` or a 4-uple `(left, lower, upper, right)`.
 
 ```python
@@ -337,8 +339,8 @@ The function is expected to return an `AtomicInterval`, an `Interval` or a 4-upl
 
 ```
 
-The `apply` method is very powerful when used in combination with `replace`. 
-Because the latter allows functions to be passed as parameters and can ignore infinities, it can be 
+The `apply` method is very powerful when used in combination with `replace`.
+Because the latter allows functions to be passed as parameters and can ignore infinities, it can be
 conveniently used to transform intervals in presence of infinities.
 
 ```python
@@ -394,7 +396,7 @@ True
 ```
 
 Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
-These comparison operators have a different behaviour than the usual one. 
+These comparison operators have a different behaviour than the usual one.
 For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
 on the right of the upper bound of `b`.
 
@@ -419,10 +421,10 @@ False
 
 ```
 
-Intervals can also be compared with single values. If `i` is an interval and `x` a value, then 
-`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the 
+Intervals can also be compared with single values. If `i` is an interval and `x` a value, then
+`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the
 left of the upper bound of `i`. This behaviour is similar to the one that could be obtained by first
-converting `x` to a singleton interval. 
+converting `x` to a singleton interval.
 
 ```python
 >>> 5 < I.closed(0, 10)
@@ -551,7 +553,7 @@ The values that must be used to represent positive and negative infinities can b
 
 ```
 
-Intervals can be imported from such a list of 4-uples with `from_data`. 
+Intervals can be imported from such a list of 4-uples with `from_data`.
 The same set of parameters can be used to specify how bounds and infinities are converted.
 
 ```python
@@ -581,10 +583,10 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
  - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
  - Intervals have a `replace` method to create new intervals based on the current one. This method accepts both values and functions.
- - Intervals have an `apply` method to apply a function on the underlying atomic intervals. 
+ - Intervals have an `apply` method to apply a function on the underlying atomic intervals.
  - Intervals can be compared with single values as well.
  - `I.empty()` returns the same instance to save memory.
- - Infinities are singleton objects. 
+ - Infinities are singleton objects.
  - Set `len(I.empty()) = 1` and `I.empty()[0] == I.empty().to_atomic()` for consistency.
 
 
@@ -607,7 +609,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **1.5.3** (2018-06-21)
 
  - Fix invalid `repr` for atomic singleton intervals.
- 
+
 
 **1.5.2** (2018-06-15)
 
