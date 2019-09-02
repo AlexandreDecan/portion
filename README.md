@@ -396,7 +396,7 @@ True
 ```
 
 Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
-These comparison operators have a different behaviour than the usual one.
+These comparison operators have a different behaviour than the usual ones.
 For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
 on the right of the upper bound of `b`.
 
@@ -439,7 +439,7 @@ True
 ```
 
 
-Note that these semantics differ from classical comparison operators.
+Note that all these semantics differ from classical comparison operators.
 As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
 
 ```python
