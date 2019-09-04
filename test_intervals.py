@@ -665,6 +665,72 @@ def test_proxy_methods():
         i1 - 1
 
 
+def test_iterate():
+    # Default parameters
+    assert list(I.iterate(I.closed(0, 5))) == [0, 1, 2, 3, 4, 5]
+    assert list(I.iterate(I.open(0, 5))) == [1, 2, 3, 4]
+    assert list(I.iterate(I.closed(0.5, 5))) == [0.5, 1.5, 2.5, 3.5, 4.5]
+
+    # Step
+    assert list(I.iterate(I.closed(0, 2), step=0.5)) == [0, 0.5, 1, 1.5, 2]
+    assert list(I.iterate(I.open(0, 1.2), step=0.5)) == [0.5, 1]
+
+    # Step as callable
+    step = lambda x: x + 0.5
+    assert list(I.iterate(I.closed(0, 2), step=step)) == list(I.iterate(I.closed(0, 2), step=0.5))
+    assert list(I.iterate(I.open(0, 1.2), step=step)) == list(I.iterate(I.open(0, 1.2), step=0.5))
+
+    # Rounding
+    assert list(I.iterate(I.closed(0, 3), round=int)) == [0, 1, 2, 3]
+    assert list(I.iterate(I.open(0.2, 3), round=int)) == [1, 2, 3]
+
+    # Infinities
+    with pytest.raises(ValueError):
+        I.iterate(I.closed(-I.inf, 1))
+    assert list(I.iterate(I.closed(-I.inf, 1), round=lambda x: 0)) == [0, 1]
+    iterable = I.iterate(I.closed(0, I.inf))
+    assert iterable.next() == 0
+    assert iterable.next() == 1
+    assert iterable.next() == 2
+    # ... and so on.
+
+    # Empty intervals
+    assert list(I.iterate(I.empty())) == []
+
+
+def test_iterate_reverse():
+    # Default parameters
+    assert list(I.iterate(I.closed(0, 5), reverse=True)) == [5, 4, 3, 2, 1, 0]
+    assert list(I.iterate(I.open(0, 5), reverse=True)) == [4, 3, 2, 1]
+    assert list(I.iterate(I.closed(0.5, 5), reverse=True)) == [5, 4, 3, 2, 1]
+
+    # Step
+    assert list(I.iterate(I.closed(0, 2), step=0.5, reverse=True)) == [2, 2.5, 2, 1.5, 1, 0.5, 0]
+    assert list(I.iterate(I.open(0, 1.2), step=0.5, reverse=True)) == [0.7, 0.2]
+
+    # Step as callable
+    step = lambda x: x - 0.5
+    assert list(I.iterate(I.closed(0, 2), step=step, reverse=True)) == list(I.iterate(I.closed(0, 2), step=0.5, reverse=True))
+    assert list(I.iterate(I.open(0, 1.2), step=step, reverse=True)) == list(I.iterate(I.open(0, 1.2), step=0.5, reverse=True))
+
+    # Rounding
+    assert list(I.iterate(I.closed(0, 3), round=int, reverse=True)) == [3, 2, 1, 0]
+    assert list(I.iterate(I.open(0.2, 3), round=int, reverse=True)) == [1, 2, 3]
+    assert list(I.iterate(I.closed(0, 3.2), round=int, reverse=True)) == [3, 2, 1, 0]
+
+    # Infinities
+    with pytest.raises(ValueError):
+        I.iterate(I.closed(0, I.inf), reverse=True)
+    assert list(I.iterate(I.closed(0, I.inf), round=lambda x: 1, reverse=True)) == [1, 0]
+    iterable = I.iterate(I.closed(-I.inf, 0), reverse=True)
+    assert iterable.next() == 0
+    assert iterable.next() == -1
+    assert iterable.next() == -2
+    # ... and so on.
+
+    # Empty intervals
+    assert list(I.iterate(I.empty(), reverse=True)) == []
+
 def test_example():
     failure = None
 
