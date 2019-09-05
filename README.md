@@ -582,6 +582,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **Unreleased**
 
  - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
+ - Faster comparisons between arbitrary values and intervals.
 
 
 **1.8.0** (2018-12-15)

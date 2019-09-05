@@ -414,8 +414,54 @@ def test_atomic_comparisons(i1, i2, i3):
     assert not i1 == 1
 
 
+def test_comparisons_with_value_1():
+    i = I.closed(0, 5).to_atomic()
+
+    assert -1 < i
+    assert -1 <= i
+    assert 6 > i
+    assert 6 >= i
+
+    assert not (2 < i)
+    assert 2 <= i
+    assert not (5 < i)
+    assert 5 <= i
+
+    assert not (3 > i)
+    assert 3 >= i
+    assert not (0 > i)
+    assert 0 >= i
+
+    i = I.open(0, 5).to_atomic()
+
+    assert -1 < i
+    assert -1 <= i
+    assert 6 > i
+    assert 6 >= i
+
+    assert not (2 < i)
+    assert 2 <= i
+    assert not (5 < i)
+    assert not (5 <= i)
+
+    assert not (3 > i)
+    assert 3 >= i
+    assert not (0 > i)
+    assert not (0 >= i)
+
+    assert -I.inf < i
+    assert -I.inf <= i
+    assert not (-I.inf > i)
+    assert not (-I.inf >= i)
+
+    assert I.inf > i
+    assert I.inf >= i
+    assert not (I.inf < i)
+    assert not (I.inf <= i)
+
+
 @pytest.mark.parametrize('i', [I.closedopen(0, 10).to_atomic(), I.closedopen(0, 10)])
-def test_comparisons_with_values(i):
+def test_comparisons_with_value_2(i):
     assert -1 < i
     assert -1 <= i
     assert not (0 < i)

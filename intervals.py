@@ -293,6 +293,25 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return data
 
 
+def iterate(interval, step=1, round=None, reverse=False):
+    """
+    Discrete iterate over the values of given interval.
+
+    TODO: Be more complete ^^
+
+    Each returned value merely corresponds to round(interval.lower) + i * step,
+    according that this value is part of the interval. When reverse is set to
+    True, this corresponds to round(interval.upper) - i * step.
+
+    :param interval: Interval or atomic interval.
+    :param step: (positive) step between values, or a callable that computes the next value (default: 1).
+    :param round: Callable to round a bound and start the iteration (default: identity).
+    :param reverse: Set to True to reverse the order in which values are yielded (default: False).
+    :return: An iterator.
+    """
+    pass
+
+
 class AtomicInterval:
     """
     This class represents an atomic interval.
@@ -584,7 +603,7 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return self < other.to_atomic()
         else:
-            return AtomicInterval(CLOSED, other, other, CLOSED) > self
+            return self._upper < other or (self._right == OPEN and self._upper == other)
 
     def __gt__(self, other):
         if isinstance(other, AtomicInterval):
@@ -595,7 +614,7 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return self > other.to_atomic()
         else:
-            return AtomicInterval(CLOSED, other, other, CLOSED) < self
+            return self._lower > other or (self._left == OPEN and self._lower == other)
 
     def __le__(self, other):
         if isinstance(other, AtomicInterval):
@@ -606,7 +625,7 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return self <= other.to_atomic()
         else:
-            return AtomicInterval(CLOSED, other, other, CLOSED) >= self
+            return self._lower < other or (self._left == CLOSED and self._lower == other)
 
     def __ge__(self, other):
         if isinstance(other, AtomicInterval):
@@ -617,7 +636,7 @@ class AtomicInterval:
         elif isinstance(other, Interval):
             return self >= other.to_atomic()
         else:
-            return AtomicInterval(CLOSED, other, other, CLOSED) <= self
+            return self._upper > other or (self._right == CLOSED and self._upper == other)
 
     def __hash__(self):
         try:
