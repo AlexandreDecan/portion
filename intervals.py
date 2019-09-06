@@ -293,21 +293,34 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return data
 
 
-def iterate(interval, step=1, round=None, reverse=False):
+def iterate(interval, step=1, start=None, stop=None, reverse=False):
     """
-    Discrete iterate over the values of given interval.
+    Iterate over the (discrete) values of given (possibly atomic) interval.
 
-    TODO: Be more complete ^^
+    This function returns a (lazy) iterator over the values of given atomic interval, starting
+    from its lower bound and ending on its upper bound (if they are not open).
+    Each returned value correspond to lower + i * step, where "step" is either
+    a positive value, or a callable that, given a value, returns the next value.
 
-    Each returned value merely corresponds to round(interval.lower) + i * step,
-    according that this value is part of the interval. When reverse is set to
-    True, this corresponds to round(interval.upper) - i * step.
+    When a non-atomic interval is provided, this function chains the iterators obtained
+    by calling this function on the underlying atomic intervals.
+
+    Parameters "start" and "stop" can be used to restrict the values that are returned
+    (e.g., in presence of infinities, or to round bounds). If a callable is passed,
+    it will be called with the corresponding bound (lower bound for start, and
+    upper bound for stop).
+
+    Parameter "reverse" can be set to True to iterate in descending order.
+    If reverse is True, step still has to be a positive step (it will be used to
+    decrement values) or a callable that returns the "previous" value.
+    Start will correspond to the upper bound by default, and stop to the lower one.
 
     :param interval: Interval or atomic interval.
-    :param step: (positive) step between values, or a callable that computes the next value (default: 1).
-    :param round: Callable to round a bound and start the iteration (default: identity).
+    :param step: (positive) step between values, or callable that returns a successor/predecessor.
+    :param start: Initial value to consider, or a callable that accepts a bound.
+    :param stop: Last value to consider, or a callable that accepts a bound.
     :param reverse: Set to True to reverse the order in which values are yielded (default: False).
-    :return: An iterator.
+    :return: A lazy iterator.
     """
     pass
 
