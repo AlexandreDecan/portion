@@ -1,9 +1,10 @@
+import operator
 import re
 import warnings
 
 
 __package__ = 'python-intervals'
-__version__ = '1.8.0'
+__version__ = '1.9.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -293,36 +294,58 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return data
 
 
-def iterate(interval, step=1, start=None, stop=None, reverse=False):
+def iterate(interval, incr=1, base=None, reverse=False):
     """
-    Iterate over the (discrete) values of given (possibly atomic) interval.
+    Iterate on the (discrete) values of given interval.
 
-    This function returns a (lazy) iterator over the values of given atomic interval, starting
-    from its lower bound and ending on its upper bound (if they are not open).
-    Each returned value correspond to lower + i * step, where "step" is either
-    a positive value, or a callable that, given a value, returns the next value.
+    This function returns a (lazy) iterator over the values of given (atomic or not) interval,
+    starting from its lower bound and ending on its upper bound (if interval is not open).
+    Each returned value merely corresponds to lower + i * incr, where "incr" defines
+    the step between consecutive values. This parameter must be a (positive) value, even if
+    "reverse" is set to True. It also accepts a callable that is used to compute the next possible
+    value based on the current one.
 
     When a non-atomic interval is provided, this function chains the iterators obtained
-    by calling this function on the underlying atomic intervals.
+    by calling itself on the underlying atomic intervals.
 
-    Parameters "start" and "stop" can be used to restrict the values that are returned
-    (e.g., in presence of infinities, or to round bounds). If a callable is passed,
-    it will be called with the corresponding bound (lower bound for start, and
-    upper bound for stop).
+    The values returned by the iterator can be aligned with a base value with the "base" parameter.
+    This parameter must be a callable that accepts the lower bound of the (atomic) interval as
+    input, and returns the first value that needs to be considered for the iteration.
+    By default, the identity function is used. Notice that a value can be provided instead of a
+    callable.
 
-    Parameter "reverse" can be set to True to iterate in descending order.
-    If reverse is True, step still has to be a positive step (it will be used to
-    decrement values) or a callable that returns the "previous" value.
-    Start will correspond to the upper bound by default, and stop to the lower one.
+    For convenience, a value can be provided instead of a callable. In this case, it will be
+    translated to a function returning this (fixed) value. Note that this could be very
+    inefficient when an union of intervals is composed of atomic intervals that are distant from
+    each other, as values between those intervals will have to be tested as well.
 
     :param interval: Interval or atomic interval.
-    :param step: (positive) step between values, or callable that returns a successor/predecessor.
-    :param start: Initial value to consider, or a callable that accepts a bound.
-    :param stop: Last value to consider, or a callable that accepts a bound.
-    :param reverse: Set to True to reverse the order in which values are yielded (default: False).
+    :param incr: (positive) step between values, or callable that returns a successor/predecessor.
+    :param base: a callable that accepts a bound and returns an initial value to consider.
+    :param reverse: Set to True for descending order.
     :return: A lazy iterator.
     """
-    pass
+    intervals = [interval] if isinstance(interval, AtomicInterval) else interval._intervals
+
+    base = (lambda x: x) if base is None else base
+
+    exclude = operator.lt if not reverse else operator.gt
+    include = operator.le if not reverse else operator.ge
+    increment = incr if callable(incr) else (lambda x: x + incr if not reverse else x - incr)
+
+    value = base(interval.lower if not reverse else interval.upper) if callable(base) else base
+    if (value == -inf and not reverse) or (value == inf and reverse):
+        raise ValueError('Cannot start iteration with infinity.')
+
+    for i in intervals if not reverse else reversed(intervals):
+        value = base(i.lower if not reverse else i.upper) if callable(base) else value
+
+        while exclude(value, i):
+            value = increment(value)
+
+        while include(value, i):
+            yield value
+            value = increment(value)
 
 
 class AtomicInterval:

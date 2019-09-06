@@ -717,7 +717,8 @@ def test_iterate():
     assert list(I.iterate(I.closedopen(0, 2))) == [0, 1]
     assert list(I.iterate(I.openclosed(0, 2))) == [1, 2]
     assert list(I.iterate(I.open(0, 2))) == [1]
-    assert list(I.iterate(I.open(0, 2.5))) == [0, 1, 2]
+    assert list(I.iterate(I.open(0, 2.5))) == [1, 2]
+
 
     # Empty intervals or iterations
     assert list(I.iterate(I.empty())) == []
@@ -725,7 +726,7 @@ def test_iterate():
 
     # Infinities
     with pytest.raises(ValueError):
-        I.iterate(I.openclosed(-I.inf, 2))
+        list(I.iterate(I.openclosed(-I.inf, 2)))
     gen = I.iterate(I.closedopen(0, I.inf))
     assert next(gen) == 0
     assert next(gen) == 1
@@ -738,45 +739,35 @@ def test_iterate():
     assert list(I.iterate(I.open(0.5, 1) | I.open(1, 3))) == [2]
 
     # Step
-    assert list(I.iterate(I.closed(0, 6), step=2)) == [0, 2, 4, 6]
-    assert list(I.iterate(I.closed(0, 6), step=4)) == [0, 4]
-    assert list(I.iterate(I.closed(0, 6), step=lambda x: x + 2)) == [0, 2, 4, 6]
+    assert list(I.iterate(I.closed(0, 6), incr=2)) == [0, 2, 4, 6]
+    assert list(I.iterate(I.closed(0, 6), incr=4)) == [0, 4]
+    assert list(I.iterate(I.closed(0, 6), incr=lambda x: x + 2)) == [0, 2, 4, 6]
 
-    # Start, stop
-    assert list(I.iterate(I.closed(0, 1), start=-1)) == [0, 1]
-    assert list(I.iterate(I.closed(0, 2), start=1)) == [1, 2]
-    assert list(I.iterate(I.closed(0, 1), start=2)) == []
-    assert list(I.iterate(I.closed(0, 1), stop=2)) == [0, 1]
-    assert list(I.iterate(I.closed(0, 2), stop=1)) == [0, 1]
-    assert list(I.iterate(I.closed(0, 2), stop=-1)) == []
-    assert list(I.iterate(I.open(-I.inf, I.inf), start=0, stop=2)) == []
+    # Base
+    assert list(I.iterate(I.closed(0, 1), base=-1)) == [0, 1]
+    assert list(I.iterate(I.closed(0, 2), base=1)) == [1, 2]
+    assert list(I.iterate(I.closed(0, 1), base=2)) == []
+    assert list(I.iterate(I.openclosed(-I.inf, 2), base=0)) == [0, 1, 2]
 
-    # Start and stop: callable
-    assert list(I.iterate(I.closed(0, 2), start=lambda x: x)) == [0, 1, 2]
-    assert list(I.iterate(I.open(0, 2), start=lambda x: x)) == [1]
-    assert list(I.iterate(I.closed(0.4, 2), start=lambda x: round(x))) == [1, 2]
-    assert list(I.iterate(I.closed(0.6, 2), start=lambda x: round(x))) == [1, 2]
-
-    assert list(I.iterate(I.closed(0, 2), stop=lambda x: x)) == [0, 1, 2]
-    assert list(I.iterate(I.open(0, 2), stop=lambda x: x)) == [1]
-    assert list(I.iterate(I.closed(0, 2.4), stop=lambda x: round(x))) == [0, 1, 2]
-    assert list(I.iterate(I.closed(0, 2.6), stop=lambda x: round(x))) == [0, 1, 2]
+    assert list(I.iterate(I.closed(0, 2), base=lambda x: x)) == [0, 1, 2]
+    assert list(I.iterate(I.open(0, 2), base=lambda x: x)) == [1]
+    assert list(I.iterate(I.closed(0.4, 2), base=lambda x: round(x))) == [1, 2]
+    assert list(I.iterate(I.closed(0.6, 2), base=lambda x: round(x))) == [1, 2]
 
     # Reversed
     assert list(I.iterate(I.closed(0, 1), reverse=True)) == [1, 0]
     assert list(I.iterate(I.open(0, 3), reverse=True)) == [2, 1]
-    assert list(I.iterate(I.closed(0, 1), step=0.5, reverse=True)) == [1, 0.5, 0]
-    assert list(I.iterate(I.closed(0, 2), start=1, reverse=True)) == [1, 0]
-    assert list(I.iterate(I.closed(0, 2), stop=-1, reverse=True)) == [2, 1, 0]
-    assert list(I.iterate(I.closed(0, 2), stop=1, reverse=True)) == [2, 1]
+    assert list(I.iterate(I.closed(0, 1), incr=0.5, reverse=True)) == [1, 0.5, 0]
+    assert list(I.iterate(I.closed(0, 2), base=1, reverse=True)) == [1, 0]
+
+    assert list(I.iterate(I.closed(0, 2) | I.closed(4, 5), reverse=True)) == [5, 4, 2, 1, 0]
 
     with pytest.raises(ValueError):
-        I.iterate(I.closedopen(0, I.inf), reverse=True)
+        list(I.iterate(I.closedopen(0, I.inf), reverse=True))
     gen = I.iterate(I.openclosed(-I.inf, 2), reverse=True)
     assert next(gen) == 2
     assert next(gen) == 1
     assert next(gen) == 0  # and so on
-
 
 
 def test_example():

@@ -14,8 +14,9 @@ This library provides data structure and operations for intervals in Python 2.7+
       * [Interval operations](#interval-operations)
       * [Bounds of an interval](#bounds-of-an-interval)
       * [Interval transformation](#interval-transformation)
-      * [Iteration & indexing](#iteration--indexing)
       * [Comparison operators](#comparison-operators)
+      * [Discrete iteration](#discrete-iteration)
+      * [Accessing atomic intervals](#accessing-atomic-intervals)
       * [Import & export intervals to strings](#import--export-intervals-to-strings)
       * [Import & export intervals to Python built-in data types](#import--export-intervals-to-python-built-in-data-types)
   * [Contributions](#contributions)
@@ -362,27 +363,6 @@ conveniently used to transform intervals in presence of infinities.
 ```
 
 
-### Iteration & indexing
-
-Intervals can be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
-
-```python
->>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
-[[0,1], (2,3), [21,24]]
-
-```
-
-The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
-
-```python
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
-[0,1]
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
-(2,3)
-
-```
-
-
 ### Comparison operators
 
 Equality between intervals can be checked with the classical `==` operator:
@@ -449,6 +429,93 @@ False
 False
 >>> I.empty() < I.empty()
 True
+
+```
+
+### Discrete iteration
+
+The `iterate` function takes an interval or atomic interval, and returns a generator to iterate over
+the values of an interval. Obviously, as intervals are continuous, it is required to specify the increment
+ `incr` between consecutive values. The iteration then starts from the lower bound and ends on the upper one,
+given they are not excluded by the interval:
+
+```python
+>>> list(I.iterate(I.closed(0, 3)))  # By default, incr=1
+[0, 1, 2, 3]
+>>> list(I.iterate(I.closed(0, 3), incr=2))
+[0, 2]
+>>> list(I.iterate(I.open(0, 3), incr=2))
+[2]
+
+```
+
+Iteration can be performed in reverse order by specifying `reverse=True`. In that case, `incr` will be
+subtracted instead of being added, implying that `incr` must always be a "positive" value:
+
+```python
+>>> list(I.iterate(I.closed(0, 3), reverse=True))
+[3, 2, 1, 0]
+>>> list(I.iterate(I.closed(0, 3), incr=2, reverse=True))  # Not incr=-2
+[3, 1]
+
+```
+
+Again, this library does not make any assumption about the objects being used in an interval, as long as they
+are comparable. However, it is not always possible to provide a meaningful value for `incr` (e.g., what would
+be the step between two consecutive characters?). In these cases, a callable can be passed instead of a value.
+This callable will be called with the current value, and is expected to return the next possible value.
+
+```python
+>>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) + 1)))
+['a', 'b', 'c', 'd']
+>>> # Notice the reversed order:
+>>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) - 1), reverse=True))
+['d', 'c', 'b', 'a']
+
+```
+
+Sometimes it can be convenient to define an initial value to start the iteration. For example, one could
+want to retrieve all integers in a given interval. The `base` parameter can be used to specify how to
+*align* the returned values. It accepts a callable that will be called with the lower bound (unless
+`reverse=True`) for each underlying atomic interval, and that must return the first value to consider
+instead of this bound.
+
+This can be helpful to deal with (semi-)infinite intervals or to align the generated values of the iterator:
+
+```python
+>>> # Restrict values of a (semi-)infinite interval
+>>> noinf = lambda x: max(0, x)
+>>> list(I.iterate(I.openclosed(-I.inf, 2), base=noinf))
+[0, 1, 2]
+>>> # Align on integers
+>>> list(I.iterate(I.closed(0.3, 4.9), base=int))
+[1, 2, 3, 4]
+
+```
+
+For convenience, a value can be provided instead of a callable. Notice that in that case, all values
+from `base` will be tested. This can be very inefficient if the underlying atomic intervals are
+distant from each other.
+
+
+
+### Accessing atomic intervals
+
+Intervals can be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
+
+```python
+>>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
+[[0,1], (2,3), [21,24]]
+
+```
+
+The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
+
+```python
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
+[0,1]
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
+(2,3)
 
 ```
 
@@ -583,6 +650,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
  - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
  - Faster comparisons between arbitrary values and intervals.
+ - Discrete iteration on the values of an interval with `iterate`.
 
 
 **1.8.0** (2018-12-15)
