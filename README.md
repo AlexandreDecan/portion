@@ -468,24 +468,24 @@ This callable will be called with the current value, and is expected to return t
 ```python
 >>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) + 1)))
 ['a', 'b', 'c', 'd']
->>> # Notice the reversed order:
+>>> # Notice the reversed order, mind the "- 1"
 >>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) - 1), reverse=True))
 ['d', 'c', 'b', 'a']
 
 ```
 
-Sometimes it can be convenient to define an initial value to start the iteration. For example, one could
-want to retrieve all integers in a given interval. The `base` parameter can be used to specify how to
-*align* the returned values. It accepts a callable that will be called with the lower bound (unless
-`reverse=True`) for each underlying atomic interval, and that must return the first value to consider
-instead of the lower bound.
+By default, the iteration always starts on the lower bound (unless `reverse=True`) of each atomic interval.
+The `base` parameter can be used to change this behaviour, by specifying how the initial value to start
+the iteration on must be computed. This parameter accepts a callable that will be called with the lower
+bound (unless `reverse=True`) for each underlying atomic interval, and that must return the first value to
+consider instead of the lower bound.
 
-This can be helpful to deal with (semi-)infinite intervals or to align the generated values of the iterator:
+This can be helpful to deal with (semi-)infinite intervals, or to *align* the generated values of
+the iterator:
 
 ```python
 >>> # Restrict values of a (semi-)infinite interval
->>> noinf = lambda x: max(0, x)
->>> list(I.iterate(I.openclosed(-I.inf, 2), incr=1, base=noinf))
+>>> list(I.iterate(I.openclosed(-I.inf, 2), incr=1, base=lambda x: max(0, x)))
 [0, 1, 2]
 >>> # Align on integers
 >>> list(I.iterate(I.closed(0.3, 4.9), incr=1, base=int))

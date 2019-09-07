@@ -124,8 +124,9 @@ def empty():
     return empty._instance
 
 
-def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?', left_open=r'\(',
-                left_closed=r'\[', right_open=r'\)', right_closed=r'\]', pinf=r'\+inf', ninf=r'-inf'):
+def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
+                left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]',
+                pinf=r'\+inf', ninf=r'-inf'):
     """
     Parse given string and create an Interval instance.
     A converter function has to be provided to convert a bound (as string) to a value.
@@ -233,7 +234,7 @@ def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
     Import an interval from a piece of data.
 
     :param data: a list of 4-uples (left, lower, upper, right).
-    :param conv: function that is used to convert "lower" and "upper" to bounds, default to identity.
+    :param conv: function that converts "lower" and "upper" to bounds, default to identity.
     :param pinf: value used to represent positive infinity.
     :param ninf: value used to represent negative infinity.
     :return: an Interval instance.
@@ -311,11 +312,11 @@ def iterate(interval, incr, base=None, reverse=False):
     The values returned by the iterator can be aligned with a base value with the "base" parameter.
     This parameter must be a callable that accepts the lower bound of the (atomic) interval as
     input, and returns the first value that needs to be considered for the iteration.
-    By default, the identity function is used. Notice that a value can be provided instead of a
-    callable.
+    By default, the identity function is used. If reverse=True, then the upper bound will be
+    passed instead of the lower one.
 
     :param interval: Interval or atomic interval.
-    :param incr: (positive) step between values, or callable that returns a successor/predecessor.
+    :param incr: (positive) step between values, or a callable that returns the next value.
     :param base: a callable that accepts a bound and returns an initial value to consider.
     :param reverse: Set to True for descending order.
     :return: A lazy iterator.
@@ -361,10 +362,10 @@ class AtomicInterval:
         If a bound is set to infinity (regardless of its sign), the corresponding boundary will
         be exclusive.
 
-        :param left: Boolean indicating whether the left boundary is inclusive (True) or exclusive (False).
-        :param lower: lower bound value.
-        :param upper: upper bound value.
-        :param right: Boolean indicating whether the right boundary is inclusive (True) or exclusive (False).
+        :param left: Boolean indicating if left boundary is inclusive (True) or exclusive (False).
+        :param lower: value of the lower bound.
+        :param upper: value of the upper bound.
+        :param right: Boolean indicating if right boundary is inclusive (True) or exclusive (False).
         """
         self._left = left if lower not in [inf, -inf] else OPEN
         self._lower = lower
@@ -496,8 +497,9 @@ class AtomicInterval:
 
     def union(self, other):
         """
-        Return the union of two intervals. If the union cannot be represented using a single atomic interval,
-        return an Interval instance (which corresponds to an union of atomic intervals).
+        Return the union of two intervals. If the union cannot be represented using a single
+        atomic interval, return an Interval instance (which corresponds to an union of atomic
+        intervals).
 
         :param other: an interval.
         :return: the union of the intervals.
@@ -583,9 +585,11 @@ class AtomicInterval:
     def __contains__(self, item):
         if isinstance(item, AtomicInterval):
             left = item._lower > self._lower or (
-                    item._lower == self._lower and (item._left == self._left or self._left == CLOSED))
+                item._lower == self._lower and (item._left == self._left or self._left == CLOSED)
+            )
             right = item._upper < self._upper or (
-                    item._upper == self._upper and (item._right == self._right or self._right == CLOSED))
+                item._upper == self._upper and (item._right == self._right or self._right == CLOSED)
+            )
             return left and right
         elif isinstance(item, Interval):
             for interval in item:
@@ -631,7 +635,8 @@ class AtomicInterval:
             if self._right == OPEN:
                 return self._upper <= other._lower
             else:
-                return self._upper < other._lower or (self._upper == other._lower and other._left == OPEN)
+                return self._upper < other._lower or \
+                    (self._upper == other._lower and other._left == OPEN)
         elif isinstance(other, Interval):
             return self < other.to_atomic()
         else:
@@ -642,7 +647,8 @@ class AtomicInterval:
             if self._left == OPEN:
                 return self._lower >= other._upper
             else:
-                return self._lower > other._upper or (self._lower == other._upper and other._right == OPEN)
+                return self._lower > other._upper or \
+                    (self._lower == other._upper and other._right == OPEN)
         elif isinstance(other, Interval):
             return self > other.to_atomic()
         else:
@@ -653,7 +659,8 @@ class AtomicInterval:
             if self._right == OPEN:
                 return self._upper <= other._upper
             else:
-                return self._upper < other._upper or (self._upper == other._upper and other._right == CLOSED)
+                return self._upper < other._upper or \
+                    (self._upper == other._upper and other._right == CLOSED)
         elif isinstance(other, Interval):
             return self <= other.to_atomic()
         else:
@@ -664,7 +671,8 @@ class AtomicInterval:
             if self._left == OPEN:
                 return self._lower >= other._lower
             else:
-                return self._lower > other._lower or (self._lower == other._lower and other._left == CLOSED)
+                return self._lower > other._lower or \
+                    (self._lower == other._lower and other._left == CLOSED)
         elif isinstance(other, Interval):
             return self >= other.to_atomic()
         else:
@@ -744,7 +752,8 @@ class Interval:
     @property
     def left(self):
         """
-        Boolean indicating whether the lowest left boundary is inclusive (True) or exclusive (False).
+        Boolean indicating whether the lowest left boundary is inclusive (True) or
+        exclusive (False).
         """
         return self._intervals[0].left
 
@@ -765,7 +774,8 @@ class Interval:
     @property
     def right(self):
         """
-        Boolean indicating whether the highest right boundary is inclusive (True) or exclusive (False).
+        Boolean indicating whether the highest right boundary is inclusive (True)
+        or exclusive (False).
         """
         return self._intervals[-1].right
 
@@ -779,7 +789,8 @@ class Interval:
 
     def is_atomic(self):
         """
-        Test interval atomicity. An interval is atomic if it is composed of a single atomic interval.
+        Test interval atomicity. An interval is atomic if it is composed of a
+        single atomic interval.
 
         :return: True if this interval is atomic, False otherwise.
         """
@@ -834,12 +845,18 @@ class Interval:
             left = enclosure._left if left is None else left
 
         if callable(lower):
-            lower = enclosure._lower if ignore_inf and enclosure._lower in [-inf, inf] else lower(enclosure._lower)
+            if ignore_inf and enclosure._lower in [-inf, inf]:
+                lower = enclosure._lower
+            else:
+                lower = lower(enclosure._lower)
         else:
             lower = enclosure._lower if lower is None else lower
 
         if callable(upper):
-            upper = enclosure._upper if ignore_inf and enclosure._upper in [-inf, inf] else upper(enclosure._upper)
+            if ignore_inf and enclosure._upper in [-inf, inf]:
+                upper = enclosure._upper
+            else:
+                upper = upper(enclosure._upper)
         else:
             upper = enclosure._upper if upper is None else upper
 
