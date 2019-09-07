@@ -440,7 +440,7 @@ the values of an interval. Obviously, as intervals are continuous, it is require
 given they are not excluded by the interval:
 
 ```python
->>> list(I.iterate(I.closed(0, 3)))  # By default, incr=1
+>>> list(I.iterate(I.closed(0, 3), incr=1))
 [0, 1, 2, 3]
 >>> list(I.iterate(I.closed(0, 3), incr=2))
 [0, 2]
@@ -453,7 +453,7 @@ Iteration can be performed in reverse order by specifying `reverse=True`. In tha
 subtracted instead of being added, implying that `incr` must always be a "positive" value:
 
 ```python
->>> list(I.iterate(I.closed(0, 3), reverse=True))
+>>> list(I.iterate(I.closed(0, 3), incr=1, reverse=True))
 [3, 2, 1, 0]
 >>> list(I.iterate(I.closed(0, 3), incr=2, reverse=True))  # Not incr=-2
 [3, 1]
@@ -478,25 +478,20 @@ Sometimes it can be convenient to define an initial value to start the iteration
 want to retrieve all integers in a given interval. The `base` parameter can be used to specify how to
 *align* the returned values. It accepts a callable that will be called with the lower bound (unless
 `reverse=True`) for each underlying atomic interval, and that must return the first value to consider
-instead of this bound.
+instead of the lower bound.
 
 This can be helpful to deal with (semi-)infinite intervals or to align the generated values of the iterator:
 
 ```python
 >>> # Restrict values of a (semi-)infinite interval
 >>> noinf = lambda x: max(0, x)
->>> list(I.iterate(I.openclosed(-I.inf, 2), base=noinf))
+>>> list(I.iterate(I.openclosed(-I.inf, 2), incr=1, base=noinf))
 [0, 1, 2]
 >>> # Align on integers
->>> list(I.iterate(I.closed(0.3, 4.9), base=int))
+>>> list(I.iterate(I.closed(0.3, 4.9), incr=1, base=int))
 [1, 2, 3, 4]
 
 ```
-
-For convenience, a value can be provided instead of a callable. Notice that in that case, all values
-from `base` will be tested. This can be very inefficient if the underlying atomic intervals are
-distant from each other.
-
 
 
 ### Accessing atomic intervals
@@ -646,11 +641,12 @@ Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
-**Unreleased**
 
- - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
- - Faster comparisons between arbitrary values and intervals.
+**1.9.0** (unreleased)
+
  - Discrete iteration on the values of an interval with `iterate`.
+ - Faster comparisons between arbitrary values and intervals.
+ - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
 
 
 **1.8.0** (2018-12-15)

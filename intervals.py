@@ -294,7 +294,7 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return data
 
 
-def iterate(interval, incr=1, base=None, reverse=False):
+def iterate(interval, incr, base=None, reverse=False):
     """
     Iterate on the (discrete) values of given interval.
 
@@ -314,11 +314,6 @@ def iterate(interval, incr=1, base=None, reverse=False):
     By default, the identity function is used. Notice that a value can be provided instead of a
     callable.
 
-    For convenience, a value can be provided instead of a callable. In this case, it will be
-    translated to a function returning this (fixed) value. Note that this could be very
-    inefficient when an union of intervals is composed of atomic intervals that are distant from
-    each other, as values between those intervals will have to be tested as well.
-
     :param interval: Interval or atomic interval.
     :param incr: (positive) step between values, or callable that returns a successor/predecessor.
     :param base: a callable that accepts a bound and returns an initial value to consider.
@@ -327,18 +322,19 @@ def iterate(interval, incr=1, base=None, reverse=False):
     """
     intervals = [interval] if isinstance(interval, AtomicInterval) else interval._intervals
 
-    base = (lambda x: x) if base is None else base
+    if base is None:
+        base = (lambda x: x)
 
     exclude = operator.lt if not reverse else operator.gt
     include = operator.le if not reverse else operator.ge
     increment = incr if callable(incr) else (lambda x: x + incr if not reverse else x - incr)
 
-    value = base(interval.lower if not reverse else interval.upper) if callable(base) else base
+    value = base(interval.lower if not reverse else interval.upper)
     if (value == -inf and not reverse) or (value == inf and reverse):
         raise ValueError('Cannot start iteration with infinity.')
 
     for i in intervals if not reverse else reversed(intervals):
-        value = base(i.lower if not reverse else i.upper) if callable(base) else value
+        value = base(i.lower if not reverse else i.upper)
 
         while exclude(value, i):
             value = increment(value)
