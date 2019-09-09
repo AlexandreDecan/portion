@@ -15,6 +15,7 @@ __all__ = [
     'inf', 'CLOSED', 'OPEN',
     'Interval',  # 'AtomicInterval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
+    'iterate',
     'from_string', 'to_string', 'from_data', 'to_data',
 ]
 
