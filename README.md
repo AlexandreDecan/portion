@@ -30,7 +30,8 @@ This library provides data structure and operations for intervals in Python 2.7+
  - Closed or open, finite or (semi-)infinite intervals.
  - Atomic intervals and interval sets are supported.
  - Automatic simplification of intervals.
- - Support iteration, comparison, transformation, intersection, union, complement, difference and containment.
+ - Support comparison, transformation, intersection, union, complement, difference and containment.
+ - Discrete iterations on the values of an interval.
  - Import and export intervals to strings and to Python built-in data types.
 
 
