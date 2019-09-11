@@ -565,14 +565,14 @@ class AtomicInterval:
             if self.overlaps(other, adjacent=True):
                 if self._lower == other._lower:
                     lower = self._lower
-                    left = self._left if self._left == OPEN else other._left
+                    left = self._left if self._left == CLOSED else other._left
                 else:
                     lower = min(self._lower, other._lower)
                     left = self._left if lower == self._lower else other._left
 
                 if self._upper == other._upper:
                     upper = self._upper
-                    right = self._right if self._right == OPEN else other._right
+                    right = self._right if self._right == CLOSED else other._right
                 else:
                     upper = max(self._upper, other._upper)
                     right = self._right if upper == self._upper else other._right
