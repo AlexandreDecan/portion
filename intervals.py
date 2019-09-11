@@ -1141,7 +1141,7 @@ class IntervalDict(MutableMapping):
         """
         if isinstance(key, Interval):
             d = self[key]
-            d[d.keys(single=True) - key] = default
+            d[key - d.keys(single=True)] = default
             return d
         else:
             try:
@@ -1183,7 +1183,7 @@ class IntervalDict(MutableMapping):
 
         :return: an iterator of 2-uples.
         """
-        return list(self._items)
+        return sorted(self._items, key=lambda t: t[0].lower)
 
     def keys(self, single=False):
         """
@@ -1279,7 +1279,7 @@ class IntervalDict(MutableMapping):
     def __getitem__(self, key):
         if isinstance(key, Interval):
             items = []
-            for v, i in self._content:
+            for i, v in self._items:
                 intersection = key & i
                 if not intersection.is_empty():
                     items.append((intersection, v))
@@ -1292,6 +1292,9 @@ class IntervalDict(MutableMapping):
 
     def __setitem__(self, key, value):
         key = key if isinstance(key, Interval) else singleton(key)
+
+        if key.is_empty():
+            return
 
         new_items = []
         found = False
@@ -1307,7 +1310,7 @@ class IntervalDict(MutableMapping):
         if not found:
             new_items.append((key, value))
 
-        self._items = sorted(new_items)
+        self._items = new_items
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -1326,13 +1329,13 @@ class IntervalDict(MutableMapping):
             else:
                 new_items.append((i, v))
 
-        self._items = sorted(new_items)
+        self._items = new_items
 
         if not found and not isinstance(key, Interval):
             raise KeyError('{} not found'.format(key))
 
     def __iter__(self):
-        return iter(self._items)
+        return iter(self.keys())
 
     def __len__(self):
         return len(self._items)

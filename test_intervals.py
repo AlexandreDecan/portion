@@ -774,12 +774,14 @@ def test_intervaldict():
         d[3]
     assert d.get(3) is None
 
-    # assert d[I.closed(0, 2)] == [(I.closed(0, 2), 0)]
-    # assert d[I.closed(-1, 0)] == [(I.singleton(0), 0)]
-    # with pytest.raises(KeyError):
-    #     d[I.closed(-2, -1)]
-    # assert d.get(I.closed(-2, -1)) == [(I.closed(-2, -1), None)]
-    # assert d.get(I.closed(-1, 0)) == [(I.closedopen(-1, 0), None), (I.singleton(0), 0)]
+    # Intervals
+    assert d[I.closed(0, 2)].items() == [(I.closed(0, 2), 0)]
+    assert d[I.closed(-1, 0)].items() == [(I.singleton(0), 0)]
+    assert d[I.closed(-2, -1)].items() == []
+
+    assert d.get(I.closed(0, 2)).items() == [(I.closed(0, 2), 0)]
+    assert d.get(I.closed(-2, -1)).items() == [(I.closed(-2, -1), None)]
+    assert d.get(I.closed(-1, 0)).items() == [(I.closedopen(-1, 0), None), (I.singleton(0), 0)]
 
     d[I.closed(1, 3)] = 1
     assert len(d) == 2
@@ -836,8 +838,12 @@ def test_intervaldict_methods():
     with pytest.raises(KeyError):
         I.IntervalDict().popitem()
 
-    # coverage
-    assert I.IntervalDict().coverage() == I.empty()
+    # Iterators on empty
+    assert I.IntervalDict().values() == []
+    assert I.IntervalDict().items() == []
+    assert I.IntervalDict().keys() == []
+    assert I.IntervalDict().keys(single=True) == I.empty()
+
 
 
 def test_example():
