@@ -1076,13 +1076,19 @@ class Interval:
 
 class IntervalDict(MutableMapping):
     """
-    An IntervalDict is a dict-like data structure to conveniently store data
-    along with intervals. An IntervalDict accepts its keys to be defined either
-    using a single value (in that case, it acts exactly as a dict) or an Interval
-    (in that case, it corresponds to a range query).
+    An IntervalDict is a dict-like data structure where keys can be single
+    values or Interval instances. When Interval instances are used as keys, its
+    behaviour merely corresponds to range queries and it returns IntervalDict
+    instances corresponding to the subset of values covered by the interval.
 
-    Additionally, an IntervalDict exposes a find(value) method that can be used
-    to find intervals with the provided value.
+    Even if it mimicks a dictionary, there are some differences:
+
+     - It exposes a d.domain() method to retrieve the Interval covered by stored keys.
+     - It exposes a d.find(value) to retrieve all intervals for given value.
+     - KeyError are only raised when keys are single values. If a key is an Interval,
+       and if there is no matching value, it returns an empty IntervalDict instead.
+
+    This class does not aim for performances, and is mainly provided for convenience.
     """
 
     __slots__ = ('_items', )
@@ -1101,7 +1107,7 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
-        self._items = list()  #  List of (interval, value) pairs
+        self._items = list()  # List of (interval, value) pairs
 
         if mapping_or_iterable is not None:
             if hasattr(mapping_or_iterable, 'items'):
@@ -1110,7 +1116,7 @@ class IntervalDict(MutableMapping):
                 data = mapping_or_iterable
 
             for i, v in data:
-                self.set(i, v)
+                self[i] = v
 
     def clear(self):
         """
@@ -1128,20 +1134,20 @@ class IntervalDict(MutableMapping):
 
     def get(self, key, default=None):
         """
-        Return the corresponding value. If the parameter is an Interval, it returns a new
-        IntervalDict instance where the intervals are restricted to the intersection with
-        the provided one. The optional default is then used to "fill the gaps".
+        Return the values associated to given key.
 
-        If the parameter is a single value, it returns the corresponding associated value,
-        or the default value if there is no associated value for given key.
+        If the key is a single value, it returns a single value (if it exists) or
+        the default value. If the key is an Interval, it returns a new IntervalDict
+        restricted to given interval. In that case, the default value is used to
+        "fill the gaps" (if any) w.r.t. given key.
 
         :param key: a single value or an Interval instance.
-        :param default: optional default value.
+        :param default: default value (default to None).
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
         if isinstance(key, Interval):
             d = self[key]
-            d[key - d.keys(single=True)] = default
+            d[key - d.domain()] = default
             return d
         else:
             try:
@@ -1151,7 +1157,7 @@ class IntervalDict(MutableMapping):
 
     def set(self, key, value):
         """
-        Set the corresponding value for given key.
+        Set value for given key.
 
         :param key: a single value or an Interval instance.
         :param value: value to associate with given key.
@@ -1160,8 +1166,10 @@ class IntervalDict(MutableMapping):
 
     def remove(self, key):
         """
-        Remove given key. If given key is a single value, raises a KeyError
-        if it does not exist.
+        Remove given key from the IntervalDict.
+
+        If key is a single value, and if that value does not exist in the IntervalDict,
+        raises a KeyError.
 
         :param key: an IntervalDict, or a single value if key is not an Interval.
         """
@@ -1185,18 +1193,13 @@ class IntervalDict(MutableMapping):
         """
         return sorted(self._items, key=lambda t: t[0].lower)
 
-    def keys(self, single=False):
+    def keys(self):
         """
-        Return an iterator over the underlying Interval instances, unless single is
-        set to True. In that case, a single interval is returned, corresponding to
-        the domain of this IntervalSet.
+        Return an iterator over the underlying Interval instances.
 
-        :return: an iterator of intervals or a single Interval
+        :return: an iterator of intervals.
         """
-        if single:
-            return Interval(*(i for i, v in self._items))
-        else:
-            return [i for i, v in self._items]
+        return [i for i, v in self._items]
 
     def values(self):
         """
@@ -1206,50 +1209,58 @@ class IntervalDict(MutableMapping):
         """
         return [v for i, v in self._items]
 
+    def domain(self):
+        """
+        Return an Interval corresponding to the domain of this IntervalDict.
+
+        :return: an Interval.
+        """
+        return Interval(*(i for i, v in self._items))
+
     def pop(self, key, default=None):
         """
-        Combine self.get(key, default) and self.remove(key).
-        If default is provided and is not None,  no KeyError is raised
-        even if given key cannot be found.
+        Return and remove given key.
+
+        This method combines self[key] and del self[key]. If a default value
+        is provided and is not None, it uses self.get(key, default) instead of
+        self[key].
 
         :param key: a single value or an Interval instance.
         :param default: optional default value.
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
-        value = self.get(key, default)
-
-        try:
-            self.remove(key)
-        except KeyError:
-            if default is None:
-                raise
-
-        return value
+        if default is None:
+            value = self[key]
+            del self[key]
+            return value
+        else:
+            value = self.get(key, default)
+            try:
+                del self[key]
+            except KeyError:
+                pass
+            return value
 
     def popitem(self):
         """
-        Do self.pop(key) for an arbitrary existing key.
+        Pop an arbitrary existing key.
 
-        If the IntervalDict is empty, raises a KeyError.
         :return: an IntervalDict
         """
-        if len(self) == 0:
+        try:
+            return self.pop(self._items[-1][0])
+        except IndexError:
             raise KeyError('Instance is empty.')
-
-        i = next(self.values())
-        return self.pop(i)
 
     def setdefault(self, key, default=None):
         """
-        Return self.get(key, default) and set the value to given default for
-        intervals covered by provided key but not by the IntervalDict.
+        Return given key. If it does not exist, set its value to default and
+        return it. This method corresponds to self[key] = self.get(key, default).
 
         :param key: a single value or an Interval instance.
-        :param default: default value, or None if not set.
+        :param default: default value (default to None).
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
-
-        # TODO: CHECK THIS, IN PROGRESS
         if isinstance(key, Interval):
             value = self.get(key, default)
             self.update(value)
@@ -1263,8 +1274,11 @@ class IntervalDict(MutableMapping):
 
     def update(self, mapping_or_iterable):
         """
-        Update current instance with the key/value pairs from
-        mapping_or_iterable. See IntervalDict.__init__ for more information.
+        Update current IntervalDict with provided values.
+
+        If a mapping is provided, it must map Interval instances to values (e.g., another
+        IntervalDict). If an iterable is provided, it must consist of a list of
+        (interval, value) pairs.
 
         :param mapping_or_iterable: mapping or iterable.
         """
@@ -1291,9 +1305,9 @@ class IntervalDict(MutableMapping):
             raise KeyError('{} not found.'.format(key))
 
     def __setitem__(self, key, value):
-        key = key if isinstance(key, Interval) else singleton(key)
+        interval = key if isinstance(key, Interval) else singleton(key)
 
-        if key.is_empty():
+        if interval.is_empty():
             return
 
         new_items = []
@@ -1301,19 +1315,22 @@ class IntervalDict(MutableMapping):
         for i, v in self._items:
             if value == v:
                 found = True
-                new_items.append((i | key, v))
+                new_items.append((i | interval, v))
             else:
-                new_i = i - key
+                new_i = i - interval
                 if not new_i.is_empty():
                     new_items.append((new_i, v))
 
         if not found:
-            new_items.append((key, value))
+            new_items.append((interval, value))
 
         self._items = new_items
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
+
+        if interval.is_empty():
+            return
 
         new_items = []
         found = False
@@ -1341,9 +1358,7 @@ class IntervalDict(MutableMapping):
         return len(self._items)
 
     def __contains__(self, key):
-        key = key if isinstance(key, Interval) else singleton(key)
-
-        return any(key.overlaps(i) for i, v in self._items)
+        return key in self.domain()
 
     def __repr__(self):
         return '{}{}{}'.format(
