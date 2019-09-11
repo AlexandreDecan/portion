@@ -762,6 +762,84 @@ def test_iterate():
     assert next(gen) == 0  # and so on
 
 
+def test_intervaldict():
+    d = I.IntervalDict()
+
+    # Single value
+    d[I.closed(0, 2)] = 0
+    assert len(d) == 1
+    assert d[2] == 0
+    assert d.get(2) == 0
+    with pytest.raises(KeyError):
+        d[3]
+    assert d.get(3) is None
+
+    # assert d[I.closed(0, 2)] == [(I.closed(0, 2), 0)]
+    # assert d[I.closed(-1, 0)] == [(I.singleton(0), 0)]
+    # with pytest.raises(KeyError):
+    #     d[I.closed(-2, -1)]
+    # assert d.get(I.closed(-2, -1)) == [(I.closed(-2, -1), None)]
+    # assert d.get(I.closed(-1, 0)) == [(I.closedopen(-1, 0), None), (I.singleton(0), 0)]
+
+    d[I.closed(1, 3)] = 1
+    assert len(d) == 2
+    assert d[0] == 0
+    assert d[1] == 1
+    assert d[3] == 1
+
+    # Default value
+    assert d.get(0, 2) == 0
+    assert d.get(1, 2) == 1
+    assert d.get(4, 2) == 2
+
+    d.set(3, 2)
+    assert len(d) == 3
+    assert d[3] == 2
+
+    # Iterators
+    assert d.keys() == [I.closedopen(0, 1), I.closedopen(1, 3), I.singleton(3)]
+    assert d.keys(single=True) == I.closed(0, 3)
+    assert d.values() == [0, 1, 2]
+    assert d.items() == zip(d.keys(), d.values())
+    assert list(d) == d.items()
+
+    del d[3]
+    assert d.keys(single=True) == I.closedopen(0, 3)
+    with pytest.raises(KeyError):
+        d[3]
+
+    assert 0 in d
+    assert -1 not in d
+
+    # pop
+    assert d.pop(2) == 1
+    assert d.pop(4, 0) == 0
+    with pytest.raises(KeyError):
+        d.pop(4)
+
+    # setdefault
+    assert d.setdefault(-1, default=0) == 0
+    assert d[-1] == 0
+    assert d.setdefault(0, default=1) == 0
+    assert d[0] == 0
+
+
+def test_intervaldict_methods():
+    # init
+    # clear
+    # copy
+    # find
+    # update
+    # eq
+
+    # popitem
+    with pytest.raises(KeyError):
+        I.IntervalDict().popitem()
+
+    # coverage
+    assert I.IntervalDict().coverage() == I.empty()
+
+
 def test_example():
     failure = None
 

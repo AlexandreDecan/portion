@@ -1,3 +1,4 @@
+from collections.abc import MutableMapping
 import operator
 import re
 import warnings
@@ -17,6 +18,7 @@ __all__ = [
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
     'iterate',
     'from_string', 'to_string', 'from_data', 'to_data',
+    'IntervalDict',
 ]
 
 
@@ -1070,3 +1072,288 @@ class Interval:
 
     def __repr__(self):
         return ' | '.join(repr(i) for i in self._intervals)
+
+
+class IntervalDict(MutableMapping):
+    """
+    An IntervalDict is a dict-like data structure to conveniently store data
+    along with intervals. An IntervalDict accepts its keys to be defined either
+    using a single value (in that case, it acts exactly as a dict) or an Interval
+    (in that case, it corresponds to a range query).
+
+    Additionally, an IntervalDict exposes a find(value) method that can be used
+    to find intervals with the provided value.
+    """
+
+    __slots__ = ('_items', )
+
+    def __init__(self, mapping_or_iterable=None):
+        """
+        Return a new IntervalDict.
+
+        If no argument is given, an empty IntervalDict is created. If an argument
+        is given, and is a mapping object (e.g., another IntervalDict), an
+        new IntervalDict with the same key-value pairs is created.
+
+        If an iterable is provided, each item must contain exactly two objects
+        where the first object must be an Interval instance or a value (that will
+        be converted to a singleton).
+
+        :param mapping_or_iterable: optional mapping or iterable.
+        """
+        self._items = list()  #  List of (interval, value) pairs
+
+        if mapping_or_iterable is not None:
+            if hasattr(mapping_or_iterable, 'items'):
+                data = mapping_or_iterable.items()
+            else:
+                data = mapping_or_iterable
+
+            for i, v in data:
+                self.set(i, v)
+
+    def clear(self):
+        """
+        Remove all items from the IntervalDict.
+        """
+        self._items.clear()
+
+    def copy(self):
+        """
+        Return a shallow copy.
+
+        :return: a shallow copy.
+        """
+        return IntervalDict(self)
+
+    def get(self, key, default=None):
+        """
+        Return the corresponding value. If the parameter is an Interval, it returns a new
+        IntervalDict instance where the intervals are restricted to the intersection with
+        the provided one. The optional default is then used to "fill the gaps".
+
+        If the parameter is a single value, it returns the corresponding associated value,
+        or the default value if there is no associated value for given key.
+
+        :param key: a single value or an Interval instance.
+        :param default: optional default value.
+        :return: an IntervalDict, or a single value if key is not an Interval.
+        """
+        if isinstance(key, Interval):
+            d = self[key]
+            d[d.keys(single=True) - key] = default
+            return d
+        else:
+            try:
+                return self[key]
+            except KeyError:
+                return default
+
+    def set(self, key, value):
+        """
+        Set the corresponding value for given key.
+
+        :param key: a single value or an Interval instance.
+        :param value: value to associate with given key.
+        """
+        self[key] = value
+
+    def remove(self, key):
+        """
+        Remove given key. If given key is a single value, raises a KeyError
+        if it does not exist.
+
+        :param key: an IntervalDict, or a single value if key is not an Interval.
+        """
+        del self[key]
+
+    def find(self, value):
+        """
+        Return a (possibly empty) Interval i such that self[i] = value, and
+        self[~i] != value.
+
+        :param value: value to look for.
+        :return: an Interval instance.
+        """
+        return Interval(*(i for i, v in self._items if v == value))
+
+    def items(self):
+        """
+        Return an iterator over (Interval, value) pairs.
+
+        :return: an iterator of 2-uples.
+        """
+        return list(self._items)
+
+    def keys(self, single=False):
+        """
+        Return an iterator over the underlying Interval instances, unless single is
+        set to True. In that case, a single interval is returned, corresponding to
+        the domain of this IntervalSet.
+
+        :return: an iterator of intervals or a single Interval
+        """
+        if single:
+            return Interval(*(i for i, v in self._items))
+        else:
+            return [i for i, v in self._items]
+
+    def values(self):
+        """
+        Return an iterator over the underlying values.
+
+        :return: an iterator of values.
+        """
+        return [v for i, v in self._items]
+
+    def pop(self, key, default=None):
+        """
+        Combine self.get(key, default) and self.remove(key).
+        If default is provided and is not None,  no KeyError is raised
+        even if given key cannot be found.
+
+        :param key: a single value or an Interval instance.
+        :param default: optional default value.
+        :return: an IntervalDict, or a single value if key is not an Interval.
+        """
+        value = self.get(key, default)
+
+        try:
+            self.remove(key)
+        except KeyError:
+            if default is None:
+                raise
+
+        return value
+
+    def popitem(self):
+        """
+        Do self.pop(key) for an arbitrary existing key.
+
+        If the IntervalDict is empty, raises a KeyError.
+        :return: an IntervalDict
+        """
+        if len(self) == 0:
+            raise KeyError('Instance is empty.')
+
+        i = next(self.values())
+        return self.pop(i)
+
+    def setdefault(self, key, default=None):
+        """
+        Return self.get(key, default) and set the value to given default for
+        intervals covered by provided key but not by the IntervalDict.
+
+        :param key: a single value or an Interval instance.
+        :param default: default value, or None if not set.
+        :return: an IntervalDict, or a single value if key is not an Interval.
+        """
+
+        # TODO: CHECK THIS, IN PROGRESS
+        if isinstance(key, Interval):
+            value = self.get(key, default)
+            self.update(value)
+            return value
+        else:
+            try:
+                return self[key]
+            except KeyError:
+                self[key] = default
+                return default
+
+    def update(self, mapping_or_iterable):
+        """
+        Update current instance with the key/value pairs from
+        mapping_or_iterable. See IntervalDict.__init__ for more information.
+
+        :param mapping_or_iterable: mapping or iterable.
+        """
+        if hasattr(mapping_or_iterable, 'items'):
+            data = mapping_or_iterable.items()
+        else:
+            data = mapping_or_iterable
+
+        for i, v in data:
+            self[i] = v
+
+    def __getitem__(self, key):
+        if isinstance(key, Interval):
+            items = []
+            for v, i in self._content:
+                intersection = key & i
+                if not intersection.is_empty():
+                    items.append((intersection, v))
+            return IntervalDict(items)
+        else:
+            for i, v in self._items:
+                if key in i:
+                    return v
+            raise KeyError('{} not found.'.format(key))
+
+    def __setitem__(self, key, value):
+        key = key if isinstance(key, Interval) else singleton(key)
+
+        new_items = []
+        found = False
+        for i, v in self._items:
+            if value == v:
+                found = True
+                new_items.append((i | key, v))
+            else:
+                new_i = i - key
+                if not new_i.is_empty():
+                    new_items.append((new_i, v))
+
+        if not found:
+            new_items.append((key, value))
+
+        self._items = sorted(new_items)
+
+    def __delitem__(self, key):
+        interval = key if isinstance(key, Interval) else singleton(key)
+
+        new_items = []
+        found = False
+        for i, v in self._items:
+            intersection = interval & i
+
+            if not intersection.is_empty():
+                found = True
+                remaining = i - intersection
+
+                if not remaining.is_empty():
+                    new_items.append((remaining, v))
+            else:
+                new_items.append((i, v))
+
+        self._items = sorted(new_items)
+
+        if not found and not isinstance(key, Interval):
+            raise KeyError('{} not found'.format(key))
+
+    def __iter__(self):
+        return iter(self._items)
+
+    def __len__(self):
+        return len(self._items)
+
+    def __contains__(self, key):
+        key = key if isinstance(key, Interval) else singleton(key)
+
+        return any(key.overlaps(i) for i, v in self._items)
+
+    def __repr__(self):
+        return '{}{}{}'.format(
+            '{',
+            ', '.join('{}: {}'.format(i, v) for i, v in self._items),
+            '}',
+        )
+
+    def __eq__(self, other):
+        if isinstance(other, IntervalDict):
+            return self._items == other._items
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        return not self == other  # Required for Python 2
