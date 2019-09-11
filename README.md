@@ -19,6 +19,7 @@ This library provides data structure and operations for intervals in Python 2.7+
       * [Accessing atomic intervals](#accessing-atomic-intervals)
       * [Import & export intervals to strings](#import--export-intervals-to-strings)
       * [Import & export intervals to Python built-in data types](#import--export-intervals-to-python-built-in-data-types)
+      * [Map intervals to data](#map-intervals-to-data)
   * [Contributions](#contributions)
   * [Licence](#licence)
   * [Changelog](#changelog)
@@ -33,6 +34,7 @@ This library provides data structure and operations for intervals in Python 2.7+
  - Support comparison, transformation, intersection, union, complement, difference and containment.
  - Discrete iterations on the values of an interval.
  - Import and export intervals to strings and to Python built-in data types.
+ - Dict-like structure to map intervals to data.
 
 
 ## Installation
@@ -627,6 +629,20 @@ The same set of parameters can be used to specify how bounds and infinities are 
 ```
 
 
+### Map intervals to data
+
+TODO:
+ - Introduce data structure and rationale
+ - Example with a single value (set, contains, get[], get)
+ - Example with an interval (set)
+ - Example with an interval (get[] + get(default))
+ - Iteration on IntervalDict (len(), keys() + domain(), values(), items())
+ - Find
+ - Setdefault
+ - Removal
+ - Other methods: clear, copy, pop, popitem, update
+
+
 ## Contributions
 
 Contributions are very welcome!
@@ -646,9 +662,10 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **1.9.0** (unreleased)
 
  - Discrete iteration on the values of an interval with `iterate`.
+ - Map intervals to data with the dict-like `IntervalDict` structure.
  - Faster comparisons between arbitrary values and intervals.
- - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
  - Fix `.union` when intervals share a bound, one open and one closed ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
+ - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
 
 
 **1.8.0** (2018-12-15)

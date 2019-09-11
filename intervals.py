@@ -13,7 +13,7 @@ __version__ = '1.9.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
-__description__ = 'Interval operations for Python'
+__description__ = 'Interval data structure and operations for Python'
 
 
 __all__ = [
@@ -1080,19 +1080,19 @@ class Interval:
 
 class IntervalDict(MutableMapping):
     """
-    An IntervalDict is a dict-like data structure where keys can be single
-    values or Interval instances. When Interval instances are used as keys, its
-    behaviour merely corresponds to range queries and it returns IntervalDict
-    instances corresponding to the subset of values covered by the interval.
+    An IntervalDict is a dict-like data structure that maps from intervals to data,
+    where keys can be single values or Interval instances.
 
-    Even if it mimicks a dictionary, there are some differences:
+    When Interval instances are used as keys, its behaviour merely corresponds to
+    range queries and it returns IntervalDict instances corresponding to the
+    subset of values covered by the interval. When single values are used as keys,
+    its behaviour corresponds to built-in dict.
 
-     - It exposes a d.domain() method to retrieve the Interval covered by stored keys.
-     - It exposes a d.find(value) to retrieve all intervals for given value.
-     - KeyError are only raised when keys are single values. If a key is an Interval,
-       and if there is no matching value, it returns an empty IntervalDict instead.
+    KeyError are only raised when values are used as keys. When intervals are used,
+    and if there is no matching value, an empty IntervalDict is returned instead.
 
-    This class does not aim for performances, and is mainly provided for convenience.
+    Note that this class does not aim to have the best performance, but is
+    provided mainly for convenience.
     """
 
     __slots__ = ('_items', )
