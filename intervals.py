@@ -1126,7 +1126,7 @@ class IntervalDict(MutableMapping):
         """
         Remove all items from the IntervalDict.
         """
-        self._items.clear()
+        self._items = list()
 
     def copy(self):
         """
