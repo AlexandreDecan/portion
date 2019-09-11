@@ -648,6 +648,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Discrete iteration on the values of an interval with `iterate`.
  - Faster comparisons between arbitrary values and intervals.
  - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
+ - Fix `.union` when intervals share a bound, one open and one closed ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
 
 
 **1.8.0** (2018-12-15)

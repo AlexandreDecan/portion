@@ -630,6 +630,15 @@ def test_union():
 
     assert I.closed(0, 1) | I.empty() == I.closed(0, 1)
 
+    assert I.open(0, 2) | I.closed(0, 2) == I.closed(0, 2)
+    assert I.open(0, 2) | I.closed(1, 2) == I.openclosed(0, 2)
+    assert I.open(0, 2) | I.closed(0, 1) == I.closedopen(0, 2)
+
+    assert I.closed(0, 2) | I.singleton(2) == I.closed(0, 2)
+    assert I.closedopen(0, 2) | I.singleton(2) == I.closed(0, 2)
+    assert I.openclosed(0, 2) | I.singleton(2) == I.openclosed(0, 2)
+    assert I.openclosed(0, 2) | I.singleton(0) == I.closed(0, 2)
+
 
 def test_iteration():
     i1 = I.closed(10, 10) | I.closed(5, 6) | I.closed(7, 8) | I.closed(8, 9)
