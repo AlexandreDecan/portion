@@ -932,6 +932,7 @@ def test_intervaldict_other_methods():
     assert a != 1
     assert a.items() == [(I.closed(-1, 1), 2), (I.openclosed(1, 2), 0), (I.closed(4, 5), 1)]
 
+
 def test_example():
     failure = None
 

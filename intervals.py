@@ -1,7 +1,11 @@
-from collections.abc import MutableMapping
 import operator
 import re
 import warnings
+
+try:
+    from collections.abc import MutableMapping
+except ImportError:  # Python 2
+    from collections import MutableMapping
 
 
 __package__ = 'python-intervals'
