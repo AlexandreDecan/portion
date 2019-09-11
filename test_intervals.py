@@ -825,17 +825,19 @@ def test_intervaldict_get_set():
 
     # Delete
     d = I.IntervalDict([(I.closed(0, 2), 0)])
-    del d[1]
+    d.remove(1)
     with pytest.raises(KeyError):
         d[1]
     with pytest.raises(KeyError):
-        del d[3]
+        d.remove(3)
 
     d = I.IntervalDict([(I.closed(0, 2), 0)])
-    del d[I.closed(-1, 1)]
+    d.remove(I.closed(-1, 1))
     assert d.items() == [(I.openclosed(1, 2), 0)]
 
-    del d[I.closed(-10, -9)]
+    d.remove(I.closed(-10, -9))
+    assert d.items() == [(I.openclosed(1, 2), 0)]
+    d.remove(I.empty())
     assert d.items() == [(I.openclosed(1, 2), 0)]
 
     # setdefault
@@ -879,6 +881,9 @@ def test_intervaldict_other_methods():
     assert I.closed(1, 2) in d
     assert I.closed(1, 4) not in d
 
+    # Repr
+    assert repr(d) == '{' + repr(I.closed(0, 3)) + ': 0}'
+
     # pop
     assert d.pop(2) == 0
     assert d.pop(4, 1) == 1
@@ -915,7 +920,7 @@ def test_intervaldict_other_methods():
     assert d.find(-1) == I.empty()
     assert d.find(0) == I.closed(0, 3)
 
-    # init & update
+    # init & update & eq
     d = I.IntervalDict({I.closed(0, 2): 0, I.closed(4, 5): 1})
     assert d == I.IntervalDict([(I.closed(0, 2), 0), (I.closed(4, 5), 1)])
 
@@ -924,8 +929,8 @@ def test_intervaldict_other_methods():
     b.update([[I.closed(-1, 1), 2]])
     assert a != d
     assert a == b
+    assert a != 1
     assert a.items() == [(I.closed(-1, 1), 2), (I.openclosed(1, 2), 0), (I.closed(4, 5), 1)]
-
 
 def test_example():
     failure = None
