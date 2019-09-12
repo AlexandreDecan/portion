@@ -607,7 +607,7 @@ Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to sup
 
 ```
 
-The function that is used to convert bounds can be specified with the `conv` parameter.
+The function to convert bounds can be specified with the `conv` parameter.
 The values that must be used to represent positive and negative infinities can be specified with
 `pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
@@ -663,8 +663,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
  - Discrete iteration on the values of an interval with `iterate`.
  - Map intervals to data with the dict-like `IntervalDict` structure.
+ - Fix `.union` when both intervals share a bound and one is inclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
  - Faster comparisons between arbitrary values and intervals.
- - Fix `.union` when intervals share a bound, one open and one closed ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
  - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
 
 
