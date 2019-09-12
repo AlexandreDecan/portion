@@ -637,6 +637,16 @@ Feel free to report bugs or suggest new features using GitHub issues and/or pull
 
 Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt).
 
+You can cite this library using:
+
+```
+@software{python-intervals,
+  author = {Decan, Alexandre},
+  title = {python-intervals, data structure and operations for intervals},
+  url = {https://github.com/AlexandreDecan/python-intervals},
+}
+```
+
 
 ## Changelog
 
