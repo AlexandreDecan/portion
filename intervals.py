@@ -1191,27 +1191,27 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return an iterator over (Interval, value) pairs.
+        Return the set of (Interval, value) pairs.
 
-        :return: an iterator of 2-uples.
+        :return: a set of 2-uples.
         """
-        return sorted(self._items, key=lambda t: t[0].lower)
+        return set(self._items)
 
     def keys(self):
         """
-        Return an iterator over the underlying Interval instances.
+        Return the set of underlying Interval instances.
 
-        :return: an iterator of intervals.
+        :return: a set of intervals.
         """
-        return [i for i, v in self._items]
+        return set([i for i, v in self._items])
 
     def values(self):
         """
-        Return an iterator over the underlying values.
+        Return the set of values.
 
-        :return: an iterator of values.
+        :return: a set of values.
         """
-        return [v for i, v in self._items]
+        return set([v for i, v in self._items])
 
     def domain(self):
         """
