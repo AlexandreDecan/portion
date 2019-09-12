@@ -349,9 +349,14 @@ def test_overlaps():
 
     # https://github.com/AlexandreDecan/python-intervals/issues/13
     assert not I.closed(0, 1).overlaps(I.openclosed(1, 2))
+    assert not I.closedopen(0, 1).overlaps(I.closed(1, 2))
     assert not I.closed(1, 1).overlaps(I.openclosed(1, 2))
+    assert not I.closedopen(1, 1).overlaps(I.closed(1, 2))
     assert not I.openclosed(1, 2).overlaps(I.closed(0, 1))
     assert not I.openclosed(1, 2).overlaps(I.closed(1, 1))
+
+    assert I.open(0, 2).overlaps(I.open(0, 1))
+    assert I.open(0, 1).overlaps(I.open(0, 2))
 
 
 def test_overlaps_adjacent():
@@ -388,6 +393,7 @@ def test_overlaps_adjacent():
 
     # https://github.com/AlexandreDecan/python-intervals/issues/13
     assert I.closed(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
+    assert I.closedopen(0, 1).overlaps(I.closed(1, 2), adjacent=True)
     assert I.closed(1, 1).overlaps(I.openclosed(1, 2), adjacent=True)
     assert I.openclosed(1, 2).overlaps(I.closed(0, 1), adjacent=True)
     assert I.openclosed(1, 2).overlaps(I.closed(1, 1), adjacent=True)
@@ -647,16 +653,30 @@ def test_union():
     assert I.open(0, 2) | I.closed(1, 2) == I.openclosed(0, 2)
     assert I.open(0, 2) | I.closed(0, 1) == I.closedopen(0, 2)
 
+    assert I.closed(0, 2) | I.open(0, 2) == I.closed(0, 2)
+    assert I.closed(1, 2) | I.open(0, 2) == I.openclosed(0, 2)
+    assert I.closed(0, 1) | I.open(0, 2) == I.closedopen(0, 2)
+
     assert I.closed(0, 2) | I.singleton(2) == I.closed(0, 2)
     assert I.closedopen(0, 2) | I.singleton(2) == I.closed(0, 2)
     assert I.openclosed(0, 2) | I.singleton(2) == I.openclosed(0, 2)
     assert I.openclosed(0, 2) | I.singleton(0) == I.closed(0, 2)
+
+    assert I.singleton(2) | I.closed(0, 2) == I.closed(0, 2)
+    assert I.singleton(2) | I.closedopen(0, 2) == I.closed(0, 2)
+    assert I.singleton(2) | I.openclosed(0, 2) == I.openclosed(0, 2)
+    assert I.singleton(0) | I.openclosed(0, 2) == I.closed(0, 2)
 
     # https://github.com/AlexandreDecan/python-intervals/issues/13
     assert I.closed(1, 1) | I.openclosed(1, 2) == I.closed(1, 2)
     assert I.openclosed(1, 2) | I.closed(1, 1) == I.closed(1, 2)
     assert I.closed(0, 1) | I.openclosed(1, 2) == I.closed(0, 2)
     assert I.openclosed(1, 2) | I.closed(0, 1) == I.closed(0, 2)
+
+    assert I.openclosed(1, 2) | I.closed(1, 1) == I.closed(1, 2)
+    assert I.closed(1, 1) | I.openclosed(1, 2) == I.closed(1, 2)
+    assert I.openclosed(1, 2) | I.closed(0, 1) == I.closed(0, 2)
+    assert I.closed(0, 1) | I.openclosed(1, 2) == I.closed(0, 2)
 
 
 def test_iteration():
