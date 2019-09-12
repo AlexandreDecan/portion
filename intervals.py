@@ -480,10 +480,10 @@ class AtomicInterval:
         if not isinstance(other, AtomicInterval):
             raise TypeError('Only AtomicInterval instances are supported.')
 
-        if self._lower > other.lower:
-            first, second = other, self
-        else:
+        if self._lower < other.lower or (self._lower == other.lower and self._left == CLOSED):
             first, second = self, other
+        else:
+            first, second = other, self
 
         if first._upper == second._lower:
             if adjacent:

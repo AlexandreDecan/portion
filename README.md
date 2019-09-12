@@ -653,6 +653,16 @@ Feel free to report bugs or suggest new features using GitHub issues and/or pull
 
 Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt).
 
+You can cite this library using:
+
+```
+@software{python-intervals,
+  author = {Decan, Alexandre},
+  title = {python-intervals, data structure and operations for intervals},
+  url = {https://github.com/AlexandreDecan/python-intervals},
+}
+```
+
 
 ## Changelog
 
@@ -663,9 +673,10 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
  - Discrete iteration on the values of an interval with `iterate`.
  - Map intervals to data with the dict-like `IntervalDict` structure.
- - Fix `.union` when both intervals share a bound and one is inclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
  - Faster comparisons between arbitrary values and intervals.
  - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
+ - Fix `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
+ - Fix `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/python-intervals/issues/13)).
 
 
 **1.8.0** (2018-12-15)
