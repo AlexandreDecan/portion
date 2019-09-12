@@ -1320,10 +1320,12 @@ class IntervalDict(MutableMapping):
             if value == v:
                 found = True
                 new_items.append((i | interval, v))
+            elif i.overlaps(interval):
+                remaining = i - interval
+                if not remaining.is_empty():
+                    new_items.append((remaining, v))
             else:
-                new_i = i - interval
-                if not new_i.is_empty():
-                    new_items.append((new_i, v))
+                new_items.append((i, v))
 
         if not found:
             new_items.append((interval, value))
@@ -1339,12 +1341,9 @@ class IntervalDict(MutableMapping):
         new_items = []
         found = False
         for i, v in self._items:
-            intersection = interval & i
-
-            if not intersection.is_empty():
+            if i.overlaps(interval):
                 found = True
-                remaining = i - intersection
-
+                remaining = i - interval
                 if not remaining.is_empty():
                     new_items.append((remaining, v))
             else:

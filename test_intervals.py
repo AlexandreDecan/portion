@@ -926,21 +926,26 @@ def test_intervaldict_other_methods():
     assert repr(d) == '{' + repr(I.closed(0, 3)) + ': 0}'
 
     # pop
-    assert d.pop(2) == 0
-    assert d.pop(4, 1) == 1
+    t = d.pop(2)
+    assert t == 0
+    t = d.pop(4, 1)
+    assert t == 1
     with pytest.raises(KeyError):
         d.pop(4)
 
     # pop intervals
     d = I.IntervalDict([(I.closed(0, 3), 0)])
-    assert d.pop(I.closed(0, 1)).items() == set([(I.closed(0, 1), 0)])
+    t = d.pop(I.closed(0, 1))
+    assert t.items() == set([(I.closed(0, 1), 0)])
     assert d.items() == set([(I.openclosed(1, 3), 0)])
-    assert d.pop(I.closed(0, 2), 1).items() == set([(I.closed(0, 1), 1), (I.openclosed(1, 2), 0)])
+    t = d.pop(I.closed(0, 2), 1)
+    assert t.items() == set([(I.closed(0, 1), 1), (I.openclosed(1, 2), 0)])
     assert d.items() == set([(I.openclosed(2, 3), 0)])
 
     # popitem
     d = I.IntervalDict([(I.closed(0, 3), 0)])
-    assert d.popitem().items() == set([(I.closed(0, 3), 0)])
+    t = d.popitem()
+    assert t.items() == set([(I.closed(0, 3), 0)])
     assert len(d) == 0
 
     with pytest.raises(KeyError):
