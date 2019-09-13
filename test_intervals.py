@@ -847,7 +847,7 @@ def test_intervaldict_get_set():
 
     # Set values
     d = I.IntervalDict([(I.closed(0, 2), 0)])
-    d.set(3, 2)
+    d[3] = 2
     assert d.items() == set([(I.closed(0, 2), 0), (I.singleton(3), 2)])
     d[3] = 3
     assert d.items() == set([(I.closed(0, 2), 0), (I.singleton(3), 3)])
@@ -864,19 +864,19 @@ def test_intervaldict_get_set():
 
     # Delete
     d = I.IntervalDict([(I.closed(0, 2), 0)])
-    d.remove(1)
+    del d[1]
     with pytest.raises(KeyError):
         d[1]
     with pytest.raises(KeyError):
-        d.remove(3)
+        del d[3]
 
     d = I.IntervalDict([(I.closed(0, 2), 0)])
-    d.remove(I.closed(-1, 1))
+    del d[I.closed(-1, 1)]
     assert d.items() == set([(I.openclosed(1, 2), 0)])
 
-    d.remove(I.closed(-10, -9))
+    del d[I.closed(-10, -9)]
     assert d.items() == set([(I.openclosed(1, 2), 0)])
-    d.remove(I.empty())
+    del d[I.empty()]
     assert d.items() == set([(I.openclosed(1, 2), 0)])
 
     # setdefault

@@ -1159,26 +1159,6 @@ class IntervalDict(MutableMapping):
             except KeyError:
                 return default
 
-    def set(self, key, value):
-        """
-        Set value for given key.
-
-        :param key: a single value or an Interval instance.
-        :param value: value to associate with given key.
-        """
-        self[key] = value
-
-    def remove(self, key):
-        """
-        Remove given key from the IntervalDict.
-
-        If key is a single value, and if that value does not exist in the IntervalDict,
-        raises a KeyError.
-
-        :param key: an IntervalDict, or a single value if key is not an Interval.
-        """
-        del self[key]
-
     def find(self, value):
         """
         Return a (possibly empty) Interval i such that self[i] = value, and
@@ -1306,7 +1286,7 @@ class IntervalDict(MutableMapping):
             for i, v in self._items:
                 if key in i:
                     return v
-            raise KeyError('{} not found.'.format(key))
+            raise KeyError(key)
 
     def __setitem__(self, key, value):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -1352,7 +1332,7 @@ class IntervalDict(MutableMapping):
         self._items = new_items
 
         if not found and not isinstance(key, Interval):
-            raise KeyError('{} not found'.format(key))
+            raise KeyError(key)
 
     def __iter__(self):
         return iter(self.keys())
@@ -1364,9 +1344,10 @@ class IntervalDict(MutableMapping):
         return key in self.domain()
 
     def __repr__(self):
+        items = sorted(self._items, key=lambda i: i[0].lower)
         return '{}{}{}'.format(
             '{',
-            ', '.join('{}: {}'.format(i, v) for i, v in self._items),
+            ', '.join('{!r}: {!r}'.format(i, v) for i, v in items),
             '}',
         )
 

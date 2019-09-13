@@ -631,16 +631,109 @@ The same set of parameters can be used to specify how bounds and infinities are 
 
 ### Map intervals to data
 
-TODO:
- - Introduce data structure and rationale
- - Example with a single value (set, contains, get[], get)
- - Example with an interval (set)
- - Example with an interval (get[] + get(default))
- - Iteration on IntervalDict (len(), keys() + domain(), values(), items())
- - Find
- - Setdefault
- - Removal
- - Other methods: clear, copy, pop, popitem, update
+
+The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data
+along with intervals. Any value can be stored in such data structure as long as it supports
+equality.
+
+
+```python
+>>> d = I.IntervalDict()
+>>> d[I.closed(0, 3)] = 'banana'
+>>> d[4] = 'apple'
+>>> d
+{[0,3]: 'banana', [4]: 'apple'}
+
+```
+
+When a value is defined for an interval that overlaps an existing one, it is automatically updated
+to take the new value into account:
+
+```python
+>>> d[I.closed(2, 4)] = 'orange'
+>>> d
+{[0,2): 'banana', [2,4]: 'orange'}
+
+```
+
+An `IntervalDict` can be queried using single values or intervals. If a single value is used as a
+key, its behaviour corresponds to the one of a classical `dict`:
+
+```python
+>>> d[2]
+'orange'
+>>> d[5]  # Key does not exist
+Traceback (most recent call last):
+ ...
+KeyError: 5
+>>> d.get(5, default=0)
+0
+
+```
+
+When an interval is used as a key, a new `IntervalDict` containing the values
+for that interval is returned:
+
+```python
+>>> d[~I.empty()]  # Get all values, similar to d.copy()
+{[0,2): 'banana', [2,4]: 'orange'}
+>>> d[I.closed(1, 3)]
+{[1,2): 'banana', [2,3]: 'orange'}
+>>> d[I.closed(-2, 1)]
+{[0,1]: 'banana'}
+>>> d[I.closed(-2, -1)]
+{}
+
+```
+
+By using `.get`, a default value (defaulting to `None`) can be specified.
+This value is used to "fill the gaps" if the queried interval is not completely
+covered by the `IntervalDict`:
+
+```python
+>>> d.get(I.closed(-2, 1), default='peach')
+{[-2,0): 'peach', [0,1]: 'banana'}
+>>> d.get(I.closed(-2, -1), default='peach')
+{[-2,-1]: 'peach'}
+>>> d.get(I.singleton(1), default='peach')  # Key is covered, default is not used
+{[1]: 'banana'}
+
+```
+
+For convenience, an `IntervalDict` provides a way to look for specific data values.
+The `.find` method always return a (possibly empty) `Interval` instance for which given
+value is defined:
+
+```python
+>>> d.find('banana')
+[0,2)
+>>> d.find('orange')
+[2,4]
+>>> d.find('carrot')
+()
+
+```
+
+The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
+This method always returns a single `Interval` instance, where `.keys` returns a set
+of disjoint intervals, one by value.
+
+```python
+>>> d.domain()
+[0,4]
+>>> d.keys() == set([I.closedopen(0, 2), I.closed(2, 4)])
+True
+>>> d.values() == set(['banana', 'orange'])
+True
+>>> d.items() == set([(I.closedopen(0, 2), 'banana'), (I.closed(2, 4), 'orange')])
+True
+
+```
+
+Finally, similarly to a `dict`, an `IntervalDict` supports `len`, `in` and `del`, and defines
+`.clear`, `.copy`, `.update`, `.pop`, `.popitem`,
+and `.setdefault` methods.
+
 
 
 ## Contributions
