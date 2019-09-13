@@ -721,12 +721,12 @@ of disjoint intervals, one by value.
 ```python
 >>> d.domain()
 [0,4]
->>> d.keys() == set([I.closedopen(0, 2), I.closed(2, 4)])
-True
->>> d.values() == set(['banana', 'orange'])
-True
->>> d.items() == set([(I.closedopen(0, 2), 'banana'), (I.closed(2, 4), 'orange')])
-True
+>>> d.keys()
+[[0,2), [2,4]]
+>>> d.values()
+['banana', 'orange']
+>>> d.items()
+[([0,2), 'banana'), ([2,4], 'orange')]
 
 ```
 

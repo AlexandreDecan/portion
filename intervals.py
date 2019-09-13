@@ -1105,22 +1105,14 @@ class IntervalDict(MutableMapping):
         is given, and is a mapping object (e.g., another IntervalDict), an
         new IntervalDict with the same key-value pairs is created.
 
-        If an iterable is provided, each item must contain exactly two objects
-        where the first object must be an Interval instance or a value (that will
-        be converted to a singleton).
+        If an iterable is provided, it has to be a list of (key, value) pairs.
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
         self._items = list()  # List of (interval, value) pairs
 
         if mapping_or_iterable is not None:
-            if hasattr(mapping_or_iterable, 'items'):
-                data = mapping_or_iterable.items()
-            else:
-                data = mapping_or_iterable
-
-            for i, v in data:
-                self[i] = v
+            self.update(mapping_or_iterable)
 
     def clear(self):
         """
@@ -1171,27 +1163,30 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return the set of (Interval, value) pairs.
+        Return the list of (Interval, value) pairs.
 
-        :return: a set of 2-uples.
+        :return: a list of 2-uples.
         """
-        return set(self._items)
+        def func(i):
+            return (i[0].lower, not i[0].left, i[0].upper, i[0].right)
+
+        return sorted(self._items, key=func)
 
     def keys(self):
         """
-        Return the set of underlying Interval instances.
+        Return the list of underlying Interval instances.
 
-        :return: a set of intervals.
+        :return: a list of intervals.
         """
-        return set([i for i, v in self._items])
+        return [i for i, v in self.items()]
 
     def values(self):
         """
-        Return the set of values.
+        Return the list of values.
 
-        :return: a set of values.
+        :return: a list of values.
         """
-        return set([v for i, v in self._items])
+        return [v for i, v in self.items()]
 
     def domain(self):
         """
@@ -1239,7 +1234,7 @@ class IntervalDict(MutableMapping):
     def setdefault(self, key, default=None):
         """
         Return given key. If it does not exist, set its value to default and
-        return it. This method corresponds to self[key] = self.get(key, default).
+        return it.
 
         :param key: a single value or an Interval instance.
         :param default: default value (default to None).
@@ -1262,7 +1257,7 @@ class IntervalDict(MutableMapping):
 
         If a mapping is provided, it must map Interval instances to values (e.g., another
         IntervalDict). If an iterable is provided, it must consist of a list of
-        (interval, value) pairs.
+        (key, value) pairs.
 
         :param mapping_or_iterable: mapping or iterable.
         """
@@ -1272,6 +1267,7 @@ class IntervalDict(MutableMapping):
             data = mapping_or_iterable
 
         for i, v in data:
+            i = singleton(i) if not isinstance(i, Interval) else i
             self[i] = v
 
     def __getitem__(self, key):
@@ -1344,16 +1340,15 @@ class IntervalDict(MutableMapping):
         return key in self.domain()
 
     def __repr__(self):
-        items = sorted(self._items, key=lambda i: i[0].lower)
         return '{}{}{}'.format(
             '{',
-            ', '.join('{!r}: {!r}'.format(i, v) for i, v in items),
+            ', '.join('{!r}: {!r}'.format(i, v) for i, v in self.items()),
             '}',
         )
 
     def __eq__(self, other):
         if isinstance(other, IntervalDict):
-            return self._items == other._items
+            return self.items() == other.items()
         else:
             return NotImplemented
 
