@@ -762,21 +762,21 @@ You can cite this library using:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**1.9.0** (unreleased)
+**1.9.0** (2019-09-13)
 
  - Discrete iteration on the values of an interval with `iterate`.
  - Map intervals to data with the dict-like `IntervalDict` structure.
  - Faster comparisons between arbitrary values and intervals.
- - Deprecate `permissive` in `Interval.overlaps` in favour of `adjacent`.
+ - Deprecate `permissive` in `.overlaps` in favour of `adjacent`.
  - Fix `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
  - Fix `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/python-intervals/issues/13)).
 
 
 **1.8.0** (2018-12-15)
 
- - Intervals have a `left`, `lower`, `upper`, and `right` attribute that refer to its enclosure.
- - Intervals have a `replace` method to create new intervals based on the current one. This method accepts both values and functions.
- - Intervals have an `apply` method to apply a function on the underlying atomic intervals.
+ - Intervals have a `.left`, `.lower`, `.upper`, and `.right` attribute that refer to its enclosure.
+ - Intervals have a `.replace` method to create new intervals based on the current one. This method accepts both values and functions.
+ - Intervals have an `.apply` method to apply a function on the underlying atomic intervals.
  - Intervals can be compared with single values as well.
  - `I.empty()` returns the same instance to save memory.
  - Infinities are singleton objects.
