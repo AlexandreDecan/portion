@@ -1,4 +1,4 @@
-# Interval operations for Python
+# Python data structure and operations for intervals
 
 [![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/python-intervals/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)
@@ -131,6 +131,7 @@ Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with
 in `[0,3]` even if there is no integer between `1` and `2`.
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Interval operations
 
 Both `Interval` and `AtomicInterval` support following interval operations:
@@ -261,6 +262,7 @@ The `AtomicInterval` objects of an `Interval` can also be accessed using their i
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Comparison operators
 
 Equality between intervals can be checked with the classical `==` operator:
@@ -331,6 +333,7 @@ True
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Bounds of an interval
 
 The left and right boundaries, and the lower and upper bounds of an `AtomicInterval` can be respectively accessed
@@ -414,6 +417,7 @@ its enclosure satisfies the new bounds.
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Interval transformation
 
 To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method.
@@ -454,6 +458,7 @@ conveniently used to transform intervals in presence of infinities.
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Discrete iteration
 
 The `iterate` function takes an interval or atomic interval, and returns a generator to iterate over
@@ -516,6 +521,7 @@ the iterator:
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Map intervals to data
 
 The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data
@@ -621,6 +627,7 @@ Finally, similarly to a `dict`, an `IntervalDict` supports `len`, `in` and `del`
 and `.setdefault` methods.
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Import & export intervals to strings
 
 Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
@@ -699,6 +706,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Import & export intervals to Python built-in data types
 
 Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
@@ -732,6 +740,7 @@ The same set of parameters can be used to specify how bounds and infinities are 
 ```
 
 
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ## Contributions
 
 Contributions are very welcome!
@@ -747,7 +756,7 @@ You can cite this library using:
 ```
 @software{python-intervals,
   author = {Decan, Alexandre},
-  title = {python-intervals, data structure and operations for intervals},
+  title = {python-intervals: Python data structure and operations for intervals},
   url = {https://github.com/AlexandreDecan/python-intervals},
 }
 ```

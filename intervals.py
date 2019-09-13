@@ -13,7 +13,7 @@ __version__ = '1.9.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
-__description__ = 'Interval data structure and operations for Python'
+__description__ = 'Python data structure and operations for intervals'
 
 
 __all__ = [
