@@ -480,7 +480,7 @@ When an interval represents an union of atomic intervals, `iterate` consecutivel
 intervals, starting from each lower bound and ending on each upper one:
 
 ```python
->>> list(I.iterate(I.singleton(0) | I.singleton(1) | I.singleton(5), incr=2)  # Won't be [0]
+>>> list(I.iterate(I.singleton(0) | I.singleton(1) | I.singleton(5), incr=2))  # Won't be [0]
 [0, 1, 5]
 >>> list(I.iterate(I.closed(0, 2) | I.closed(5, 6), incr=3))  # Won't be [0, 6]
 [0, 5]
@@ -535,8 +535,8 @@ The `base` parameter can be used to change how `iterate` applies on unions of at
 specifying a function that returns a single value, as illustrated next:
 
 ```python
->>> interval = I.iterate(I.closed(0, 1) | I.closed(2, 4) | I.closed(5, 6)
->>> list(I.iterate(interval, incr=3)  # Won't be [0, 3, 6]
+>>> interval = I.closed(0, 1) | I.closed(2, 4) | I.closed(5, 6)
+>>> list(I.iterate(interval, incr=3))  # Won't be [0, 3, 6]
 [0, 2, 5]
 >>> list(I.iterate(interval, incr=3, base=lambda x: 0))
 [0, 3, 6]
