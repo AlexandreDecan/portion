@@ -476,11 +476,22 @@ given they are not excluded by the interval:
 
 ```
 
+When an interval represents an union of atomic intervals, `iterate` consecutively iterates on all atomic
+intervals, starting from each lower bound and ending on each upper one:
+
+```python
+>>> list(I.iterate(I.singleton(0) | I.singleton(1) | I.singleton(5), incr=2)  # Won't be [0]
+[0, 1, 5]
+>>> list(I.iterate(I.closed(0, 2) | I.closed(5, 6), incr=3))  # Won't be [0, 6]
+[0, 5]
+
+```
+
 Iteration can be performed in reverse order by specifying `reverse=True`. In that case, `incr` will be
 subtracted instead of being added, implying that `incr` must always be a "positive" value:
 
 ```python
->>> list(I.iterate(I.closed(0, 3), incr=1, reverse=True))
+>>> list(I.iterate(I.closed(0, 3), incr=1, reverse=True))  # Not incr=-1
 [3, 2, 1, 0]
 >>> list(I.iterate(I.closed(0, 3), incr=2, reverse=True))  # Not incr=-2
 [3, 1]
@@ -519,6 +530,21 @@ the iterator:
 [1, 2, 3, 4]
 
 ```
+
+The `base` parameter can be used to change how `iterate` applies on unions of atomic interval, by
+specifying a function that returns a single value, as illustrated next:
+
+```python
+>>> interval = I.iterate(I.closed(0, 1) | I.closed(2, 4) | I.closed(5, 6)
+>>> list(I.iterate(interval, incr=3)  # Won't be [0, 3, 6]
+[0, 2, 5]
+>>> list(I.iterate(interval, incr=3, base=lambda x: 0))
+[0, 3, 6]
+
+```
+
+Notice that this approach can be extremely inefficient in terms of performance when the intervals
+are "far apart" each other.
 
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
