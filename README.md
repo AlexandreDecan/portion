@@ -12,14 +12,13 @@ This library provides data structure and operations for intervals in Python 2.7+
   * [Documentation & usage](#documentation--usage)
       * [Interval creation](#interval-creation)
       * [Interval operations](#interval-operations)
+      * [Comparison operators](#comparison-operators)
       * [Bounds of an interval](#bounds-of-an-interval)
       * [Interval transformation](#interval-transformation)
-      * [Comparison operators](#comparison-operators)
       * [Discrete iteration](#discrete-iteration)
-      * [Accessing atomic intervals](#accessing-atomic-intervals)
+      * [Map intervals to data](#map-intervals-to-data)
       * [Import & export intervals to strings](#import--export-intervals-to-strings)
       * [Import & export intervals to Python built-in data types](#import--export-intervals-to-python-built-in-data-types)
-      * [Map intervals to data](#map-intervals-to-data)
   * [Contributions](#contributions)
   * [Licence](#licence)
   * [Changelog](#changelog)
@@ -243,6 +242,95 @@ The following methods are only available for `Interval` instances:
    ```
 
 
+Intervals can also be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
+
+```python
+>>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
+[[0,1], (2,3), [21,24]]
+
+```
+
+The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
+
+```python
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
+[0,1]
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
+(2,3)
+
+```
+
+
+### Comparison operators
+
+Equality between intervals can be checked with the classical `==` operator:
+
+```python
+>>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
+True
+>>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
+True
+
+```
+
+Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
+These comparison operators have a different behaviour than the usual ones.
+For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
+on the right of the upper bound of `b`.
+
+```python
+>>> I.closed(0, 1) < I.closed(2, 3)
+True
+>>> I.closed(0, 1) < I.closed(1, 2)
+False
+
+```
+
+Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
+holds if `a` is entirely on the right of the lower bound of `b`.
+
+```python
+>>> I.closed(0, 1) <= I.closed(2, 3)
+True
+>>> I.closed(0, 2) <= I.closed(1, 3)
+True
+>>> I.closed(0, 3) <= I.closed(1, 2)
+False
+
+```
+
+Intervals can also be compared with single values. If `i` is an interval and `x` a value, then
+`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the
+left of the upper bound of `i`. This behaviour is similar to the one that could be obtained by first
+converting `x` to a singleton interval.
+
+```python
+>>> 5 < I.closed(0, 10)
+False
+>>> 5 <= I.closed(0, 10)
+True
+>>> I.closed(0, 10) < 5
+False
+>>> I.closed(0, 10) <= 5
+True
+
+```
+
+
+Note that all these semantics differ from classical comparison operators.
+As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
+
+```python
+>>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
+False
+>>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
+False
+>>> I.empty() < I.empty()
+True
+
+```
+
+
 ### Bounds of an interval
 
 The left and right boundaries, and the lower and upper bounds of an `AtomicInterval` can be respectively accessed
@@ -366,75 +454,6 @@ conveniently used to transform intervals in presence of infinities.
 ```
 
 
-### Comparison operators
-
-Equality between intervals can be checked with the classical `==` operator:
-
-```python
->>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
-True
->>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
-True
-
-```
-
-Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
-These comparison operators have a different behaviour than the usual ones.
-For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
-on the right of the upper bound of `b`.
-
-```python
->>> I.closed(0, 1) < I.closed(2, 3)
-True
->>> I.closed(0, 1) < I.closed(1, 2)
-False
-
-```
-
-Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
-holds if `a` is entirely on the right of the lower bound of `b`.
-
-```python
->>> I.closed(0, 1) <= I.closed(2, 3)
-True
->>> I.closed(0, 2) <= I.closed(1, 3)
-True
->>> I.closed(0, 3) <= I.closed(1, 2)
-False
-
-```
-
-Intervals can also be compared with single values. If `i` is an interval and `x` a value, then
-`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the
-left of the upper bound of `i`. This behaviour is similar to the one that could be obtained by first
-converting `x` to a singleton interval.
-
-```python
->>> 5 < I.closed(0, 10)
-False
->>> 5 <= I.closed(0, 10)
-True
->>> I.closed(0, 10) < 5
-False
->>> I.closed(0, 10) <= 5
-True
-
-```
-
-
-Note that all these semantics differ from classical comparison operators.
-As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
-
-```python
->>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
-False
->>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
-False
->>> I.empty() < I.empty()
-True
-
-```
-
 ### Discrete iteration
 
 The `iterate` function takes an interval or atomic interval, and returns a generator to iterate over
@@ -497,25 +516,109 @@ the iterator:
 ```
 
 
-### Accessing atomic intervals
+### Map intervals to data
 
-Intervals can be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
+The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data
+along with intervals. Any value can be stored in such data structure as long as it supports
+equality.
+
 
 ```python
->>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
-[[0,1], (2,3), [21,24]]
+>>> d = I.IntervalDict()
+>>> d[I.closed(0, 3)] = 'banana'
+>>> d[4] = 'apple'
+>>> d
+{[0,3]: 'banana', [4]: 'apple'}
 
 ```
 
-The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
+When a value is defined for an interval that overlaps an existing one, it is automatically updated
+to take the new value into account:
 
 ```python
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
-[0,1]
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
-(2,3)
+>>> d[I.closed(2, 4)] = 'orange'
+>>> d
+{[0,2): 'banana', [2,4]: 'orange'}
 
 ```
+
+An `IntervalDict` can be queried using single values or intervals. If a single value is used as a
+key, its behaviour corresponds to the one of a classical `dict`:
+
+```python
+>>> d[2]
+'orange'
+>>> d[5]  # Key does not exist
+Traceback (most recent call last):
+ ...
+KeyError: 5
+>>> d.get(5, default=0)
+0
+
+```
+
+When an interval is used as a key, a new `IntervalDict` containing the values
+for that interval is returned:
+
+```python
+>>> d[~I.empty()]  # Get all values, similar to d.copy()
+{[0,2): 'banana', [2,4]: 'orange'}
+>>> d[I.closed(1, 3)]
+{[1,2): 'banana', [2,3]: 'orange'}
+>>> d[I.closed(-2, 1)]
+{[0,1]: 'banana'}
+>>> d[I.closed(-2, -1)]
+{}
+
+```
+
+By using `.get`, a default value (defaulting to `None`) can be specified.
+This value is used to "fill the gaps" if the queried interval is not completely
+covered by the `IntervalDict`:
+
+```python
+>>> d.get(I.closed(-2, 1), default='peach')
+{[-2,0): 'peach', [0,1]: 'banana'}
+>>> d.get(I.closed(-2, -1), default='peach')
+{[-2,-1]: 'peach'}
+>>> d.get(I.singleton(1), default='peach')  # Key is covered, default is not used
+{[1]: 'banana'}
+
+```
+
+For convenience, an `IntervalDict` provides a way to look for specific data values.
+The `.find` method always return a (possibly empty) `Interval` instance for which given
+value is defined:
+
+```python
+>>> d.find('banana')
+[0,2)
+>>> d.find('orange')
+[2,4]
+>>> d.find('carrot')
+()
+
+```
+
+The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
+This method always returns a single `Interval` instance, where `.keys` returns a set
+of disjoint intervals, one by value.
+
+```python
+>>> d.domain()
+[0,4]
+>>> d.keys()
+[[0,2), [2,4]]
+>>> d.values()
+['banana', 'orange']
+>>> d.items()
+[([0,2), 'banana'), ([2,4], 'orange')]
+
+```
+
+Finally, similarly to a `dict`, an `IntervalDict` supports `len`, `in` and `del`, and defines
+`.clear`, `.copy`, `.update`, `.pop`, `.popitem`,
+and `.setdefault` methods.
 
 
 ### Import & export intervals to strings
@@ -627,113 +730,6 @@ The same set of parameters can be used to specify how bounds and infinities are 
 [datetime.date(2011, 3, 15),datetime.date(2013, 10, 10))
 
 ```
-
-
-### Map intervals to data
-
-
-The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data
-along with intervals. Any value can be stored in such data structure as long as it supports
-equality.
-
-
-```python
->>> d = I.IntervalDict()
->>> d[I.closed(0, 3)] = 'banana'
->>> d[4] = 'apple'
->>> d
-{[0,3]: 'banana', [4]: 'apple'}
-
-```
-
-When a value is defined for an interval that overlaps an existing one, it is automatically updated
-to take the new value into account:
-
-```python
->>> d[I.closed(2, 4)] = 'orange'
->>> d
-{[0,2): 'banana', [2,4]: 'orange'}
-
-```
-
-An `IntervalDict` can be queried using single values or intervals. If a single value is used as a
-key, its behaviour corresponds to the one of a classical `dict`:
-
-```python
->>> d[2]
-'orange'
->>> d[5]  # Key does not exist
-Traceback (most recent call last):
- ...
-KeyError: 5
->>> d.get(5, default=0)
-0
-
-```
-
-When an interval is used as a key, a new `IntervalDict` containing the values
-for that interval is returned:
-
-```python
->>> d[~I.empty()]  # Get all values, similar to d.copy()
-{[0,2): 'banana', [2,4]: 'orange'}
->>> d[I.closed(1, 3)]
-{[1,2): 'banana', [2,3]: 'orange'}
->>> d[I.closed(-2, 1)]
-{[0,1]: 'banana'}
->>> d[I.closed(-2, -1)]
-{}
-
-```
-
-By using `.get`, a default value (defaulting to `None`) can be specified.
-This value is used to "fill the gaps" if the queried interval is not completely
-covered by the `IntervalDict`:
-
-```python
->>> d.get(I.closed(-2, 1), default='peach')
-{[-2,0): 'peach', [0,1]: 'banana'}
->>> d.get(I.closed(-2, -1), default='peach')
-{[-2,-1]: 'peach'}
->>> d.get(I.singleton(1), default='peach')  # Key is covered, default is not used
-{[1]: 'banana'}
-
-```
-
-For convenience, an `IntervalDict` provides a way to look for specific data values.
-The `.find` method always return a (possibly empty) `Interval` instance for which given
-value is defined:
-
-```python
->>> d.find('banana')
-[0,2)
->>> d.find('orange')
-[2,4]
->>> d.find('carrot')
-()
-
-```
-
-The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
-This method always returns a single `Interval` instance, where `.keys` returns a set
-of disjoint intervals, one by value.
-
-```python
->>> d.domain()
-[0,4]
->>> d.keys()
-[[0,2), [2,4]]
->>> d.values()
-['banana', 'orange']
->>> d.items()
-[([0,2), 'banana'), ([2,4], 'orange')]
-
-```
-
-Finally, similarly to a `dict`, an `IntervalDict` supports `len`, `in` and `del`, and defines
-`.clear`, `.copy`, `.update`, `.pop`, `.popitem`,
-and `.setdefault` methods.
-
 
 
 ## Contributions
