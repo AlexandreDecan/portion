@@ -619,7 +619,7 @@ covered by the `IntervalDict`:
 ```
 
 For convenience, an `IntervalDict` provides a way to look for specific data values.
-The `.find` method always return a (possibly empty) `Interval` instance for which given
+The `.find` method always returns a (possibly empty) `Interval` instance for which given
 value is defined:
 
 ```python
@@ -633,8 +633,8 @@ value is defined:
 ```
 
 The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
-This method always returns a single `Interval` instance, where `.keys` returns a set
-of disjoint intervals, one by value.
+This method always returns a single `Interval` instance, where `.keys` returns a list
+of disjoint intervals, one for each stored value.
 
 ```python
 >>> d.domain()
@@ -648,9 +648,8 @@ of disjoint intervals, one by value.
 
 ```
 
-Finally, similarly to a `dict`, an `IntervalDict` supports `len`, `in` and `del`, and defines
-`.clear`, `.copy`, `.update`, `.pop`, `.popitem`,
-and `.setdefault` methods.
+Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
+`.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
 
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
