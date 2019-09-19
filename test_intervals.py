@@ -913,6 +913,44 @@ def test_intervaldict_iterators():
     assert I.IntervalDict().domain() == I.empty()
 
 
+def test_intervaldict_combine():
+    add = lambda x, y: x + y
+
+    assert I.IntervalDict().combine(I.IntervalDict(), add) == I.IntervalDict()
+
+    d = I.IntervalDict([(I.closed(0, 3), 0)])
+    assert I.IntervalDict().Combine(d, add) == d
+    assert d.combine(I.IntervalDict(), add) == d
+
+    d1 = I.IntervalDict([(I.closed(1, 3) | I.closed(5, 7), 1)])
+    d2 = I.IntervalDict([(I.closed(2, 4) | I.closed(6, 8), 2)])
+    assert d1.combine(d2, add) == d2.combine(d1, add)
+    assert d1.combine(d2, add) == I.IntervalDict([
+        (I.closedopen(1, 2) | I.closedopen(5, 6), 1),
+        (I.closedopen(2, 3) | I.closedopen(6, 7), 3),
+        (I.closed(3, 4) | I.closed(7, 8), 2),
+    ])
+
+    d1 = I.IntervalDict({
+        I.closed(0, 1): 2,
+        I.closed(3, 4): 2
+    })
+    d2 = I.IntervalDict({
+        I.closed(1, 3): 2,
+        I.closed(4, 5): 1
+    })
+    assert d1.combine(d2, add) == d2.combine(d1, add)
+    assert d1.combine(d2, add) == I.IntervalDict({
+        I.closedopen(0, 1): 1,
+        I.closed(1, 3): 3,
+        I.open(2, 3): 2,
+        I.singleton(3): 4,
+        I.open(3, 4): 2,
+        I.singleton(4): 3,
+        I.openclosed(4, 5): 1,
+    })
+
+
 def test_intervaldict_other_methods():
     # Containment
     d = I.IntervalDict([(I.closed(0, 3), 0)])
