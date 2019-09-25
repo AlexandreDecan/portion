@@ -648,6 +648,35 @@ of disjoint intervals, one for each stored value.
 
 ```
 
+Two `IntervalDict` instances can be combined together using the `.combine` method.
+This method returns a new `IntervalDict` whose keys and values are taken from the two
+source `IntervalDict`. Values corresponding to non-intersecting keys are simply copied,
+while values corresponding to intersecting keys are combined together using the provided
+function, as illustrated hereafter:
+
+```python
+>>> d1 = I.IntervalDict({I.closed(0, 2): 'banana'})
+>>> d2 = I.IntervalDict({I.closed(1, 3): 'orange'})
+>>> concat = lambda x, y: x + '/' + y
+>>> d1.combine(d2, how=concat)
+{[0,1): 'banana', [1,2]: 'banana/orange', (2,3]: 'orange'}
+
+```
+
+Resulting keys always correspond to an outer join. Other joins can be easily simulated
+by querying the resulting `IntervalDict` as follows:
+
+```python
+>>> d = d1.combine(d2, how=concat)
+>>> d[d1.domain()]  # Left join
+{[0,1): 'banana', [1,2]: 'banana/orange'}
+>>> d[d2.domain()]  # Right join
+{[1,2]: 'banana/orange', (2,3]: 'orange'}
+>>> d[d1.domain() & d2.domain()]  # Inner join
+{[1,2]: 'banana/orange'}
+
+```
+
 Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
 `.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
 
@@ -790,6 +819,10 @@ You can cite this library using:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+**not yet released**
+
+ - `IntervalDict` has a `.combine` method to merge its keys and values with another `IntervalDict`.
 
 
 **1.9.0** (2019-09-13)

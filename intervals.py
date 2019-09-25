@@ -9,7 +9,7 @@ except ImportError:  # Python 2
 
 
 __package__ = 'python-intervals'
-__version__ = '1.9.0'
+__version__ = '1.10.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -1163,9 +1163,9 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return the list of (Interval, value) pairs.
+        Return a sorted list of (Interval, value) pairs.
 
-        :return: a list of 2-uples.
+        :return: a sorted list of 2-uples.
         """
         def func(i):
             return (i[0].lower, not i[0].left, i[0].upper, i[0].right)
@@ -1283,6 +1283,39 @@ class IntervalDict(MutableMapping):
                 if key in i:
                     return v
             raise KeyError(key)
+
+    def combine(self, other, how):
+        """
+        Return a new IntervalDict that combines the values from current and
+        provided ones.
+
+        If d = d1.combine(d2, f), then d contains (1) all values from d1 whose
+        keys do not intersect the ones of d2, (2) all values from d2 whose keys
+        do not intersect the ones of d1, and (3) f(x, y) for x in d1, y in d2 for
+        intersecting keys.
+
+        :param other: another IntervalDict instance.
+        :param how: a function of two parameters that combines values.
+        :return: a new IntervalDict instance.
+        """
+        new_items = []
+
+        dom1, dom2 = self.domain(), other.domain()
+
+        new_items.extend(self[dom1 - dom2].items())
+        new_items.extend(other[dom2 - dom1].items())
+
+        intersection = dom1 & dom2
+        d1, d2 = self[intersection], other[intersection]
+
+        for i1, v1 in d1.items():
+            for i2, v2 in d2.items():
+                if i1.overlaps(i2):
+                    i = i1 & i2
+                    v = how(v1, v2)
+                    new_items.append((i, v))
+
+        return IntervalDict(new_items)
 
     def __setitem__(self, key, value):
         interval = key if isinstance(key, Interval) else singleton(key)
