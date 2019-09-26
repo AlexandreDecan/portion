@@ -9,7 +9,7 @@ except ImportError:  # Python 2
 
 
 __package__ = 'python-intervals'
-__version__ = '1.10.0-pre1'
+__version__ = '1.10.0'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'

@@ -820,7 +820,8 @@ You can cite this library using:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
-**not yet released**
+
+**1.10.0** (2019-09-26)
 
  - `IntervalDict` has a `.combine` method to merge its keys and values with another `IntervalDict`.
 
