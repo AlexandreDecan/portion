@@ -1317,6 +1317,34 @@ class IntervalDict(MutableMapping):
 
         return IntervalDict(new_items)
 
+    @staticmethod
+    def combine_list(others, how):
+        """
+        Return a new IntervalDict that combines the values from current and
+        provided ones.
+
+        If d = d1.combine(d2, f), then d contains (1) all values from d1 whose
+        keys do not intersect the ones of d2, (2) all values from d2 whose keys
+        do not intersect the ones of d1, and (3) f(x, y) for x in d1, y in d2 for
+        intersecting keys.
+
+        :param other: another IntervalDict instance.
+        :param how: a function of two parameters that combines values.
+        :return: a new IntervalDict instance.
+        """
+
+        do_combine = staticmethod(IntervalDict.combine).__func__
+
+        count = len(others)
+
+        if count == 1:
+            return others[0]
+
+        if count == 0:
+            return IntervalDict()
+
+        return do_combine(IntervalDict.combine_list(others[:int(count/2)], how), IntervalDict.combine_list(others[int(count/2):], how), how)
+
     def __setitem__(self, key, value):
         interval = key if isinstance(key, Interval) else singleton(key)
 
