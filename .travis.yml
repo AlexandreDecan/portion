@@ -16,6 +16,9 @@ script:
 - coverage run --source intervals -m pytest
 after_success:
 - coveralls
+matrix:
+  allow_failures:
+  - python: 3.8-dev
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
