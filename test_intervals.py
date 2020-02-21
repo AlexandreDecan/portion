@@ -103,18 +103,28 @@ def test_bounds():
 
 
 def test_hash():
-    assert hash(I.closed(0, 1).to_atomic()) is not None
     assert hash(I.closed(0, 1)) is not None
+    assert hash(I.closed(0, 1).to_atomic()) is not None
+    assert hash(I.closed(0, 1)) != hash(I.closed(1, 2))
+
+    assert hash(I.openclosed(-I.inf, 0)) is not None
+    assert hash(I.closedopen(0, I.inf)) is not None
     assert hash(I.empty()) is not None
 
-    # Even for unhashable bounds
-    with pytest.raises(TypeError):
-        hash(I.inf)
-    with pytest.raises(TypeError):
-        hash(-I.inf)
+    assert hash(I.closed(0, 1) | I.closed(3, 4)) is not None
 
-    assert hash(I.closed(-I.inf, I.inf).to_atomic()) is not None
-    assert hash(I.closed(-I.inf, I.inf)) is not None
+    # Let's create a comparable but no hashable object
+    class T(int):
+        def __hash__(self):
+            raise TypeError()
+
+    x = I.closed(T(1), T(2))
+    with pytest.raises(TypeError):
+        hash(x)
+
+    y = x | I.closed(3, 4)
+    with pytest.raises(TypeError):
+        hash(y)
 
 
 def test_to_string():

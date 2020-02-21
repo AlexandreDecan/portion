@@ -49,6 +49,8 @@ class _PInf(_Singleton):
 
     def __repr__(self): return '+inf'
 
+    def __hash__(self): return hash(float('+inf'))
+
 
 class _NInf(_Singleton):
     """
@@ -68,6 +70,8 @@ class _NInf(_Singleton):
     def __eq__(self, o): return isinstance(o, _NInf)
 
     def __repr__(self): return '-inf'
+
+    def __hash__(self): return hash(float('-inf'))
 
 
 # Positive infinity
@@ -669,10 +673,7 @@ class AtomicInterval:
             return self._upper > other or (self._right == CLOSED and self._upper == other)
 
     def __hash__(self):
-        try:
-            return hash(self._lower)
-        except TypeError:
-            return 0
+        return hash((self._lower, self._upper))
 
     def __repr__(self):
         if self.is_empty():
@@ -1047,6 +1048,7 @@ class Interval:
         return self.to_atomic() >= other
 
     def __hash__(self):
+        return hash(tuple(self._intervals))
         return hash(self._intervals[0])
 
     def __repr__(self):

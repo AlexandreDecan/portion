@@ -332,6 +332,8 @@ True
 
 ```
 
+Finally, intervals are hashable as long as their bounds are hashable (`I.inf` and `-I.inf` have a hash value).
+
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Bounds of an interval
@@ -830,6 +832,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`;
  - Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
+ - Infinities have a hash value.
+ - `Interval` and `AtomicInterval` are hashable if and only if the bounds are hashable.
 
 
 **1.10.0** (2019-09-26)
