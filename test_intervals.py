@@ -1,7 +1,6 @@
 import doctest
 import intervals as I
 import pytest
-import sys
 
 
 def test_infinity_comparisons():
@@ -21,7 +20,6 @@ def test_infinity_comparisons_with_self(inf):
     assert not (inf != inf)
 
 
-@pytest.mark.skipif(sys.version_info < (3,0), reason='Not supported in Python 2')
 def test_infinities_are_singletons():
     assert I._PInf() == I._PInf()
     assert I._PInf() is I._PInf()
@@ -360,12 +358,6 @@ def test_overlaps():
 
 
 def test_overlaps_adjacent():
-    # Check warnings for "permissive"
-    with pytest.warns(DeprecationWarning, match='permissive'):
-        I.closed(0, 1).to_atomic().overlaps(I.open(3, 4).to_atomic(), permissive=True)
-    with pytest.warns(DeprecationWarning, match='permissive'):
-        I.closed(0, 1).overlaps(I.open(3, 4), permissive=True)
-
     assert I.closed(0, 1).overlaps(I.closed(0, 1), adjacent=True)
     assert I.closed(0, 1).overlaps(I.open(0, 1), adjacent=True)
     assert I.open(0, 1).overlaps(I.closed(0, 1), adjacent=True)

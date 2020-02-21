@@ -5,7 +5,7 @@
 [![PyPI](https://badge.fury.io/py/python-intervals.svg)](https://pypi.org/project/python-intervals)
 
 
-This library provides data structure and operations for intervals in Python 2.7+ and Python 3.4+.
+This library provides data structure and operations for intervals in Python 3.5+.
 
   * [Features](#features)
   * [Installation](#installation)
@@ -41,7 +41,7 @@ This library provides data structure and operations for intervals in Python 2.7+
 You can use `pip` to install it, as usual: `pip install python-intervals`.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
-Prereleases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
+Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
 
 For convenience, the library is contained within a single Python file, and can thus be easily integrated in other
 projects without the need for an explicit dependency (hint: don't do that!).
@@ -819,6 +819,17 @@ You can cite this library using:
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
+
+**2.0.0-pre1** (not yet released)
+
+ - Drop support for Python 2.7 and 3.4 since they reached end-of-life.
+ - Many (optional) parameters are converted to keyword-only arguments:
+   * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
+   * for `from_data` and `to_data`: `pinf` and `ninf`;
+   * for `iterate`: `base` and `reverse`;
+   * for `i.replace`: `ignore_inf`;
+   * for `i.overlaps`: `adjacent`;
+ - Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
 
 
 **1.10.0** (2019-09-26)

@@ -1,15 +1,10 @@
 import operator
 import re
-import warnings
 
-try:
-    from collections.abc import MutableMapping
-except ImportError:  # Python 2
-    from collections import MutableMapping
-
+from collections.abc import MutableMapping
 
 __package__ = 'python-intervals'
-__version__ = '1.10.0'
+__version__ = '2.0.0-pre1'
 __licence__ = 'LGPL3'
 __author__ = 'Alexandre Decan'
 __url__ = 'https://github.com/AlexandreDecan/python-intervals'
@@ -52,8 +47,6 @@ class _PInf(_Singleton):
 
     def __eq__(self, o): return isinstance(o, _PInf)
 
-    def __ne__(self, o): return not self == o  # Required for Python 2
-
     def __repr__(self): return '+inf'
 
 
@@ -73,8 +66,6 @@ class _NInf(_Singleton):
     def __ge__(self, o): return isinstance(o, _NInf)
 
     def __eq__(self, o): return isinstance(o, _NInf)
-
-    def __ne__(self, o): return not self == o  # Required for Python 2
 
     def __repr__(self): return '-inf'
 
@@ -131,7 +122,7 @@ def empty():
     return empty._instance
 
 
-def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
+def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
                 left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]',
                 pinf=r'\+inf', ninf=r'-inf'):
     """
@@ -190,7 +181,7 @@ def from_string(string, conv, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
     return Interval(*intervals)
 
 
-def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(',
+def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
               left_closed='[', right_open=')', right_closed=']', pinf='+inf', ninf='-inf'):
     """
     Export given interval (or atomic interval) to string.
@@ -236,7 +227,7 @@ def to_string(interval, conv=repr, disj=' | ', sep=',', left_open='(',
     return disj.join(exported_intervals)
 
 
-def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
+def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
     """
     Import an interval from a piece of data.
 
@@ -268,7 +259,7 @@ def from_data(data, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return Interval(*intervals)
 
 
-def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
+def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
     """
     Export given interval (or atomic interval) to a list of 4-uples (left, lower,
     upper, right).
@@ -302,7 +293,7 @@ def to_data(interval, conv=None, pinf=float('inf'), ninf=float('-inf')):
     return data
 
 
-def iterate(interval, incr, base=None, reverse=False):
+def iterate(interval, incr, *, base=None, reverse=False):
     """
     Iterate on the (discrete) values of given interval.
 
@@ -424,7 +415,7 @@ class AtomicInterval:
             (self._lower == self._upper and (self._left == OPEN or self._right == OPEN))
         )
 
-    def replace(self, left=None, lower=None, upper=None, right=None, ignore_inf=True):
+    def replace(self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True):
         """
         Create a new interval based on the current one and the provided values.
 
@@ -461,7 +452,7 @@ class AtomicInterval:
 
         return AtomicInterval(left, lower, upper, right)
 
-    def overlaps(self, other, adjacent=False, permissive=None):
+    def overlaps(self, other, *, adjacent=False):
         """
         Test if intervals have any overlapping value.
 
@@ -470,13 +461,8 @@ class AtomicInterval:
 
         :param other: an atomic interval.
         :param adjacent: set to True to accept adjacent intervals as well.
-        :param permissive: deprecated, use adjacent instead.
         :return: True if intervals overlap, False otherwise.
         """
-        if permissive is not None:
-            adjacent = permissive
-            warnings.warn('`permissive` is deprecated, use `adjacent` instead.', DeprecationWarning)
-
         if not isinstance(other, AtomicInterval):
             raise TypeError('Only AtomicInterval instances are supported.')
 
@@ -633,9 +619,6 @@ class AtomicInterval:
             )
         else:
             return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other  # Required for Python 2
 
     def __lt__(self, other):
         if isinstance(other, AtomicInterval):
@@ -825,7 +808,7 @@ class Interval:
         """
         return Interval(self.to_atomic())
 
-    def replace(self, left=None, lower=None, upper=None, right=None, ignore_inf=True):
+    def replace(self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True):
         """
         Create a new interval based on the current one and the provided values.
 
@@ -904,7 +887,7 @@ class Interval:
 
         return Interval(*intervals)
 
-    def overlaps(self, other, adjacent=False, permissive=None):
+    def overlaps(self, other, *, adjacent=False):
         """
         Test if intervals have any overlapping value.
 
@@ -913,13 +896,8 @@ class Interval:
 
         :param other: an interval or atomic interval.
         :param adjacent: set to True to accept adjacent intervals as well.
-        :param permissive: deprecated, use adjacent instead.
         :return: True if intervals overlap, False otherwise.
         """
-        if permissive is not None:
-            adjacent = permissive
-            warnings.warn('`permissive` is deprecated, use `adjacent` instead.', DeprecationWarning)
-
         if isinstance(other, AtomicInterval):
             for interval in self._intervals:
                 if interval.overlaps(other, adjacent=adjacent):
@@ -1056,9 +1034,6 @@ class Interval:
         else:
             return NotImplemented
 
-    def __ne__(self, other):
-        return not self == other  # Required for Python 2
-
     def __lt__(self, other):
         return self.to_atomic() < other
 
@@ -1118,7 +1093,7 @@ class IntervalDict(MutableMapping):
         """
         Remove all items from the IntervalDict.
         """
-        self._items = list()
+        self._items.clear()
 
     def copy(self):
         """
@@ -1384,6 +1359,3 @@ class IntervalDict(MutableMapping):
             return self.items() == other.items()
         else:
             return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other  # Required for Python 2
