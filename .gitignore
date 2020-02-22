@@ -6,3 +6,4 @@
 .idea
 .vscode
 .pytest_cache
+.hypothesis

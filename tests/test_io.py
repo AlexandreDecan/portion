@@ -1,27 +1,37 @@
 import pytest
-
 import intervals as I
+import hypothesis.strategies as st
+
+from hypothesis import given, assume, example
+from .strategies import intervals, values
 
 
 class TestToString:
-    def test_bounds(self):
-        assert I.to_string(I.closed(0, 1)) == '[0,1]'
-        assert I.to_string(I.openclosed(0, 1)) == '(0,1]'
-        assert I.to_string(I.closedopen(0, 1)) == '[0,1)'
-        assert I.to_string(I.open(0, 1)) == '(0,1)'
+    @given(values, values)
+    def test_bounds(self, x, y):
+        assume(x < y)
+        assert I.to_string(I.closed(x, y)) == '[{},{}]'.format(x, y)
+        assert I.to_string(I.openclosed(x, y)) == '({},{}]'.format(x, y)
+        assert I.to_string(I.closedopen(x, y)) == '[{},{})'.format(x, y)
+        assert I.to_string(I.open(x, y)) == '({},{})'.format(x, y)
 
-    def test_singleton(self):
-        assert I.to_string(I.singleton(0)) == '[0]'
+    @given(values)
+    def test_singleton(self, x):
+        assert I.to_string(I.singleton(x)) == '[{}]'.format(x)
 
     def test_empty(self):
         assert I.to_string(I.empty()) == '()'
 
-    def test_infinities(self):
-        assert I.to_string(I.openclosed(-I.inf, 1)) == '(-inf,1]'
-        assert I.to_string(I.closedopen(1, I.inf)) == '[1,+inf)'
+    @given(values)
+    def test_infinities(self, x):
+        assert I.to_string(I.openclosed(-I.inf, x)) == '(-inf,{}]'.format(x)
+        assert I.to_string(I.closedopen(x, I.inf)) == '[{},+inf)'.format(x)
 
-    def test_unions(self):
-        assert I.to_string(I.closed(0, 1) | I.closed(2, 3)) == '[0,1] | [2,3]'
+    @given(st.tuples(values, values, values, values))
+    def test_unions(self, t):
+        a, b, x, y = sorted(t)
+        assume(a < b < x < y)
+        assert I.to_string(I.closed(a, b) | I.closed(x, y)) == '[{},{}] | [{},{}]'.format(a, b, x, y)
 
     def test_bound_types(self):
         assert I.to_string(I.closed('a', 'b')) == "['a','b']"
@@ -56,24 +66,32 @@ class TestToString:
 
 
 class TestFromString:
-    def test_bounds(self):
-        assert I.from_string('[0,1]', int) == I.closed(0, 1)
-        assert I.from_string('(0,1]', int) == I.openclosed(0, 1)
-        assert I.from_string('[0,1)', int) == I.closedopen(0, 1)
-        assert I.from_string('(0,1)', int) == I.open(0, 1)
+    @given(values, values)
+    def test_bounds(self, x, y):
+        assume(x < y)
+        assert I.from_string('[{},{}]'.format(x, y), int) == I.closed(x, y)
+        assert I.from_string('({},{}]'.format(x, y), int) == I.openclosed(x, y)
+        assert I.from_string('[{},{})'.format(x, y), int) == I.closedopen(x, y)
+        assert I.from_string('({},{})'.format(x, y), int) == I.open(x, y)
 
-    def test_singleton(self):
-        assert I.from_string('[0]', int) == I.singleton(0)
+    @given(values)
+    def test_singleton(self, x):
+        assert I.from_string('[{}]'.format(x), int) == I.singleton(x)
+        assert I.from_string('[{},{}]'.format(x, x), int) == I.singleton(x)
 
     def test_empty(self):
         assert I.from_string('()', int) == I.empty()
 
-    def test_infinities(self):
-        assert I.from_string('(-inf,1]', int) == I.openclosed(-I.inf, 1)
-        assert I.from_string('[1,+inf)', int) == I.closedopen(1, I.inf)
+    @given(values)
+    def test_infinities(self, x):
+        assert I.from_string('(-inf,{}]'.format(x), int) == I.openclosed(-I.inf, x)
+        assert I.from_string('[{},+inf)'.format(x), int) == I.closedopen(x, I.inf)
 
-    def test_unions(self):
-        assert I.from_string('[0,1] | [2,3]', int) == I.closed(0, 1) | I.closed(2, 3)
+    @given(st.tuples(values, values, values, values))
+    def test_unions(self, t):
+        a, b, x, y = sorted(t)
+        assume(a < b < x < y)
+        assert I.from_string('[{},{}] | [{},{}]'.format(a, b, x, y), int) == I.closed(a, b) | I.closed(x, y)
 
     def test_conv_is_required(self):
         with pytest.raises(Exception):
@@ -108,28 +126,33 @@ class TestFromString:
 
 
 class TestStringIdentity:
-    def test_identity(self):
-        i1, i2, i3, i4 = I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1)
-
-        assert I.from_string(I.to_string(i1), int) == i1
-        assert I.from_string(I.to_string(i2), int) == i2
-        assert I.from_string(I.to_string(i3), int) == i3
-        assert I.from_string(I.to_string(i4), int) == i4
+    @example(I.closed(0, 1))
+    @example(I.openclosed(0, 1))
+    @example(I.closedopen(0, 1))
+    @example(I.open(0, 1))
+    @example(I.singleton(0))
+    @example(I.empty())
+    @given(intervals())
+    def test_identity(self, x):
+        assert I.from_string(I.to_string(x), int) == x
 
 
 class TestToData:
-    def test_bounds(self):
-        assert I.to_data(I.closed(0, 1)) == [(I.CLOSED, 0, 1, I.CLOSED)]
-        assert I.to_data(I.openclosed(0, 1)) == [(I.OPEN, 0, 1, I.CLOSED)]
-        assert I.to_data(I.closedopen(0, 1)) == [(I.CLOSED, 0, 1, I.OPEN)]
-        assert I.to_data(I.open(0, 1)) == [(I.OPEN, 0, 1, I.OPEN)]
+    @given(values, values)
+    def test_bounds(self, x, y):
+        assume(x < y)
+        assert I.to_data(I.closed(x, y)) == [(I.CLOSED, x, y, I.CLOSED)]
+        assert I.to_data(I.openclosed(x, y)) == [(I.OPEN, x, y, I.CLOSED)]
+        assert I.to_data(I.closedopen(x, y)) == [(I.CLOSED, x, y, I.OPEN)]
+        assert I.to_data(I.open(x, y)) == [(I.OPEN, x, y, I.OPEN)]
 
     def test_values(self):
         assert I.to_data(I.closed('a', 'b')) == [(I.CLOSED, 'a', 'b', I.CLOSED)]
         assert I.to_data(I.closed(tuple([0]), tuple([1]))) == [(I.CLOSED, (0,), (1,), I.CLOSED)]
 
-    def test_singleton(self):
-        assert I.to_data(I.singleton(0)) == [(I.CLOSED, 0, 0, I.CLOSED)]
+    @given(values)
+    def test_singleton(self, x):
+        assert I.to_data(I.singleton(x)) == [(I.CLOSED, x, x, I.CLOSED)]
 
     def test_open_intervals(self):
         assert I.to_data(I.open(-I.inf, I.inf)) == [(I.OPEN, float('-inf'), float('inf'), I.OPEN)]
@@ -149,18 +172,21 @@ class TestToData:
 
 
 class TestFromData:
-    def test_bounds(self):
-        assert I.from_data([(I.CLOSED, 0, 1, I.CLOSED)]) == I.closed(0, 1)
-        assert I.from_data([(I.OPEN, 0, 1, I.CLOSED)]) == I.openclosed(0, 1)
-        assert I.from_data([(I.CLOSED, 0, 1, I.OPEN)]) == I.closedopen(0, 1)
-        assert I.from_data([(I.OPEN, 0, 1, I.OPEN)]) == I.open(0, 1)
+    @given(values, values)
+    def test_bounds(self, x, y):
+        assume(x < y)
+        assert I.from_data([(I.CLOSED, x, y, I.CLOSED)]) == I.closed(x, y)
+        assert I.from_data([(I.OPEN, x, y, I.CLOSED)]) == I.openclosed(x, y)
+        assert I.from_data([(I.CLOSED, x, y, I.OPEN)]) == I.closedopen(x, y)
+        assert I.from_data([(I.OPEN, x, y, I.OPEN)]) == I.open(x, y)
 
     def test_values(self):
         assert I.from_data([(I.CLOSED, 'a', 'b', I.CLOSED)]) == I.closed('a', 'b')
         assert I.from_data([(I.CLOSED, (0,), (1,), I.CLOSED)]) == I.closed(tuple([0]), tuple([1]))
 
-    def test_singleton(self):
-        assert I.from_data([(I.CLOSED, 0, 0, I.CLOSED)]) == I.singleton(0)
+    @given(values)
+    def test_singleton(self, x):
+        assert I.from_data([(I.CLOSED, x, x, I.CLOSED)]) == I.singleton(x)
 
     def test_open_intervals(self):
         assert I.from_data([(I.OPEN, float('-inf'), float('inf'), I.OPEN)]) == I.open(-I.inf, I.inf)
@@ -180,10 +206,12 @@ class TestFromData:
 
 
 class TestDataIdentity:
-    def test_identity(self):
-        i1, i2, i3, i4 = I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1)
-
-        assert I.from_data(I.to_data(i2)) == i2
-        assert I.from_data(I.to_data(i3)) == i3
-        assert I.from_data(I.to_data(i4)) == i4
-        assert I.from_data(I.to_data(i1)) == i1
+    @example(I.closed(0, 1))
+    @example(I.openclosed(0, 1))
+    @example(I.closedopen(0, 1))
+    @example(I.open(0, 1))
+    @example(I.singleton(0))
+    @example(I.empty())
+    @given(intervals())
+    def test_identity(self, i):
+        assert I.from_data(I.to_data(i)) == i

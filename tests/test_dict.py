@@ -238,4 +238,3 @@ class TestIntervalDict:
         assert a.items() == [(I.closed(-1, 1), 2), (I.openclosed(1, 2), 0), (I.closed(4, 5), 1)]
 
         assert I.IntervalDict([(0, 0), (1, 1)]) == I.IntervalDict([(1, 1), (0, 0)])
-
