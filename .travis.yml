@@ -10,7 +10,8 @@ python:
 - pypy3
 install:
 - pip install pip -U
-- pip install coverage pytest coveralls hypothesis
+- pip install coverage coveralls
+- pip install pytest hypothesis
 - pip install -e .
 script:
 - coverage run --source intervals -m pytest
