@@ -819,6 +819,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
  - Infinities define a hash value.
  - An interval is hashable if and only if is bounds are hashable.
+ - Fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
  - Drop support for Python 2.7 and 3.4 since they reached end-of-life.
  - Breaking change: many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;

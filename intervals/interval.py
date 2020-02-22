@@ -410,7 +410,8 @@ class Interval:
 
         for interval in intervals:
             if isinstance(interval, Interval):
-                self._intervals.extend(interval)
+                if not interval.is_empty():
+                    self._intervals.extend(interval)
             elif isinstance(interval, AtomicInterval):
                 if not interval.is_empty():
                     self._intervals.append(interval)
