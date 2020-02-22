@@ -511,6 +511,11 @@ class TestIntervalContainment:
         assert (1 in i1) == i1.contains(1)
         assert (i1 in i2) == i2.contains(i1)
 
+    def test_atomic_proxy_method(self):
+        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        assert (1 in i1) == i1.contains(1)
+        assert (i1 in i2) == i2.contains(i1)
+
 
 class TestIntervalIntersection:
     def test_with_itself(self):
@@ -539,6 +544,10 @@ class TestIntervalIntersection:
 
     def test_proxy_method(self):
         i1, i2 = I.closed(0, 1), I.closed(2, 3)
+        assert i1 & i2 == i1.intersection(i2)
+
+    def test_atomic_proxy_method(self):
+        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
         assert i1 & i2 == i1.intersection(i2)
 
     def test_with_invalid_type(self):
@@ -621,6 +630,10 @@ class TestIntervalUnion:
         i1, i2 = I.closed(0, 1), I.closed(2, 3)
         assert i1 | i2 == i1.union(i2)
 
+    def test_atomic_proxy_method(self):
+        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        assert i1 | i2 == i1.union(i2)
+
     def test_with_invalid_type(self):
         with pytest.raises(TypeError):
             I.closed(0, 1) | 1
@@ -650,6 +663,10 @@ class TestIntervalComplement:
         assert ~i1 == i1.complement()
         assert ~i2 == i2.complement()
 
+    def test_atomic_proxy_method(self):
+        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        assert ~i1 == i1.complement()
+        assert ~i2 == i2.complement()
 
 class TestIntervalDifference:
     @pytest.mark.parametrize('i', [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.empty(), I.singleton(0)])
