@@ -1,6 +1,3 @@
-import hypothesis.strategies as st
-
-from hypothesis import given, example
 from intervals.const import inf, _PInf, _NInf, CLOSED, OPEN
 
 
@@ -12,31 +9,31 @@ class TestBounds:
 
 
 class TestInfinities:
-    @example(0)
-    @example('a')
-    @example([])
-    @example(-inf)
-    @given(st.one_of(st.integers(), st.booleans(), st.floats(), st.text()))
-    def test_pinf_is_greater(self, v):
-        assert inf > v
-        assert not (inf < v)
-        assert inf >= v
-        assert not (inf <= v)
-
-    def test_pinf_and_ninf(self):
+    def test_pinf_is_greater(self):
         assert not (inf > inf)
-        assert not (-inf < -inf)
+        assert inf > -inf
+        assert inf > 0
+        assert inf > 'a'
+        assert inf > []
 
-    @example(0)
-    @example('a')
-    @example([])
-    @example(inf)
-    @given(st.one_of(st.integers(), st.booleans(), st.floats(), st.text()))
-    def test_ninf_is_lower(self, v):
-        assert -inf < v
-        assert not (-inf > v)
-        assert -inf <= v
-        assert not (-inf >= v)
+        assert inf >= inf
+        assert inf >= -inf
+        assert inf >= 0
+        assert inf >= 'a'
+        assert inf >= []
+
+    def test_ninf_is_lower(self):
+        assert not (-inf < -inf)
+        assert -inf < inf
+        assert -inf < 0
+        assert -inf < 'a'
+        assert -inf < []
+
+        assert -inf <= -inf
+        assert -inf <= inf
+        assert -inf <= 0
+        assert -inf <= 'a'
+        assert -inf <= []
 
     def test_equalities(self):
         assert inf != -inf

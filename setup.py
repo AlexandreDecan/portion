@@ -46,7 +46,7 @@ setup(
     python_requires='~=3.5',
 
     install_requires=[],
-    tests_require=['pytest', 'hypothesis'],
+    tests_require=['pytest'],
 
     zip_safe=True,
 )

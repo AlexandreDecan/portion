@@ -34,7 +34,7 @@ This library provides data structure and operations for intervals in Python 3.5+
  - Discrete iterations on the values of an interval.
  - Import and export intervals to strings and to Python built-in data types.
  - Dict-like structure to map intervals to data.
- - Heavily tested with unit and property-based tests.
+ - Heavily tested with high code coverage.
 
 
 ## Installation
