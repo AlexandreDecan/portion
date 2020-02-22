@@ -44,6 +44,11 @@ class TestInterval:
         with pytest.raises(TypeError):
             I.Interval(1)
 
+    def test_creation_issue_19(self):
+        # https://github.com/AlexandreDecan/python-intervals/issues/19
+        assert I.Interval(I.empty().to_atomic(), I.empty().to_atomic()) == I.empty()
+        assert I.Interval(I.empty(), I.empty()) == I.empty()
+
     def test_bounds(self):
         i = I.openclosed(1, 2)
         assert i.left == I.OPEN
