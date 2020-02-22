@@ -1,5 +1,5 @@
 from os import path
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 
 import intervals
@@ -42,7 +42,11 @@ setup(
     ],
     keywords='interval operation range math',
 
-    py_modules=['intervals'],
+    packages=find_packages(include=['intervals']),
+    python_requires='~=3.5',
+
+    install_requires=[],
     tests_require=['pytest'],
+
     zip_safe=True,
 )

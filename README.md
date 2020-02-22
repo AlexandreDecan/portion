@@ -43,9 +43,6 @@ You can use `pip` to install it, as usual: `pip install python-intervals`.
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
 
-For convenience, the library is contained within a single Python file, and can thus be easily integrated in other
-projects without the need for an explicit dependency (hint: don't do that!).
-
 
 ## Documentation & usage
 
@@ -134,7 +131,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Interval operations
 
-Both `Interval` and `AtomicInterval` support following interval operations:
+`Interval` instances support the following operations:
 
  - `x.is_empty()` tests if the interval is empty.
    ```python
@@ -192,7 +189,7 @@ Both `Interval` and `AtomicInterval` support following interval operations:
    ```
 
  - `x.contains(other)` or `other in x` return True if given item is contained in the interval.
- Support `Interval`, `AtomicInterval` and arbitrary comparable values.
+ It supports intervals and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
    True
@@ -219,9 +216,6 @@ Both `Interval` and `AtomicInterval` support following interval operations:
 
    ```
 
-
-The following methods are only available for `Interval` instances:
-
  - `x.enclosure()` returns the smallest interval that includes the current one.
    ```python
    >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
@@ -243,7 +237,7 @@ The following methods are only available for `Interval` instances:
    ```
 
 
-Intervals can also be iterated to access the underlying `AtomicInterval` objects, sorted by their lower and upper bounds.
+Intervals can also be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
 
 ```python
 >>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
@@ -251,7 +245,7 @@ Intervals can also be iterated to access the underlying `AtomicInterval` objects
 
 ```
 
-The `AtomicInterval` objects of an `Interval` can also be accessed using their indexes:
+These atomic intervals can also be accessed using their indexes:
 
 ```python
 >>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
@@ -275,7 +269,7 @@ True
 
 ```
 
-Moreover, both `Interval` and `AtomicInterval` are comparable using e.g. `>`, `>=`, `<` or `<=`.
+Moreover, intervals are comparable using e.g. `>`, `>=`, `<` or `<=`.
 These comparison operators have a different behaviour than the usual ones.
 For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
 on the right of the upper bound of `b`.
@@ -338,21 +332,20 @@ Finally, intervals are hashable as long as their bounds are hashable (`I.inf` an
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Bounds of an interval
 
-The left and right boundaries, and the lower and upper bounds of an `AtomicInterval` can be respectively accessed
+The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
 with its `left`, `right`, `lower` and `upper` attributes.
 The `left` and `right` bounds are either `I.CLOSED` (`True`) or `I.OPEN` (`False`).
 
 ```python
 >> I.CLOSED, I.OPEN
 True, False
->>> x = I.closedopen(0, 1).to_atomic()
+>>> x = I.closedopen(0, 1)
 >>> x.left, x.lower, x.upper, x.right
 (True, 0, 1, False)
 
 ```
 
-Similarly, the bounds of an `Interval` instance can be accessed with its `left`, `right`,
-`lower` and `upper` attributes. In that case, `left` and `lower` refer to the lower bound of its enclosure,
+If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
 while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```python
@@ -378,13 +371,11 @@ False
 
 ```
 
-
-Both `Interval` and `AtomicInterval` instances are immutable but provide a `replace` method that
-can be used to create a new instance based on the current one. This method accepts four optional
-parameters `left`, `lower`, `upper`, and `right`:
+Intervals are immutable but provide a `replace` method to create a new interval based on the
+current one. This method accepts four optional parameters `left`, `lower`, `upper`, and `right`:
 
 ```python
->>> i = I.closed(0, 2).to_atomic()
+>>> i = I.closed(0, 2)
 >>> i.replace(I.OPEN, -1, 3, I.CLOSED)
 (-1,3]
 >>> i.replace(lower=1, right=I.OPEN)
@@ -406,7 +397,7 @@ value except if the corresponding bound is an infinity and parameter `ignore_inf
 
 ```
 
-When `replace` is applied on an `Interval` that is not atomic, it is extended and/or restricted such that
+When `replace` is applied on an interval that is not atomic, it is extended and/or restricted such that
 its enclosure satisfies the new bounds.
 
 ```python
@@ -422,9 +413,9 @@ its enclosure satisfies the new bounds.
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Interval transformation
 
-To apply an arbitrary transformation on an interval, `Interval` instances expose an `apply` method.
+To apply an arbitrary transformation on an interval, intervals expose an `apply` method.
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
-The function is expected to return an `AtomicInterval`, an `Interval` or a 4-uple `(left, lower, upper, right)`.
+The function is expected to return either an `AtomicInterval`, an `Interval` or a 4-uple `(left, lower, upper, right)`.
 
 ```python
 >>> i = I.closed(2, 3) | I.open(4, 5)
@@ -463,7 +454,7 @@ conveniently used to transform intervals in presence of infinities.
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
 ### Discrete iteration
 
-The `iterate` function takes an interval or atomic interval, and returns a generator to iterate over
+The `iterate` function takes an interval, and returns a generator to iterate over
 the values of an interval. Obviously, as intervals are continuous, it is required to specify the increment
  `incr` between consecutive values. The iteration then starts from the lower bound and ends on the upper one,
 given they are not excluded by the interval:
@@ -478,7 +469,7 @@ given they are not excluded by the interval:
 
 ```
 
-When an interval represents an union of atomic intervals, `iterate` consecutively iterates on all atomic
+When an interval is not atomic, `iterate` consecutively iterates on all underlying atomic
 intervals, starting from each lower bound and ending on each upper one:
 
 ```python
@@ -694,7 +685,6 @@ Intervals can be exported to string, either using `repr` (as illustrated above) 
 
 ```
 
-This function accepts both `Interval` and `AtomicInterval` instances.
 The way string representations are built can be easily parametrized using the various parameters supported by
 `to_string`:
 
@@ -832,8 +822,10 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`;
  - Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
+ - Restructure package in modules instead of a flat file.
+ - Restructure tests for each module instead of a flat file.
  - Infinities have a hash value.
- - `Interval` and `AtomicInterval` are hashable if and only if the bounds are hashable.
+ - An interval is hashable if and only if is bounds are hashable.
 
 
 **1.10.0** (2019-09-26)
