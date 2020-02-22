@@ -34,6 +34,7 @@ This library provides data structure and operations for intervals in Python 3.5+
  - Discrete iterations on the values of an interval.
  - Import and export intervals to strings and to Python built-in data types.
  - Dict-like structure to map intervals to data.
+ - Heavily tested with high test coverage.
 
 
 ## Installation
@@ -41,7 +42,8 @@ This library provides data structure and operations for intervals in Python 3.5+
 You can use `pip` to install it, as usual: `pip install python-intervals`.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
-Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals).
+Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals)
+and can be installed with `pip install git+https://github.com/AlexandreDecan/python-intervals`.
 
 
 ## Documentation & usage
@@ -797,7 +799,7 @@ Feel free to report bugs or suggest new features using GitHub issues and/or pull
 
 Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt).
 
-You can cite this library using:
+You can refer to this library using:
 
 ```
 @software{python-intervals,
@@ -812,20 +814,21 @@ You can cite this library using:
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
+
 **2.0.0-pre1** (not yet released)
 
+ - Infinities define a hash value.
+ - An interval is hashable if and only if is bounds are hashable.
  - Drop support for Python 2.7 and 3.4 since they reached end-of-life.
- - Many (optional) parameters are converted to keyword-only arguments:
+ - Breaking change: many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
    * for `iterate`: `base` and `reverse`;
    * for `i.replace`: `ignore_inf`;
-   * for `i.overlaps`: `adjacent`;
- - Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
+   * for `i.overlaps`: `adjacent`.
+ - Breaking change: remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
  - Restructure package in modules instead of a flat file.
- - Restructure tests for each module instead of a flat file.
- - Infinities have a hash value.
- - An interval is hashable if and only if is bounds are hashable.
+ - Reorganise tests in modules and classes instead of a flat file.
 
 
 **1.10.0** (2019-09-26)

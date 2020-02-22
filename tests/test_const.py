@@ -1,49 +1,55 @@
-import pytest
-
-from intervals.const import inf,_PInf, _NInf
+from intervals.const import inf, _PInf, _NInf, CLOSED, OPEN
 
 
-def test_infinity_comparisons():
-    assert inf > -inf
-    assert -inf < inf
-    assert -inf != inf
-    assert not (-inf == inf)
+class TestBounds:
+    def test_complement(self):
+        assert OPEN != CLOSED
+        assert not OPEN == CLOSED
+        assert not CLOSED == OPEN
 
 
-@pytest.mark.parametrize('inf', [inf, -inf])
-def test_infinity_comparisons_with_self(inf):
-    assert inf == inf
-    assert inf >= inf
-    assert inf <= inf
-    assert not (inf > inf)
-    assert not (inf < inf)
-    assert not (inf != inf)
+class TestInfinities:
+    def test_pinf_is_greater(self):
+        assert not (inf > inf)
+        assert inf > -inf
+        assert inf > 0
+        assert inf > 'a'
+        assert inf > []
 
+        assert inf >= inf
+        assert inf >= -inf
+        assert inf >= 0
+        assert inf >= 'a'
+        assert inf >= []
 
-def test_infinities_are_singletons():
-    assert _PInf() == _PInf()
-    assert _PInf() is _PInf()
-    assert _PInf() is -_NInf()
+    def test_ninf_is_lower(self):
+        assert not (-inf < -inf)
+        assert -inf < inf
+        assert -inf < 0
+        assert -inf < 'a'
+        assert -inf < []
 
-    assert _NInf() == _NInf()
-    assert _NInf() is _NInf()
+        assert -inf <= -inf
+        assert -inf <= inf
+        assert -inf <= 0
+        assert -inf <= 'a'
+        assert -inf <= []
 
-    assert _PInf() is not _NInf()
-    assert _PInf() is not -_PInf()
+    def test_equalities(self):
+        assert inf != -inf
+        assert inf == inf
+        assert -inf == -inf
 
+    def test_infinities_are_singletons(self):
+        assert _PInf() is _PInf()
+        assert inf is _PInf()
 
-@pytest.mark.parametrize('o', [0, 1, 1.0, 'a', list(), tuple(), dict()])
-def test_infinity_comparisons_with_objects(o):
-    assert o != inf and not (o == inf)
-    assert o < inf and inf > o
-    assert o <= inf and inf >= o
+        assert _NInf() is _NInf()
+        assert -inf is _NInf()
 
-    assert o != -inf and not (o == -inf)
-    assert o > -inf and -inf < o
-    assert o >= -inf and -inf <= o
+        assert -(-inf) is inf
 
-
-def test_infinities_are_hashable():
-    assert hash(inf) is not None
-    assert hash(-inf) is not None
-    assert hash(inf) != hash(-inf)
+    def test_infinities_are_hashable(self):
+        assert hash(inf) is not None
+        assert hash(-inf) is not None
+        assert hash(inf) != hash(-inf)
