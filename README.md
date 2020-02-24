@@ -46,6 +46,8 @@ This will install the latest available version from [PyPI](https://pypi.org/proj
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals)
 and can be installed with `pip install git+https://github.com/AlexandreDecan/python-intervals`.
 
+The test environment can be installed with `pip install python-intervals[test]` and relies on [PyTest](https://docs.pytest.org/en/latest/).
+
 
 ## Documentation & usage
 
@@ -837,6 +839,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 ### 2.0.0 (unreleased)
 
 #### Added
+ - An `adjacent` method to test whether two intervals are adjacent.
  - Infinities define a hash value.
  - `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
  - `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).

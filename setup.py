@@ -44,7 +44,10 @@ setup(
     python_requires='~=3.5',
 
     install_requires=[],
-    tests_require=['pytest'],
+    extras_require={
+        'test': ['pytest ~= 5.0.1'],
+        'travis': ['coverage ~= 5.0.3', 'coveralls ~= 1.11.1']
+    },
 
     zip_safe=True,
 )

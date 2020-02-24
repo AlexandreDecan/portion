@@ -10,8 +10,7 @@ python:
 - pypy3
 install:
 - pip install pip -U
-- pip install coverage pytest coveralls
-- pip install -e .
+- pip install -e .[test,travis]
 script:
 - coverage run --source intervals -m pytest
 after_success:
