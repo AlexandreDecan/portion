@@ -12,9 +12,8 @@ This library provides data structure and operations for intervals in Python 3.5+
   * [Documentation & usage](#documentation--usage)
       * [Interval creation](#interval-creation)
       * [Interval operations](#interval-operations)
-      * [Interval properties](#interval-properties)
+      * [Interval properties & attributes](#interval-properties--attributes)
       * [Comparison operators](#comparison-operators)
-      * [Bounds of an interval](#bounds-of-an-interval)
       * [Interval transformation](#interval-transformation)
       * [Discrete iteration](#discrete-iteration)
       * [Map intervals to data](#map-intervals-to-data)
@@ -32,6 +31,7 @@ This library provides data structure and operations for intervals in Python 3.5+
  - Atomic intervals and interval sets are supported.
  - Automatic simplification of intervals.
  - Support comparison, transformation, intersection, union, complement, difference and containment.
+ - Provide test for emptiness, atomicity, overlaps and adjacency.
  - Discrete iterations on the values of an interval.
  - Import and export intervals to strings and to Python built-in data types.
  - Dict-like structure to map intervals to data.
@@ -73,8 +73,8 @@ following helpers:
 ```
 
 Intervals created with this library are `Interval` instances.
-An `Interval` object is a disjunction of atomic intervals that represent single intervals (e.g. `[1,2]`) corresponding to `AtomicInterval` instances.
-Except when atomic intervals are explicitly created or retrieved, only `Interval` instances are exposed.
+An `Interval` object encodes an interval set, i.e., a disjunction of atomic intervals that represent
+single intervals (e.g. `[1,2]`).
 
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
@@ -222,9 +222,31 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
+`Interval` instances are disjunction of atomic intervals.
+Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
+
+```python
+>>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
+[[0,1], (2,3), [21,24]]
+
+```
+
+Atomic intervals can also be retrieved by position:
+
+```python
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
+[0,1]
+>>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
+(2,3)
+
+```
+
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
-### Interval properties
+### Interval properties & attributes
+
+
+An `Interval` defines the following properties:
 
  - `i.empty` is `True` if and only if the interval is empty.
    ```python
@@ -257,24 +279,47 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
-
-Intervals can also be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
+The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
+with its `left`, `right`, `lower` and `upper` attributes.
+The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
+By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
 
 ```python
->>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
-[[0,1], (2,3), [21,24]]
+>> I.CLOSED, I.OPEN
+CLOSED, OPEN
+>>> x = I.closedopen(0, 1)
+>>> x.left, x.lower, x.upper, x.right
+(CLOSED, 0, 1, OPEN)
 
 ```
 
-These intervals can also be accessed using their indexes:
+If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
+while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```python
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
-[0,1]
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
-(2,3)
+>>> x = I.open(0, 1) | I.closed(3, 4)
+>>> x.left, x.lower, x.upper, x.right
+(OPEN, 0, 4, CLOSED)
 
 ```
+
+One can easily check for some interval properties based on the bounds of an interval:
+
+```python
+>>> x = I.openclosed(-I.inf, 0)
+>>> # Check that interval is left/right closed
+>>> x.left == I.CLOSED, x.right == I.CLOSED
+(False, True)
+>>> # Check that interval is left/right bounded
+>>> x.lower == -I.inf, x.upper == I.inf
+(True, False)
+>>> # Check for singleton
+>>> x.lower == x.upper
+False
+
+```
+
+
 
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
@@ -350,48 +395,9 @@ True
 Finally, intervals are hashable as long as their bounds are hashable (`I.inf` and `-I.inf` have a hash value).
 
 
+
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
-### Bounds of an interval
-
-The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
-with its `left`, `right`, `lower` and `upper` attributes.
-The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
-By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
-
-```python
->> I.CLOSED, I.OPEN
-CLOSED, OPEN
->>> x = I.closedopen(0, 1)
->>> x.left, x.lower, x.upper, x.right
-(CLOSED, 0, 1, OPEN)
-
-```
-
-If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
-while `right` and `upper` refer to the upper bound of its enclosure:
-
-```python
->>> x = I.open(0, 1) | I.closed(3, 4)
->>> x.left, x.lower, x.upper, x.right
-(OPEN, 0, 4, CLOSED)
-
-```
-
-One can easily check for some interval properties based on the bounds of an interval:
-
-```python
->>> x = I.openclosed(-I.inf, 0)
->>> # Check that interval is left/right closed
->>> x.left == I.CLOSED, x.right == I.CLOSED
-(False, True)
->>> # Check that interval is left/right bounded
->>> x.lower == -I.inf, x.upper == I.inf
-(True, False)
->>> # Check for singleton
->>> x.lower == x.upper
-False
-
-```
+### Interval transformation
 
 Intervals are immutable but provide a `replace` method to create a new interval based on the
 current one. This method accepts four optional parameters `left`, `lower`, `upper`, and `right`:
@@ -429,15 +435,9 @@ its enclosure satisfies the new bounds.
 >>> i.replace(lower=4)
 (4,10]
 
-```
-
-
-[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
-### Interval transformation
-
 To apply an arbitrary transformation on an interval, intervals expose an `apply` method.
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
-The function is expected to return either an `Interval`, an `AtomicInterval` or a 4-uple `(left, lower, upper, right)`.
+The function is expected to return either an `Interval`, or a 4-uple `(left, lower, upper, right)`.
 
 ```python
 >>> i = I.closed(2, 3) | I.open(4, 5)
