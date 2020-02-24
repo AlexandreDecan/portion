@@ -288,7 +288,7 @@ class AtomicInterval:
             return left and right
         elif isinstance(item, Interval):
             for interval in item:
-                if interval not in self:
+                if interval.to_atomic() not in self:
                     return False
             return True
         else:
@@ -408,7 +408,7 @@ class Interval:
         for interval in intervals:
             if isinstance(interval, Interval):
                 if not interval.empty:
-                    self._intervals.extend(interval)
+                    self._intervals.extend(interval._intervals)
             elif isinstance(interval, AtomicInterval):
                 if not interval.empty:
                     self._intervals.append(interval)
@@ -469,7 +469,7 @@ class Interval:
         """
         True if interval is empty, False otherwise.
         """
-        return self.atomic and self._intervals[0].empty
+        return self._intervals[0].empty
 
     @property
     def atomic(self):
@@ -482,20 +482,17 @@ class Interval:
     def to_atomic(self):
         """
         Return the smallest atomic interval containing this interval.
+        Equivalent to .enclosure, except it returns an AtomicInterval instance.
 
         :return: an AtomicInterval instance.
         """
-        lower = self._intervals[0].lower
-        left = self._intervals[0].left
-        upper = self._intervals[-1].upper
-        right = self._intervals[-1].right
+        return AtomicInterval(self.left, self.lower, self.upper, self.right)
 
-        return AtomicInterval(left, lower, upper, right)
-
+    @property
     def enclosure(self):
         """
         Return the smallest interval composed of a single atomic interval that encloses
-        the current interval. This method is equivalent to Interval(self.to_atomic())
+        the current interval.
 
         :return: an Interval instance.
         """
@@ -520,42 +517,42 @@ class Interval:
         :param ignore_inf: ignore infinities if functions are provided (default is True).
         :return: an Interval instance
         """
-        enclosure = self.to_atomic()
+        enclosure = self.enclosure
 
         if callable(left):
-            left = left(enclosure._left)
+            left = left(enclosure.left)
         else:
-            left = enclosure._left if left is None else left
+            left = enclosure.left if left is None else left
 
         if callable(lower):
-            if ignore_inf and enclosure._lower in [-inf, inf]:
-                lower = enclosure._lower
+            if ignore_inf and enclosure.lower in [-inf, inf]:
+                lower = enclosure.lower
             else:
-                lower = lower(enclosure._lower)
+                lower = lower(enclosure.lower)
         else:
-            lower = enclosure._lower if lower is None else lower
+            lower = enclosure.lower if lower is None else lower
 
         if callable(upper):
-            if ignore_inf and enclosure._upper in [-inf, inf]:
-                upper = enclosure._upper
+            if ignore_inf and enclosure.upper in [-inf, inf]:
+                upper = enclosure.upper
             else:
-                upper = upper(enclosure._upper)
+                upper = upper(enclosure.upper)
         else:
-            upper = enclosure._upper if upper is None else upper
+            upper = enclosure.upper if upper is None else upper
 
         if callable(right):
-            right = right(enclosure._right)
+            right = right(enclosure.right)
         else:
-            right = enclosure._right if right is None else right
+            right = enclosure.right if right is None else right
 
         n_interval = self & AtomicInterval(left, lower, upper, right)
 
         if len(n_interval) > 1:
-            lowest = n_interval[0].replace(left=left, lower=lower)
-            highest = n_interval[-1].replace(upper=upper, right=right)
-            return Interval(*[lowest] + n_interval[1:-1] + [highest])
+            lowest = n_interval._intervals[0].replace(left=left, lower=lower)
+            highest = n_interval._intervals[-1].replace(upper=upper, right=right)
+            return Interval(*[lowest] + n_interval._intervals[1:-1] + [highest])
         else:
-            return Interval(n_interval[0].replace(left, lower, upper, right))
+            return Interval(n_interval._intervals[0].replace(left, lower, upper, right))
 
     def apply(self, func):
         """
@@ -568,7 +565,7 @@ class Interval:
         """
         intervals = []
 
-        for interval in self:
+        for interval in self._intervals:
             value = func(interval)
 
             if isinstance(value, (Interval, AtomicInterval)):
@@ -665,17 +662,17 @@ class Interval:
         return len(self._intervals)
 
     def __iter__(self):
-        return iter(self._intervals)
+        return iter([Interval(i) for i in self._intervals])
 
     def __getitem__(self, item):
-        return self._intervals[item]
+        return Interval(self._intervals[item])
 
     def __and__(self, other):
         if isinstance(other, (AtomicInterval, Interval)):
             if isinstance(other, AtomicInterval):
                 intervals = [other]
             else:
-                intervals = list(other._intervals)
+                intervals = other._intervals
             new_intervals = []
             for interval in self._intervals:
                 for o_interval in intervals:
@@ -753,7 +750,6 @@ class Interval:
 
     def __hash__(self):
         return hash(tuple(self._intervals))
-        return hash(self._intervals[0])
 
     def __repr__(self):
         return ' | '.join(repr(i) for i in self._intervals)

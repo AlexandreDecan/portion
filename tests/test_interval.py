@@ -1,7 +1,7 @@
 import pytest
 
 import intervals as I
-from intervals.interval import AtomicInterval
+from intervals.interval import AtomicInterval, Interval
 
 
 class TestHelpers:
@@ -115,6 +115,12 @@ class TestInterval:
         with pytest.raises(TypeError):
             hash(y)
 
+    def test_enclosure(self):
+        assert I.closed(0, 1) == I.closed(0, 1).enclosure
+        assert I.open(0, 1) == I.open(0, 1).enclosure
+        assert I.closed(0, 4) == (I.closed(0, 1) | I.closed(3, 4)).enclosure
+        assert I.openclosed(0, 4) == (I.open(0, 1) | I.closed(3, 4)).enclosure
+
     def test_to_atomic(self):
         intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
         for interval in intervals:
@@ -124,10 +130,17 @@ class TestInterval:
         assert I.closed(0, 1) | I.closed(2, 3) != I.closed(0, 3)
         assert (I.closed(0, 1) | I.closed(2, 3)).to_atomic() == I.closed(0, 3)
 
-        assert I.closed(0, 1).to_atomic() == I.closed(0, 1).enclosure()
-        assert (I.closed(0, 1) | I.closed(2, 3)).enclosure() == I.closed(0, 3)
+        assert I.closed(0, 1).to_atomic() == I.closed(0, 1).enclosure
+        assert (I.closed(0, 1) | I.closed(2, 3)).enclosure == I.closed(0, 3)
 
         assert I.empty().to_atomic() == AtomicInterval(False, I.inf, -I.inf, False)
+
+    @pytest.mark.parametrize('i', [I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1), I.empty(), I.singleton(0)])
+    def test_to_interval(self, i):
+        assert isinstance(i.to_atomic(), AtomicInterval)
+        assert isinstance(Interval(i.to_atomic()), Interval)
+
+        assert Interval(i.to_atomic()) == i
 
 
 class TestIntervalReplace:

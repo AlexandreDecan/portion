@@ -136,7 +136,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
 `Interval` instances support the following operations:
 
- - `x.intersection(other)` or `x & other` return the intersection of two intervals.
+ - `i.intersection(other)` or `i & other` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
    [1,2]
@@ -149,7 +149,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.union(other)` or `x | other` return the union of two intervals.
+ - `i.union(other)` or `i | other` return the union of two intervals.
    ```python
    >>> I.closed(0, 1) | I.closed(1, 2)
    [0,2]
@@ -158,7 +158,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.complement(other)` or `~x` return the complement of the interval.
+ - `i.complement(other)` or `~i` return the complement of the interval.
    ```python
    >>> ~I.closed(0, 1)
    (-inf,0) | (1,+inf)
@@ -169,7 +169,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.difference(other)` or `x - other` return the difference between `x` and `other`.
+ - `i.difference(other)` or `i - other` return the difference between `i` and `other`.
    ```python
    >>> I.closed(0,2) - I.closed(1,2)
    [0,1)
@@ -178,33 +178,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.enclosure()` returns the smallest interval that includes the current one.
-   ```python
-   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
-   [0,3]
-
-   ```
-
- - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
-
-
-[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
-### Interval properties
-
- - `x.empty` is `True` if and only if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).empty
-   False
-   >>> I.closed(0, 0).empty
-   False
-   >>> I.openclosed(0, 0).empty
-   True
-   >>> I.empty().empty
-   True
-
-   ```
-
- - `x.contains(other)` or `other in x` return True if given item is contained in the interval.
+ - `i.contains(other)` or `other in i` return True if given item is contained in the interval.
  It supports intervals and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
@@ -216,7 +190,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.adjacent(other)` tests if the two intervals are adjacent.
+ - `i.adjacent(other)` tests if the two intervals are adjacent.
  Two intervals are adjacent if their intersection is empty, and their union is an atomic interval.
    ```python
    >>> I.closed(0, 1).adjacent(I.openclosed(1, 2))
@@ -230,7 +204,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.overlaps(other)` tests if there is an overlap between two intervals.
+ - `i.overlaps(other)` tests if there is an overlap between two intervals.
  This method accepts an `adjacent` parameter which defaults to `False`.
  If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
  [1, 2) and (2, 3]). This is useful to check whether two intervals can be merged or not.
@@ -246,7 +220,24 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.atomic` is `True` if and only if the interval is composed of a single (possibly empty) atomic interval.
+
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
+### Interval properties
+
+ - `i.empty` is `True` if and only if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).empty
+   False
+   >>> I.closed(0, 0).empty
+   False
+   >>> I.openclosed(0, 0).empty
+   True
+   >>> I.empty().empty
+   True
+
+   ```
+
+ - `i.atomic` is `True` if and only if the interval is a disjunction of a single (possibly empty) interval.
    ```python
    >>> I.closed(0, 2).atomic
    True
@@ -254,6 +245,13 @@ in `[0,3]` even if there is no integer between `1` and `2`.
    True
    >>> (I.closed(0, 1) | I.closed(2, 3)).atomic
    False
+
+   ```
+
+ - `i.enclosure` refers to the smallest atomic interval that includes the current one.
+   ```python
+   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure
+   [0,3]
 
    ```
 
@@ -266,7 +264,7 @@ Intervals can also be iterated to access the underlying atomic intervals, sorted
 
 ```
 
-These atomic intervals can also be accessed using their indexes:
+These intervals can also be accessed using their indexes:
 
 ```python
 >>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
@@ -437,7 +435,7 @@ its enclosure satisfies the new bounds.
 
 To apply an arbitrary transformation on an interval, intervals expose an `apply` method.
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
-The function is expected to return either an `AtomicInterval`, an `Interval` or a 4-uple `(left, lower, upper, right)`.
+The function is expected to return either an `Interval`, an `AtomicInterval` or a 4-uple `(left, lower, upper, right)`.
 
 ```python
 >>> i = I.closed(2, 3) | I.open(4, 5)
@@ -848,6 +846,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `iterate`: `base` and `reverse`;
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`.
+ - Changed: (breaking) Accessing or iterating on the atomic intervals of an interval returns `Interval` instances, not `AtomicInterval` ones.
+ - Changed: (breaking) `i.enclosure` is a property and no longer a method.
  - Changed: (breaking) interval is hashable if and only if its bounds are hashable.
  - Changed: `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Changed: (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
