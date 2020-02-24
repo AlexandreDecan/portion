@@ -13,10 +13,3 @@ __all__ = [
     'from_string', 'to_string', 'from_data', 'to_data',
     'IntervalDict',
 ]
-
-__package__ = 'python-intervals'
-__version__ = '2.0.0-pre1'
-__licence__ = 'LGPL3'
-__author__ = 'Alexandre Decan'
-__url__ = 'https://github.com/AlexandreDecan/python-intervals'
-__description__ = 'Python data structure and operations for intervals'

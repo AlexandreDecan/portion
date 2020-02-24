@@ -2,20 +2,18 @@ from os import path
 from setuptools import setup, find_packages
 from codecs import open
 
-import intervals
-
 with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name=intervals.__package__,
-    version=intervals.__version__,
-    license=intervals.__licence__,
+    name='python-intervals',
+    version='2.0.0-pre1',
+    license='LGPL3',
 
-    author=intervals.__author__,
-    url=intervals.__url__,
+    author='Alexandre Decan',
+    url='https://github.com/AlexandreDecan/python-intervals',
 
-    description=intervals.__description__,
+    description='Python data structure and operations for intervals',
     long_description=long_description,
     long_description_content_type='text/markdown',
 

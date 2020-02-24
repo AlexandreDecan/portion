@@ -829,6 +829,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Changed: interval is hashable if and only if its bounds are hashable.
  - Changed: restructure package in modules instead of a flat file.
  - Changed: reorganise tests in modules and classes instead of a flat file.
+ - Removed: package meta-data (e.g., `__version__`, `__url__`, ...) moved to `setup.py`.
  - Fixed: fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
 
 
