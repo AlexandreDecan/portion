@@ -7,7 +7,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 
 setup(
     name='python-intervals',
-    version='2.0.0-pre1',
+    version='2.0.0',
     license='LGPL3',
 
     author='Alexandre Decan',
