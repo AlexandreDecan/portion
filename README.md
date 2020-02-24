@@ -12,6 +12,7 @@ This library provides data structure and operations for intervals in Python 3.5+
   * [Documentation & usage](#documentation--usage)
       * [Interval creation](#interval-creation)
       * [Interval operations](#interval-operations)
+      * [Interval properties](#interval-properties)
       * [Comparison operators](#comparison-operators)
       * [Bounds of an interval](#bounds-of-an-interval)
       * [Interval transformation](#interval-transformation)
@@ -135,19 +136,6 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
 `Interval` instances support the following operations:
 
- - `x.is_empty()` tests if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).is_empty()
-   False
-   >>> I.closed(0, 0).is_empty()
-   False
-   >>> I.openclosed(0, 0).is_empty()
-   True
-   >>> I.empty().is_empty()
-   True
-
-   ```
-
  - `x.intersection(other)` or `x & other` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
@@ -190,6 +178,32 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
+ - `x.enclosure()` returns the smallest interval that includes the current one.
+   ```python
+   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
+   [0,3]
+
+   ```
+
+ - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
+
+
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
+### Interval properties
+
+ - `x.empty` is `True` if and only if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).empty
+   False
+   >>> I.closed(0, 0).empty
+   False
+   >>> I.openclosed(0, 0).empty
+   True
+   >>> I.empty().empty
+   True
+
+   ```
+
  - `x.contains(other)` or `other in x` return True if given item is contained in the interval.
  It supports intervals and arbitrary comparable values.
    ```python
@@ -218,22 +232,13 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
- - `x.enclosure()` returns the smallest interval that includes the current one.
+ - `x.atomic` is `True` if and only if the interval is composed of a single (possibly empty) atomic interval.
    ```python
-   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure()
-   [0,3]
-
-   ```
-
- - `x.to_atomic()` is equivalent to `x.enclosure()` but returns an `AtomicInterval` instead of an `Interval` object.
-
- - `x.is_atomic()` evaluates to `True` if interval is composed of a single (possibly empty) atomic interval.
-   ```python
-   >>> I.closed(0, 2).is_atomic()
+   >>> I.closed(0, 2).atomic
    True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).is_atomic()
+   >>> (I.closed(0, 1) | I.closed(1, 2)).atomic
    True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).is_atomic()
+   >>> (I.closed(0, 1) | I.closed(2, 3)).atomic
    False
 
    ```
@@ -820,6 +825,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **2.0.0-pre1** (unreleased)
 
  - Added: infinities define a hash value.
+ - Added: `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
+ - Added: `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).
  - Changed: drop support for Python 2.7 and 3.4 since they reached end-of-life.
  - Changed: many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
@@ -833,6 +840,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Changed: `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - Changed: restructure package in modules instead of a flat file.
  - Changed: reorganise tests in modules and classes instead of a flat file.
+ - Removed: `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
  - Removed: package meta-data (e.g., `__version__`, `__url__`, ...) moved to `setup.py`.
  - Fixed: fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
 

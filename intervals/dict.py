@@ -201,7 +201,7 @@ class IntervalDict(MutableMapping):
             items = []
             for i, v in self._items:
                 intersection = key & i
-                if not intersection.is_empty():
+                if not intersection.empty:
                     items.append((intersection, v))
             return IntervalDict(items)
         else:
@@ -246,7 +246,7 @@ class IntervalDict(MutableMapping):
     def __setitem__(self, key, value):
         interval = key if isinstance(key, Interval) else singleton(key)
 
-        if interval.is_empty():
+        if interval.empty:
             return
 
         new_items = []
@@ -257,7 +257,7 @@ class IntervalDict(MutableMapping):
                 new_items.append((i | interval, v))
             elif i.overlaps(interval):
                 remaining = i - interval
-                if not remaining.is_empty():
+                if not remaining.empty:
                     new_items.append((remaining, v))
             else:
                 new_items.append((i, v))
@@ -270,7 +270,7 @@ class IntervalDict(MutableMapping):
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
 
-        if interval.is_empty():
+        if interval.empty:
             return
 
         new_items = []
@@ -279,7 +279,7 @@ class IntervalDict(MutableMapping):
             if i.overlaps(interval):
                 found = True
                 remaining = i - interval
-                if not remaining.is_empty():
+                if not remaining.empty:
                     new_items.append((remaining, v))
             else:
                 new_items.append((i, v))

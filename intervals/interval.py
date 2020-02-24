@@ -72,7 +72,7 @@ class AtomicInterval:
         self._upper = upper
         self._right = right if upper not in [inf, -inf] else Bound.OPEN
 
-        if self.is_empty():
+        if self.empty:
             self._left = Bound.OPEN
             self._lower = inf
             self._upper = -inf
@@ -106,11 +106,10 @@ class AtomicInterval:
         """
         return self._right
 
-    def is_empty(self):
+    @property
+    def empty(self):
         """
-        Test interval emptiness.
-
-        :return: True if interval is empty, False otherwise.
+        True if interval is empty, False otherwise.
         """
         return (
             self._lower > self._upper or
@@ -371,7 +370,7 @@ class AtomicInterval:
         return hash((self._lower, self._upper))
 
     def __repr__(self):
-        if self.is_empty():
+        if self.empty:
             return '()'
         elif self._lower == self._upper:
             return '[{}]'.format(repr(self._lower))
@@ -407,10 +406,10 @@ class Interval:
 
         for interval in intervals:
             if isinstance(interval, Interval):
-                if not interval.is_empty():
+                if not interval.empty:
                     self._intervals.extend(interval)
             elif isinstance(interval, AtomicInterval):
-                if not interval.is_empty():
+                if not interval.empty:
                     self._intervals.append(interval)
             else:
                 raise TypeError('Parameters must be Interval or AtomicInterval instances')
@@ -464,20 +463,18 @@ class Interval:
         """
         return self._intervals[-1].right
 
-    def is_empty(self):
+    @property
+    def empty(self):
         """
-        Test interval emptiness.
-
-        :return: True iff interval is empty.
+        True if interval is empty, False otherwise.
         """
-        return self.is_atomic() and self._intervals[0].is_empty()
+        return self.atomic and self._intervals[0].empty
 
-    def is_atomic(self):
+    @property
+    def atomic(self):
         """
-        Test interval atomicity. An interval is atomic if it is composed of a
-        single atomic interval.
-
-        :return: True if this interval is atomic, False otherwise.
+        True if this interval is atomic, False otherwise.
+        An interval is atomic if it is composed of a single atomic interval.
         """
         return len(self._intervals) == 1
 

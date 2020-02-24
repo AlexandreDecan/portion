@@ -82,7 +82,7 @@ def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
     """
     interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
 
-    if interval.is_empty():
+    if interval.empty:
         return '{}{}'.format(left_open, right_open)
 
     def _convert(bound):

@@ -83,12 +83,12 @@ class TestInterval:
         assert i.upper == 4
 
     def test_is_empty(self):
-        assert I.openclosed(1, 1).is_empty()
-        assert I.closedopen(1, 1).is_empty()
-        assert I.open(1, 1).is_empty()
-        assert not I.closed(1, 1).is_empty()
-        assert I.Interval().is_empty()
-        assert I.empty().is_empty()
+        assert I.openclosed(1, 1).empty
+        assert I.closedopen(1, 1).empty
+        assert I.open(1, 1).empty
+        assert not I.closed(1, 1).empty
+        assert I.Interval().empty
+        assert I.empty().empty
 
     def test_hash_with_hashable(self):
         assert hash(I.closed(0, 1)) is not None
@@ -539,7 +539,7 @@ class TestIntervalIntersection:
         assert I.open(0, 3) & I.closed(2, 4) == I.closedopen(2, 3)
 
     def test_empty(self):
-        assert (I.closed(0, 1) & I.closed(2, 3)).is_empty()
+        assert (I.closed(0, 1) & I.closed(2, 3)).empty
         assert I.closed(0, 1) & I.empty() == I.empty()
 
     def test_proxy_method(self):
@@ -584,11 +584,11 @@ class TestIntervalUnion:
 
     def test_with_disjoint(self):
         assert I.closed(1, 2) | I.closed(3, 4) != I.closed(1, 4)
-        assert (I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)).is_atomic()
+        assert (I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)).atomic
         assert I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3) == I.closed(1, 4)
         assert I.closed(1, 2) | I.closed(0, 4) == I.closed(0, 4)
 
-        assert (I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)).is_atomic()
+        assert (I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2)).atomic
         assert I.closed(0, 1) | I.closed(2, 3) | I.closed(1, 2) == I.closed(0, 3)
 
     def test_with_empty(self):
@@ -655,7 +655,7 @@ class TestIntervalComplement:
 
     def test_empty(self):
         assert ~I.open(1, 1) == I.open(-I.inf, I.inf)
-        assert (~I.closed(-I.inf, I.inf)).is_empty()
+        assert (~I.closed(-I.inf, I.inf)).empty
         assert ~I.empty() == I.open(-I.inf, I.inf)
 
     def test_proxy_method(self):
@@ -667,6 +667,7 @@ class TestIntervalComplement:
         i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
         assert ~i1 == i1.complement()
         assert ~i2 == i2.complement()
+
 
 class TestIntervalDifference:
     @pytest.mark.parametrize('i', [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.empty(), I.singleton(0)])
