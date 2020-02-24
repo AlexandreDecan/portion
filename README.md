@@ -203,7 +203,7 @@ in `[0,3]` even if there is no integer between `1` and `2`.
    ```
 
  - `x.overlaps(other)` tests if there is an overlap between two intervals.
- This method accepts a `adjacent` parameter which defaults to `False`.
+ This method accepts an `adjacent` parameter which defaults to `False`.
  If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
  [1, 2) and (2, 3]).
    ```python
@@ -818,7 +818,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 **2.0.0-pre1** (not yet released)
 
  - Infinities define a hash value.
- - An interval is hashable if and only if is bounds are hashable.
+ - An interval is hashable if and only if its bounds are hashable.
  - Fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
  - Drop support for Python 2.7 and 3.4 since they reached end-of-life.
  - Breaking change: many (optional) parameters are converted to keyword-only arguments:
