@@ -1,11 +1,29 @@
-from intervals.const import inf, _PInf, _NInf, CLOSED, OPEN
+import pytest
+
+from intervals.const import inf, _PInf, _NInf, Bound
+from intervals import CLOSED, OPEN
 
 
 class TestBounds:
-    def test_complement(self):
+    def test_comparisons(self):
+        assert CLOSED == Bound.CLOSED
+        assert OPEN == Bound.OPEN
+        assert CLOSED != OPEN
         assert OPEN != CLOSED
-        assert not OPEN == CLOSED
-        assert not CLOSED == OPEN
+
+    def test_non_Boolean(self):
+        with pytest.raises(ValueError):
+            assert not OPEN
+
+        with pytest.raises(ValueError):
+            assert not CLOSED
+
+    def test_value(self):
+        assert Bound(True) == Bound.CLOSED
+        assert Bound(False) == Bound.OPEN
+
+        assert Bound.CLOSED.value == True
+        assert Bound.OPEN.value == False
 
 
 class TestInfinities:

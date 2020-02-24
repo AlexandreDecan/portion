@@ -119,33 +119,33 @@ class TestStringIdentity:
 
 class TestToData:
     def test_bounds(self):
-        assert I.to_data(I.closed(0, 1)) == [(I.CLOSED, 0, 1, I.CLOSED)]
-        assert I.to_data(I.openclosed(0, 1)) == [(I.OPEN, 0, 1, I.CLOSED)]
-        assert I.to_data(I.closedopen(0, 1)) == [(I.CLOSED, 0, 1, I.OPEN)]
-        assert I.to_data(I.open(0, 1)) == [(I.OPEN, 0, 1, I.OPEN)]
+        assert I.to_data(I.closed(0, 1)) == [(True, 0, 1, True)]
+        assert I.to_data(I.openclosed(0, 1)) == [(False, 0, 1, True)]
+        assert I.to_data(I.closedopen(0, 1)) == [(True, 0, 1, False)]
+        assert I.to_data(I.open(0, 1)) == [(False, 0, 1, False)]
 
     def test_values(self):
-        assert I.to_data(I.closed('a', 'b')) == [(I.CLOSED, 'a', 'b', I.CLOSED)]
-        assert I.to_data(I.closed(tuple([0]), tuple([1]))) == [(I.CLOSED, (0,), (1,), I.CLOSED)]
+        assert I.to_data(I.closed('a', 'b')) == [(True, 'a', 'b', True)]
+        assert I.to_data(I.closed(tuple([0]), tuple([1]))) == [(True, (0,), (1,), True)]
 
     def test_singleton(self):
-        assert I.to_data(I.singleton(0)) == [(I.CLOSED, 0, 0, I.CLOSED)]
+        assert I.to_data(I.singleton(0)) == [(True, 0, 0, True)]
 
     def test_open_intervals(self):
-        assert I.to_data(I.open(-I.inf, I.inf)) == [(I.OPEN, float('-inf'), float('inf'), I.OPEN)]
-        assert I.to_data(I.openclosed(-I.inf, 0)) == [(I.OPEN, float('-inf'), 0, I.CLOSED)]
-        assert I.to_data(I.closedopen(0, I.inf)) == [(I.CLOSED, 0, float('inf'), I.OPEN)]
+        assert I.to_data(I.open(-I.inf, I.inf)) == [(False, float('-inf'), float('inf'), False)]
+        assert I.to_data(I.openclosed(-I.inf, 0)) == [(False, float('-inf'), 0, True)]
+        assert I.to_data(I.closedopen(0, I.inf)) == [(True, 0, float('inf'), False)]
 
     def test_empty_interval(self):
-        assert I.to_data(I.empty()) == [(I.OPEN, float('inf'), float('-inf'), I.OPEN)]
+        assert I.to_data(I.empty()) == [(False, float('inf'), float('-inf'), False)]
 
     def test_unions(self):
         i = I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
-        assert I.to_data(i) == [(I.OPEN, float('-inf'), 4, I.CLOSED), (I.CLOSED, 6, float('inf'), I.OPEN)]
+        assert I.to_data(i) == [(False, float('-inf'), 4, True), (True, 6, float('inf'), False)]
 
     def test_parameters(self):
         i = I.openclosed(-I.inf, 4) | I.closedopen(6, I.inf)
-        assert I.to_data(i, conv=str, pinf='highest', ninf='lowest') == [(I.OPEN, 'lowest', '4', I.CLOSED), (I.CLOSED, '6', 'highest', I.OPEN)]
+        assert I.to_data(i, conv=str, pinf='highest', ninf='lowest') == [(False, 'lowest', '4', True), (True, '6', 'highest', False)]
 
 
 class TestFromData:

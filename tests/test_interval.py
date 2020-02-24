@@ -155,7 +155,7 @@ class TestIntervalReplace:
         assert i.replace(upper=1) == I.closedopen(0, 1)
         assert i.replace(lower=5) == I.empty()
         assert i.replace(upper=-5) == I.empty()
-        assert i.replace(left=lambda v: not v, lower=lambda v: v - 1, upper=lambda v: v + 1, right=lambda v: not v) == I.openclosed(-1, 1) | I.openclosed(2, 4)
+        assert i.replace(left=lambda v: ~v, lower=lambda v: v - 1, upper=lambda v: v + 1, right=lambda v: ~v) == I.openclosed(-1, 1) | I.openclosed(2, 4)
 
     def test_replace_with_empty(self):
         assert I.empty().replace(left=I.CLOSED, right=I.CLOSED) == I.empty()
@@ -168,16 +168,16 @@ class TestIntervalApply:
     def test_apply(self):
         i = I.closed(0, 1)
         assert i.apply(lambda s: s) == i
-        assert i.apply(lambda s: (False, -1, 2, False)) == I.open(-1, 2)
-        assert i.apply(lambda s: AtomicInterval(False, -1, 2, False)) == I.open(-1, 2)
+        assert i.apply(lambda s: (I.OPEN, -1, 2, I.OPEN)) == I.open(-1, 2)
+        assert i.apply(lambda s: AtomicInterval(I.OPEN, -1, 2, I.OPEN)) == I.open(-1, 2)
         assert i.apply(lambda s: I.open(-1, 2)) == I.open(-1, 2)
 
     def test_apply_on_unions(self):
         i = I.closed(0, 1) | I.closed(2, 3)
         assert i.apply(lambda s: s) == i
-        assert i.apply(lambda s: (False, -1, 2, False)) == I.open(-1, 2)
-        assert i.apply(lambda s: (not s.left, s.lower - 1, s.upper - 1, not s.right)) == I.open(-1, 0) | I.open(1, 2)
-        assert i.apply(lambda s: AtomicInterval(False, -1, 2, False)) == I.open(-1, 2)
+        assert i.apply(lambda s: (I.OPEN, -1, 2, I.OPEN)) == I.open(-1, 2)
+        assert i.apply(lambda s: (~s.left, s.lower - 1, s.upper - 1, ~s.right)) == I.open(-1, 0) | I.open(1, 2)
+        assert i.apply(lambda s: AtomicInterval(I.OPEN, -1, 2, I.OPEN)) == I.open(-1, 2)
         assert i.apply(lambda s: I.open(-1, 2)) == I.open(-1, 2)
 
         assert i.apply(lambda s: (s.left, s.lower, s.upper * 2, s.right)) == I.closed(0, 6)

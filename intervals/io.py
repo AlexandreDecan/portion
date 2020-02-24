@@ -1,6 +1,6 @@
 import re
 
-from .const import OPEN, inf
+from .const import Bound, inf
 from .interval import AtomicInterval, Interval
 
 
@@ -49,8 +49,8 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
         else:
             group = match.groupdict()
 
-            left = re.match(left_closed + '$', group['left']) is not None
-            right = re.match(right_closed + '$', group['right']) is not None
+            left = Bound.CLOSED if re.match(left_closed + '$', group['left']) else Bound.OPEN
+            right = Bound.CLOSED if re.match(right_closed + '$', group['right']) else Bound.OPEN
 
             lower = group.get('lower', None)
             upper = group.get('upper', None)
@@ -95,8 +95,8 @@ def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
 
     exported_intervals = []
     for item in interval:
-        left = left_open if item.left == OPEN else left_closed
-        right = right_open if item.right == OPEN else right_closed
+        left = left_open if item.left == Bound.OPEN else left_closed
+        right = right_open if item.right == Bound.OPEN else right_closed
 
         lower = _convert(item.lower)
         upper = _convert(item.upper)
@@ -133,10 +133,10 @@ def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
     for item in data:
         left, lower, upper, right = item
         intervals.append(AtomicInterval(
-            left,
+            Bound(left),
             _convert(lower),
             _convert(upper),
-            right
+            Bound(right),
         ))
     return Interval(*intervals)
 
@@ -167,9 +167,9 @@ def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
 
     for item in interval:
         data.append((
-            item.left,
+            item.left.value,
             _convert(item.lower),
             _convert(item.upper),
-            item.right
+            item.right.value
         ))
     return data

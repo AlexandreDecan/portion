@@ -1,4 +1,4 @@
-from .const import OPEN, CLOSED, inf
+from .const import Bound, inf
 from .interval import Interval, open, closed, openclosed, closedopen, empty, singleton
 from .func import iterate
 from .io import from_string, to_string, from_data, to_data
@@ -13,3 +13,6 @@ __all__ = [
     'from_string', 'to_string', 'from_data', 'to_data',
     'IntervalDict',
 ]
+
+CLOSED = Bound.CLOSED
+OPEN = Bound.OPEN

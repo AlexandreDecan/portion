@@ -1,3 +1,4 @@
+from .const import Bound
 from .interval import Interval, singleton
 
 from collections.abc import MutableMapping
@@ -93,7 +94,7 @@ class IntervalDict(MutableMapping):
         :return: a sorted list of 2-uples.
         """
         def func(i):
-            return (i[0].lower, not i[0].left, i[0].upper, i[0].right)
+            return (i[0].lower, i[0].left is Bound.CLOSED, i[0].upper, i[0].right is Bound.OPEN)
 
         return sorted(self._items, key=func)
 

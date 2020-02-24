@@ -1,3 +1,26 @@
+import enum
+
+
+class Bound(enum.Enum):
+    """
+    Bound types, either CLOSED for inclusive, or OPEN for exclusive.
+    """
+    CLOSED = True
+    OPEN = False
+
+    def __bool__(self):
+        raise ValueError('The truth value of a bound is ambiguous.')
+
+    def __invert__(self):
+        return Bound.CLOSED if self is Bound.OPEN else Bound.OPEN
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
+
+
 class _Singleton():
     __instance = None
 
@@ -53,7 +76,3 @@ class _NInf(_Singleton):
 
 # Positive infinity
 inf = _PInf()
-
-# Boundary types (True for inclusive, False for exclusive)
-CLOSED = True
-OPEN = False

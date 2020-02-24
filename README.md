@@ -336,14 +336,15 @@ Finally, intervals are hashable as long as their bounds are hashable (`I.inf` an
 
 The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
 with its `left`, `right`, `lower` and `upper` attributes.
-The `left` and `right` bounds are either `I.CLOSED` (`True`) or `I.OPEN` (`False`).
+The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
+By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
 
 ```python
 >> I.CLOSED, I.OPEN
-True, False
+CLOSED, OPEN
 >>> x = I.closedopen(0, 1)
 >>> x.left, x.lower, x.upper, x.right
-(True, 0, 1, False)
+(CLOSED, 0, 1, OPEN)
 
 ```
 
@@ -353,7 +354,7 @@ while `right` and `upper` refer to the upper bound of its enclosure:
 ```python
 >>> x = I.open(0, 1) | I.closed(3, 4)
 >>> x.left, x.lower, x.upper, x.right
-(False, 0, 4, True)
+(OPEN, 0, 4, CLOSED)
 
 ```
 
@@ -425,7 +426,7 @@ The function is expected to return either an `AtomicInterval`, an `Interval` or 
 >>> i.apply(lambda x: (x.left, x.lower + 1, x.upper + 1, x.right))
 [3,4] | (5,6)
 >>> # Invert bounds
->>> i.apply(lambda x: (not x.left, x.lower, x.upper, not x.right))
+>>> i.apply(lambda x: (~x.left, x.lower, x.upper, ~x.right))
 (2,3) | [4,5]
 
 ```
@@ -443,7 +444,7 @@ conveniently used to transform intervals in presence of infinities.
 >>> i.apply(lambda x: x.replace(lower=lambda v: v * 2))
 (-inf,0] | [16,+inf)
 >>> # Invert bounds
->>> i.apply(lambda x: x.replace(left=lambda v: not v, right=lambda v: not v))
+>>> i.apply(lambda x: x.replace(left=lambda v: ~v, right=lambda v: ~v))
 (-inf,0) | (3,4) | (8,+inf)
 >>> # Replace infinities with -10 and 10
 >>> conv = lambda v: -10 if v == -I.inf else (10 if v == I.inf else v)
@@ -758,6 +759,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 ### Import & export intervals to Python built-in data types
 
 Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
+`I.CLOSED` and `I.OPEN` are represented by Boolean values `True` (inclusive) and `False` (exclusive).
 
 ```python
 >>> x = I.openclosed(0, 1) | I.closedopen(2, I.inf)
@@ -827,6 +829,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `i.overlaps`: `adjacent`.
  - Changed: remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
  - Changed: interval is hashable if and only if its bounds are hashable.
+ - Changed: `CLOSED` and `OPEN` are members of the `Bound` enumeration.
+ - Changed: `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - Changed: restructure package in modules instead of a flat file.
  - Changed: reorganise tests in modules and classes instead of a flat file.
  - Removed: package meta-data (e.g., `__version__`, `__url__`, ...) moved to `setup.py`.
