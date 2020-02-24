@@ -194,6 +194,70 @@ class TestIntervalApply:
             i.apply(lambda s: 'unsupported')
 
 
+class TestIntervalAdjacent():
+    def test_adjacent(self):
+        assert I.closedopen(0, 1).adjacent(I.closedopen(1, 2))
+        assert I.closed(0, 1).adjacent(I.open(1, 2))
+        assert not I.closed(0, 1).adjacent(I.closed(1, 2))
+        assert not I.open(0, 1).adjacent(I.open(1, 2))
+
+    def test_reversed_adjacent(self):
+        assert I.closedopen(1, 2).adjacent(I.closedopen(0, 1))
+        assert I.open(1, 2).adjacent(I.closed(0, 1))
+        assert not I.closed(1, 2).adjacent(I.closed(0, 1))
+        assert not I.open(1, 2).adjacent(I.open(0, 1))
+
+    def test_non_adjacent(self):
+        assert not I.closedopen(0, 1).adjacent(I.closedopen(3, 4))
+        assert not I.closed(0, 1).adjacent(I.open(3, 4))
+        assert not I.closed(0, 1).adjacent(I.closed(3, 4))
+        assert not I.open(0, 1).adjacent(I.open(3, 4))
+
+        assert not I.closedopen(3, 4).adjacent(I.closedopen(0, 1))
+        assert not I.open(3, 4).adjacent(I.closed(0, 1))
+        assert not I.closed(3, 4).adjacent(I.closed(0, 1))
+        assert not I.open(3, 4).adjacent(I.open(0, 1))
+
+    def test_overlapping(self):
+        assert not I.openclosed(0, 2).adjacent(I.closedopen(2, 3))
+        assert not I.closed(0, 2).adjacent(I.closedopen(2, 3))
+        assert not I.closed(0, 2).adjacent(I.closed(2, 3))
+        assert not I.open(0, 2).adjacent(I.open(2, 3))
+
+        assert not I.closedopen(2, 3).adjacent(I.openclosed(0, 2))
+        assert not I.closedopen(2, 3).adjacent(I.closed(0, 2))
+        assert not I.closed(2, 3).adjacent(I.closed(0, 2))
+        assert not I.open(2, 3).adjacent(I.open(0, 2))
+
+    def test_contained(self):
+        assert not I.closed(0, 4).adjacent(I.closed(0, 2))
+        assert not I.closed(0, 4).adjacent(I.closed(2, 4))
+        assert not I.closed(0, 4).adjacent(I.open(0, 2))
+        assert not I.closed(0, 4).adjacent(I.open(2, 4))
+
+        assert not I.closed(0, 2).adjacent(I.closed(0, 4))
+        assert not I.closed(2, 4).adjacent(I.closed(0, 4))
+        assert not I.closed(0, 2).adjacent(I.open(0, 4))
+        assert not I.closed(2, 4).adjacent(I.open(0, 4))
+
+        assert not I.closed(0, 2).adjacent(I.closed(0, 2))
+        assert not I.open(0, 2).adjacent(I.open(0, 2))
+        assert not I.openclosed(0, 2).adjacent(I.openclosed(0, 2))
+        assert not I.closedopen(0, 2).adjacent(I.closedopen(0, 2))
+
+    def test_same_bounds(self):
+        assert not I.closed(0, 2).adjacent(I.open(0, 2))
+        assert not I.open(0, 2).adjacent(I.closed(0, 2))
+        assert not I.openclosed(0, 2).adjacent(I.closedopen(0, 2))
+        assert not I.closedopen(0, 2).adjacent(I.openclosed(0, 2))
+
+    def test_nonatomic_interval(self):
+        assert (I.closed(0, 1) | I.closed(2, 3)).adjacent(I.open(1, 2))
+        assert I.open(1, 2).adjacent(I.closed(0, 1) | I.closed(2, 3))
+        assert not (I.closed(0, 1) | I.closed(2, 3)).adjacent(I.closed(1, 2))
+        assert (I.closedopen(0, 1) | I.openclosed(2, 3)).adjacent(I.open(-1, 0) | I.closed(1, 2) | I.openclosed(3, 4))
+
+
 class TestIntervalOverlaps():
     def test_overlaps(self):
         assert I.closed(1, 2).overlaps(I.closed(2, 3))

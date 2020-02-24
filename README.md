@@ -216,10 +216,24 @@ in `[0,3]` even if there is no integer between `1` and `2`.
 
    ```
 
+ - `x.adjacent(other)` tests if the two intervals are adjacent.
+ Two intervals are adjacent if their intersection is empty, and their union is an atomic interval.
+   ```python
+   >>> I.closed(0, 1).adjacent(I.openclosed(1, 2))
+   True
+   >>> I.closed(0, 1).adjacent(I.closed(1, 2))
+   False
+   >>> (I.closed(0, 1) | I.closed(2, 3)).adjacent(I.open(1, 2) | I.open(3, 4))
+   True
+   >>> I.closed(0, 1).adjacent(I.open(1, 2) | I.open(10, 11))
+   False
+
+   ```
+
  - `x.overlaps(other)` tests if there is an overlap between two intervals.
  This method accepts an `adjacent` parameter which defaults to `False`.
  If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
- [1, 2) and (2, 3]).
+ [1, 2) and (2, 3]). This is useful to check whether two intervals can be merged or not.
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
    True
@@ -828,19 +842,19 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Added: `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
  - Added: `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).
  - Changed: drop support for Python 2.7 and 3.4 since they reached end-of-life.
- - Changed: many (optional) parameters are converted to keyword-only arguments:
+ - Changed: (breaking) many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
    * for `iterate`: `base` and `reverse`;
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`.
- - Changed: remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
- - Changed: interval is hashable if and only if its bounds are hashable.
+ - Changed: (breaking) interval is hashable if and only if its bounds are hashable.
  - Changed: `CLOSED` and `OPEN` are members of the `Bound` enumeration.
- - Changed: `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
+ - Changed: (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - Changed: restructure package in modules instead of a flat file.
  - Changed: reorganise tests in modules and classes instead of a flat file.
- - Removed: `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
+ - Removed: (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
+ - Removed: (breaking) remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
  - Removed: package meta-data (e.g., `__version__`, `__url__`, ...) moved to `setup.py`.
  - Fixed: fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
 

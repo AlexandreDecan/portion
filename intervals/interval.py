@@ -159,6 +159,7 @@ class AtomicInterval:
 
         If 'adjacent' is set to True (default is False), then it returns True for adjacent
         intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
+        This is useful to see whether two intervals can be merged or not.
 
         :param other: an atomic interval.
         :param adjacent: set to True to accept adjacent intervals as well.
@@ -579,12 +580,24 @@ class Interval:
 
         return Interval(*intervals)
 
+    def adjacent(self, other):
+        """
+        Test if given interval is adjacent.
+
+        An interval is adjacent if there is no intersection, and their union is an atomic interval.
+
+        :param other: an interval or atomic interval.
+        :return: True if intervals are adjacent, False otherwise.
+        """
+        return (self & other).empty and (self | other).atomic
+
     def overlaps(self, other, *, adjacent=False):
         """
         Test if intervals have any overlapping value.
 
         If 'adjacent' is set to True (default is False), then it returns True for adjacent
         intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
+        This is useful to see whether two intervals can be merged or not.
 
         :param other: an interval or atomic interval.
         :param adjacent: set to True to accept adjacent intervals as well.
