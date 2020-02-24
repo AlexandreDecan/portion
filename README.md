@@ -781,6 +781,15 @@ Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to sup
 `I.CLOSED` and `I.OPEN` are represented by Boolean values `True` (inclusive) and `False` (exclusive).
 
 ```python
+>>> I.to_data(I.openclosed(0, 2))
+[(False, 0, 2, True)]
+
+```
+
+The values used to represent positive and negative infinities can be specified with
+`pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
+
+```python
 >>> x = I.openclosed(0, 1) | I.closedopen(2, I.inf)
 >>> I.to_data(x)
 [(False, 0, 1, True), (True, 2, inf, False)]
@@ -788,13 +797,11 @@ Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to sup
 ```
 
 The function to convert bounds can be specified with the `conv` parameter.
-The values that must be used to represent positive and negative infinities can be specified with
-`pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
 ```python
->>> x = I.closed(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
+>>> x = I.closedopen(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
 >>> I.to_data(x, conv=lambda v: (v.year, v.month, v.day))
-[(True, (2011, 3, 15), (2013, 10, 10), True)]
+[(True, (2011, 3, 15), (2013, 10, 10), False)]
 
 ```
 
@@ -853,21 +860,21 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`.
  - (breaking) `i.enclosure` is a property and no longer a method.
- - (breaking) Interval is hashable if and only if its bounds are hashable.
- - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
- - Accessing or iterating on the atomic intervals of an interval returns `Interval` instances, not `AtomicInterval` ones.
+ - (breaking) An interval is hashable if and only if its bounds are hashable.
+ - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones. As a consequence, `AtomicInterval` instances are no longer exposed by this library.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
  - Reorganise changelog with explicit categories.
 
 #### Removed
+ - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
  - (breaking) Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
- - Package meta-data (e.g., `__version__`, `__url__`, ...) moved to `setup.py`.
+ - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
 #### Fixed
- - Fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
+ - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
 
 
 
