@@ -815,134 +815,134 @@ You can refer to this library using:
 This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 
-**2.0.0-pre1** (not yet released)
+**2.0.0-pre1** (unreleased)
 
- - Infinities define a hash value.
- - An interval is hashable if and only if its bounds are hashable.
- - Fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
- - Drop support for Python 2.7 and 3.4 since they reached end-of-life.
- - Breaking change: many (optional) parameters are converted to keyword-only arguments:
+ - Added: infinities define a hash value.
+ - Changed: drop support for Python 2.7 and 3.4 since they reached end-of-life.
+ - Changed: many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
    * for `iterate`: `base` and `reverse`;
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`.
- - Breaking change: remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
- - Restructure package in modules instead of a flat file.
- - Reorganise tests in modules and classes instead of a flat file.
+ - Changed: remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
+ - Changed: interval is hashable if and only if its bounds are hashable.
+ - Changed: restructure package in modules instead of a flat file.
+ - Changed: reorganise tests in modules and classes instead of a flat file.
+ - Fixed: fix an issue where an interval can be made of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
 
 
 **1.10.0** (2019-09-26)
 
- - `IntervalDict` has a `.combine` method to merge its keys and values with another `IntervalDict`.
+ - Added: `IntervalDict` has a `.combine` method to merge its keys and values with another `IntervalDict`.
 
 
 **1.9.0** (2019-09-13)
 
- - Discrete iteration on the values of an interval with `iterate`.
- - Map intervals to data with the dict-like `IntervalDict` structure.
- - Faster comparisons between arbitrary values and intervals.
- - Deprecate `permissive` in `.overlaps` in favour of `adjacent`.
- - Fix `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
- - Fix `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/python-intervals/issues/13)).
+ - Added: discrete iteration on the values of an interval with `iterate`.
+ - Added: map intervals to data with the dict-like `IntervalDict` structure.
+ - Changed: faster comparisons between arbitrary values and intervals.
+ - Changed: deprecate `permissive` in `.overlaps` in favour of `adjacent`.
+ - Fixed: `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
+ - Fixed: `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/python-intervals/issues/13)).
 
 
 **1.8.0** (2018-12-15)
 
- - Intervals have a `.left`, `.lower`, `.upper`, and `.right` attribute that refer to its enclosure.
- - Intervals have a `.replace` method to create new intervals based on the current one. This method accepts both values and functions.
- - Intervals have an `.apply` method to apply a function on the underlying atomic intervals.
- - Intervals can be compared with single values as well.
- - `I.empty()` returns the same instance to save memory.
- - Infinities are singleton objects.
- - Set `len(I.empty()) = 1` and `I.empty()[0] == I.empty().to_atomic()` for consistency.
+ - Added: intervals have a `.left`, `.lower`, `.upper`, and `.right` attribute that refer to its enclosure.
+ - Added: intervals have a `.replace` method to create new intervals based on the current one. This method accepts both values and functions.
+ - Added: intervals have an `.apply` method to apply a function on the underlying atomic intervals.
+ - Added: intervals can be compared with single values as well.
+ - Changed: `I.empty()` returns the same instance to save memory.
+ - Changed: infinities are singleton objects.
+ - Changed: set `len(I.empty()) = 1` and `I.empty()[0] == I.empty().to_atomic()` for consistency.
 
 
 **1.7.0** (2018-12-06)
 
- - Import from and export to Python built-in data types (a list of 4-uples) with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
- - Add examples for arbitrary interval transformations.
+ - Added: import from and export to Python built-in data types (a list of 4-uples) with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
+ - Added: examples for arbitrary interval transformations.
 
 
 **1.6.0** (2018-08-29)
 
- - Add support for customized infinity representation in `to_string` and `from_string` ([#3](https://github.com/AlexandreDecan/python-intervals/issues/3)).
+ - Added: support for customized infinity representation in `to_string` and `from_string` ([#3](https://github.com/AlexandreDecan/python-intervals/issues/3)).
 
 
 **1.5.4** (2018-07-29)
 
- - Fix `.overlaps` ([#2](https://github.com/AlexandreDecan/python-intervals/issues/2)).
+ - Fixed: `.overlaps` ([#2](https://github.com/AlexandreDecan/python-intervals/issues/2)).
 
 
 **1.5.3** (2018-06-21)
 
- - Fix invalid `repr` for atomic singleton intervals.
+ - Fixed: invalid `repr` for atomic singleton intervals.
 
 
 **1.5.2** (2018-06-15)
 
- - Fix invalid comparisons when both `Interval` and `AtomicInterval` are compared.
+ - Fixed: invalid comparisons when both `Interval` and `AtomicInterval` are compared.
 
 
 **1.5.1** (2018-04-25)
 
- - Fix [#1](https://github.com/AlexandreDecan/python-intervals/issues/1) by making empty intervals always resolving to `(I.inf, -I.inf)`.
+ - Fixed: [#1](https://github.com/AlexandreDecan/python-intervals/issues/1) by making empty intervals always resolving to `(I.inf, -I.inf)`.
 
 
 **1.5.0** (2018-04-17)
 
- - `Interval.__init__` accepts `Interval` instances in addition to `AtomicInterval` ones.
+ - Added: `Interval.__init__` accepts `Interval` instances in addition to `AtomicInterval` ones.
 
 
 **1.4.0** (2018-04-17)
 
- - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
- - Function `I.from_string` to create an interval from a string, with many options to customize the parsing.
+ - Added: function `I.to_string` to export an interval to a string, with many options to customize the representation.
+ - Added: unction `I.from_string` to create an interval from a string, with many options to customize the parsing.
 
 
 **1.3.2** (2018-04-13)
 
- - Support for Python 2.7.
+ - Added: support for Python 2.7.
 
 
 **1.3.1** (2018-04-12)
 
- - Define `__slots__` to lower memory usage, and to speed up attribute access.
- - Define `Interval.__rand__` (and other magic methods) to support `Interval` from `AtomicInterval` instead of
+ - Added: more tests to cover all comparisons.
+ - Changed: define `__slots__` to lower memory usage, and to speed up attribute access.
+ - Changed: define `Interval.__rand__` (and other magic methods) to support `Interval` from `AtomicInterval` instead of
  having a dedicated piece of code in `AtomicInterval`.
- - Fix `__all__`.
- - More tests to cover all comparisons.
+ - Fixed: `__all__`.
 
 
 **1.3.0** (2018-04-04)
 
- - Meaningful `<=` and `>=` comparisons for intervals.
+ - Added: meaningful `<=` and `>=` comparisons for intervals.
 
 
 **1.2.0** (2018-04-04)
 
- - `Interval` supports indexing to retrieve the underlying `AtomicInterval` objects.
+ - Added: `Interval` supports indexing to retrieve the underlying `AtomicInterval` objects.
 
 
 **1.1.0** (2018-04-04)
 
- - Both `AtomicInterval` and `Interval` are fully comparable.
- - Add `singleton(x)` to create a singleton interval [x].
- - Add `empty()` to create an empty interval.
- - Add `Interval.enclosure()` that returns the smallest interval that includes the current one.
- - Interval simplification is in O(n) instead of O(n*m).
- - `AtomicInterval` objects in an `Interval` are sorted by lower and upper bounds.
+ - Added: both `AtomicInterval` and `Interval` are fully comparable.
+ - Added: `singleton(x)` to create a singleton interval [x].
+ - Added: `empty()` to create an empty interval.
+ - Added: `Interval.enclosure()` that returns the smallest interval that includes the current one.
+ - Changed: interval simplification is in O(n) instead of O(n*m).
+ - Changed: `AtomicInterval` objects in an `Interval` are sorted by lower and upper bounds.
 
 
 **1.0.4** (2018-04-03)
 
- - All operations of `AtomicInterval` (except overlaps) accept `Interval`.
- - Raise `TypeError` instead of `ValueError` if type is not supported (coherent with `NotImplemented`).
+ - Changed: all operations of `AtomicInterval` (except overlaps) accept `Interval`.
+ - Fixed: raise `TypeError` instead of `ValueError` if type is not supported (coherent with `NotImplemented`).
 
 
 **1.0.3** (2018-04-03)
 
- - Initial working release on PyPi.
+ - Initial release on PyPI.
 
 
 **1.0.0** (2018-04-03)
