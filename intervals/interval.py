@@ -376,19 +376,17 @@ class Interval:
     This class represents an interval.
 
     An interval is an (automatically simplified) union of atomic intervals.
-    It can be created either by passing (atomic) intervals, or by using one of the helpers
-    provided in this module (open(..), closed(..), etc).
-
-    Unless explicitly specified, all operations on an Interval instance return Interval instances.
+    It can be created with Interval.from_atomic(), or by passing intervals to __init__, or by using
+    one of the helpers provided in this module (open, closed, openclosed, etc.)
     """
 
     __slots__ = ('_intervals',)
 
     def __init__(self, *intervals):
         """
-        Create an interval from a list of (atomic or not) intervals.
+        Create an interval from a list of intervals.
 
-        :param intervals: a list of (atomic or not) intervals.
+        :param intervals: a list of intervals.
         """
         self._intervals = list()
 
@@ -462,7 +460,7 @@ class Interval:
     def atomic(self):
         """
         True if this interval is atomic, False otherwise.
-        An interval is atomic if it is composed of a single atomic interval.
+        An interval is atomic if it is composed of a single (possibly empty) atomic interval.
         """
         return len(self._intervals) == 1
 
@@ -481,7 +479,8 @@ class Interval:
     def as_atomic(self):
         """
         Convert this interval to an AtomicInterval instance.
-        Raise a ValueError if the interval is not atomic.
+        Raise ValueError if the interval is not atomic.
+        Using i.enclosure.as_atomic() ensures a resulting AtomicInterval.
 
         This method is **NOT** part of the public API.
 
@@ -560,11 +559,14 @@ class Interval:
 
     def apply(self, func):
         """
-        Apply given function on each of the underlying AtomicInterval instances and return a new
-        Interval instance. The function is expected to return an AtomicInterval, an Interval
-        or a 4-uple (left, lower, upper, right).
+        Apply a function on each of the underlying atomic intervals and return theeir union
+        as a new interval instance
 
-        :param func: function to apply on each of the underlying AtomicInterval instances.
+        Given function is expected to return an interval (possibly empty or not atomic) or
+        a 4-uple (left, lower, upper, right) whose values correspond to the parameters of
+        Interval.from_atomic(left, lower, upper, right).
+
+        :param func: function to apply on each underlying atomic interval.
         :return: an Interval instance.
         """
         intervals = []
@@ -587,7 +589,7 @@ class Interval:
 
         An interval is adjacent if there is no intersection, and their union is an atomic interval.
 
-        :param other: an interval or atomic interval.
+        :param other: an interval.
         :return: True if intervals are adjacent, False otherwise.
         """
         return (self & other).empty and (self | other).atomic
@@ -600,7 +602,7 @@ class Interval:
         intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
         This is useful to see whether two intervals can be merged or not.
 
-        :param other: an interval or atomic interval.
+        :param other: an interval.
         :param adjacent: set to True to accept adjacent intervals as well.
         :return: True if intervals overlap, False otherwise.
         """
@@ -621,7 +623,7 @@ class Interval:
         """
         Return the intersection of two intervals.
 
-        :param other: an interval or atomic interval.
+        :param other: an interval.
         :return: the intersection of the intervals.
         """
         return self & other
@@ -630,7 +632,7 @@ class Interval:
         """
         Return the union of two intervals.
 
-        :param other: an interval or atomic interval.
+        :param other: an interval.
         :return: the union of the intervals.
         """
         return self | other
@@ -638,9 +640,9 @@ class Interval:
     def contains(self, item):
         """
         Test if given item is contained in this interval.
-        This method accepts atomic intervals, intervals and arbitrary values.
+        This method accepts intervals and arbitrary comparable values.
 
-        :param item: an atomic interval, an interval or any arbitrary value.
+        :param item: an interval or any arbitrary comparable value.
         :return: True if given item is contained, False otherwise.
         """
         return item in self
@@ -657,7 +659,7 @@ class Interval:
         """
         Return the difference of two intervals.
 
-        :param other: an interval or an atomic interval.
+        :param other: an interval.
         :return: the difference of the intervals.
         """
         return self - other

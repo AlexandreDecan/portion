@@ -193,8 +193,8 @@ An `Interval` defines the following properties:
 
  - `i.enclosure` refers to the smallest atomic interval that includes the current one.
    ```python
-   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure
-   [0,3]
+   >>> (I.closed(0, 1) | I.open(2, 3)).enclosure
+   [0,3)
 
    ```
 
@@ -511,7 +511,7 @@ intervals, starting from each lower bound and ending on each upper one:
 
 ```
 
-By default, the iteration always starts on the lower bound of each atomic interval.
+By default, the iteration always starts on the lower bound of each underlying atomic interval.
 The `base` parameter can be used to change this behaviour, by specifying how the initial value to start
 the iteration from must be computed. This parameter accepts a callable that is called with the lower
 bound of each underlying atomic interval, and that returns the initial value to start the iteration from.
