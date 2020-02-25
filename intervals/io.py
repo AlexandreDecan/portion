@@ -66,9 +66,9 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
 def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
               left_closed='[', right_open=')', right_closed=']', pinf='+inf', ninf='-inf'):
     """
-    Export given interval (or atomic interval) to string.
+    Export given interval to string.
 
-    :param interval: an Interval or AtomicInterval instance.
+    :param interval: an interval.
     :param conv: function that is used to represent a bound (default is `repr`).
     :param disj: string representing disjunctive operator (default is ' | ').
     :param sep: string representing bound separator (default is ',').
@@ -80,8 +80,6 @@ def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
     :param ninf: string representing a negative infinity (default is '-inf').
     :return: a string representation for given interval.
     """
-    interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
-
     if interval.empty:
         return '{}{}'.format(left_open, right_open)
 
@@ -143,16 +141,15 @@ def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
 
 def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
     """
-    Export given interval (or atomic interval) to a list of 4-uples (left, lower,
+    Export given interval to a list of 4-uples (left, lower,
     upper, right).
 
-    :param interval: an Interval or AtomicInterval instance.
+    :param interval: an interval.
     :param conv: function that convert bounds to "lower" and "upper", default to identity.
     :param pinf: value used to encode positive infinity.
     :param ninf: value used to encode negative infinity.
     :return: a list of 4-uples (left, lower, upper, right)
     """
-    interval = Interval(interval) if isinstance(interval, AtomicInterval) else interval
     conv = (lambda v: v) if conv is None else conv
 
     data = []

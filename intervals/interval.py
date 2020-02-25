@@ -5,35 +5,35 @@ def open(lower, upper):
     """
     Create an open interval with given bounds.
     """
-    return Interval(AtomicInterval(Bound.OPEN, lower, upper, Bound.OPEN))
+    return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.OPEN)
 
 
 def closed(lower, upper):
     """
     Create a closed interval with given bounds.
     """
-    return Interval(AtomicInterval(Bound.CLOSED, lower, upper, Bound.CLOSED))
+    return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.CLOSED)
 
 
 def openclosed(lower, upper):
     """
     Create an left-open interval with given bounds.
     """
-    return Interval(AtomicInterval(Bound.OPEN, lower, upper, Bound.CLOSED))
+    return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.CLOSED)
 
 
 def closedopen(lower, upper):
     """
     Create an right-open interval with given bounds.
     """
-    return Interval(AtomicInterval(Bound.CLOSED, lower, upper, Bound.OPEN))
+    return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.OPEN)
 
 
 def singleton(value):
     """
     Create a singleton.
     """
-    return Interval(AtomicInterval(Bound.CLOSED, value, value, Bound.CLOSED))
+    return Interval.from_atomic(Bound.CLOSED, value, value, Bound.CLOSED)
 
 
 def empty():
@@ -41,7 +41,7 @@ def empty():
     Create an empty set.
     """
     if not hasattr(empty, '_instance'):
-        empty._instance = Interval(AtomicInterval(Bound.OPEN, inf, -inf, Bound.OPEN))
+        empty._instance = Interval.from_atomic(Bound.OPEN, inf, -inf, Bound.OPEN)
     return empty._instance
 
 
@@ -286,11 +286,6 @@ class AtomicInterval:
                 item._upper == self._upper and (item._right == self._right or self._right == Bound.CLOSED)
             )
             return left and right
-        elif isinstance(item, Interval):
-            for interval in item:
-                if interval.to_atomic() not in self:
-                    return False
-            return True
         else:
             left = (item >= self._lower) if self._left == Bound.CLOSED else (item > self._lower)
             right = (item <= self._upper) if self._right == Bound.CLOSED else (item < self._upper)
@@ -326,8 +321,6 @@ class AtomicInterval:
             else:
                 return self._upper < other._lower or \
                     (self._upper == other._lower and other._left == Bound.OPEN)
-        elif isinstance(other, Interval):
-            return self < other.to_atomic()
         else:
             return self._upper < other or (self._right == Bound.OPEN and self._upper == other)
 
@@ -338,8 +331,6 @@ class AtomicInterval:
             else:
                 return self._lower > other._upper or \
                     (self._lower == other._upper and other._right == Bound.OPEN)
-        elif isinstance(other, Interval):
-            return self > other.to_atomic()
         else:
             return self._lower > other or (self._left == Bound.OPEN and self._lower == other)
 
@@ -350,8 +341,6 @@ class AtomicInterval:
             else:
                 return self._upper < other._upper or \
                     (self._upper == other._upper and other._right == Bound.CLOSED)
-        elif isinstance(other, Interval):
-            return self <= other.to_atomic()
         else:
             return self._lower < other or (self._left == Bound.CLOSED and self._lower == other)
 
@@ -362,8 +351,6 @@ class AtomicInterval:
             else:
                 return self._lower > other._lower or \
                     (self._lower == other._lower and other._left == Bound.CLOSED)
-        elif isinstance(other, Interval):
-            return self >= other.to_atomic()
         else:
             return self._upper > other or (self._right == Bound.CLOSED and self._upper == other)
 
@@ -479,6 +466,18 @@ class Interval:
         """
         return len(self._intervals) == 1
 
+    @staticmethod
+    def from_atomic(left, lower, upper, right):
+        """
+        Create an Interval instance containing a single atomic interval.
+
+        :param left: either CLOSED or OPEN.
+        :param lower: value of the lower bound.
+        :param upper: value of the upper bound.
+        :param right: either CLOSED or OPEN.
+        """
+        return Interval(AtomicInterval(left, lower, upper, right))
+
     def to_atomic(self):
         """
         Return the smallest atomic interval containing this interval.
@@ -496,7 +495,7 @@ class Interval:
 
         :return: an Interval instance.
         """
-        return Interval(self.to_atomic())
+        return Interval.from_atomic(self.left, self.lower, self.upper, self.right)
 
     def replace(self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True):
         """
@@ -673,6 +672,7 @@ class Interval:
                 intervals = [other]
             else:
                 intervals = other._intervals
+
             new_intervals = []
             for interval in self._intervals:
                 for o_interval in intervals:
@@ -729,23 +729,25 @@ class Interval:
         return other & ~self
 
     def __eq__(self, other):
-        if isinstance(other, AtomicInterval):
-            return Interval(other) == self
-        elif isinstance(other, Interval):
+        if isinstance(other, Interval):
             return self._intervals == other._intervals
         else:
             return NotImplemented
 
     def __lt__(self, other):
+        other = other.to_atomic() if isinstance(other, Interval) else other
         return self.to_atomic() < other
 
     def __gt__(self, other):
+        other = other.to_atomic() if isinstance(other, Interval) else other
         return self.to_atomic() > other
 
     def __le__(self, other):
+        other = other.to_atomic() if isinstance(other, Interval) else other
         return self.to_atomic() <= other
 
     def __ge__(self, other):
+        other = other.to_atomic() if isinstance(other, Interval) else other
         return self.to_atomic() >= other
 
     def __hash__(self):

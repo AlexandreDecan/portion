@@ -1,14 +1,13 @@
 import operator
 
 from .const import inf
-from .interval import AtomicInterval
 
 
 def iterate(interval, incr, *, base=None, reverse=False):
     """
     Iterate on the (discrete) values of given interval.
 
-    This function returns a (lazy) iterator over the values of given (atomic or not) interval,
+    This function returns a (lazy) iterator over the values of given interval,
     starting from its lower bound and ending on its upper bound (if interval is not open).
     Each returned value merely corresponds to lower + i * incr, where "incr" defines
     the step between consecutive values. This parameter must be a (positive) value, even if
@@ -24,14 +23,12 @@ def iterate(interval, incr, *, base=None, reverse=False):
     By default, the identity function is used. If reverse=True, then the upper bound will be
     passed instead of the lower one.
 
-    :param interval: Interval or atomic interval.
+    :param interval: an interval.
     :param incr: (positive) step between values, or a callable that returns the next value.
     :param base: a callable that accepts a bound and returns an initial value to consider.
-    :param reverse: Set to True for descending order.
-    :return: A lazy iterator.
+    :param reverse: set to True for descending order.
+    :return: a lazy iterator.
     """
-    intervals = [interval] if isinstance(interval, AtomicInterval) else interval._intervals
-
     if base is None:
         base = (lambda x: x)
 
@@ -43,7 +40,7 @@ def iterate(interval, incr, *, base=None, reverse=False):
     if (value == -inf and not reverse) or (value == inf and reverse):
         raise ValueError('Cannot start iteration with infinity.')
 
-    for i in intervals if not reverse else reversed(intervals):
+    for i in interval if not reverse else reversed(interval):
         value = base(i.lower if not reverse else i.upper)
 
         while exclude(value, i):

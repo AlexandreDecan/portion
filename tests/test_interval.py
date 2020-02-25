@@ -6,10 +6,10 @@ from intervals.interval import AtomicInterval, Interval
 
 class TestHelpers:
     def test_bounds(self):
-        assert I.closed(0, 1) == AtomicInterval(I.CLOSED, 0, 1, I.CLOSED)
-        assert I.open(0, 1) == AtomicInterval(I.OPEN, 0, 1, I.OPEN)
-        assert I.openclosed(0, 1) == AtomicInterval(I.OPEN, 0, 1, I.CLOSED)
-        assert I.closedopen(0, 1) == AtomicInterval(I.CLOSED, 0, 1, I.OPEN)
+        assert I.closed(0, 1) == Interval.from_atomic(I.CLOSED, 0, 1, I.CLOSED)
+        assert I.open(0, 1) == Interval.from_atomic(I.OPEN, 0, 1, I.OPEN)
+        assert I.openclosed(0, 1) == Interval.from_atomic(I.OPEN, 0, 1, I.CLOSED)
+        assert I.closedopen(0, 1) == Interval.from_atomic(I.CLOSED, 0, 1, I.OPEN)
         assert I.singleton(2) == I.closed(2, 2)
 
     def test_with_infinities(self):
@@ -18,7 +18,7 @@ class TestHelpers:
         assert I.closed(0, I.inf) == I.closedopen(0, I.inf)
 
     def test_empty(self):
-        assert I.empty() == AtomicInterval(I.OPEN, I.inf, -I.inf, I.open)
+        assert I.empty() == Interval.from_atomic(I.OPEN, I.inf, -I.inf, I.open)
         assert I.closed(3, -3) == I.empty()
 
         assert I.openclosed(0, 0) == I.empty()
@@ -125,13 +125,6 @@ class TestInterval:
         intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
         for interval in intervals:
             assert interval == I.Interval(interval.to_atomic())
-            assert interval == interval.to_atomic()
-
-        assert I.closed(0, 1) | I.closed(2, 3) != I.closed(0, 3)
-        assert (I.closed(0, 1) | I.closed(2, 3)).to_atomic() == I.closed(0, 3)
-
-        assert I.closed(0, 1).to_atomic() == I.closed(0, 1).enclosure
-        assert (I.closed(0, 1) | I.closed(2, 3)).enclosure == I.closed(0, 3)
 
         assert I.empty().to_atomic() == AtomicInterval(False, I.inf, -I.inf, False)
 
@@ -522,13 +515,6 @@ class TestIntervalComparison:
         assert I.empty() > I.closed(2, 3)
         assert I.empty() >= I.closed(2, 3)
 
-    def test_mixed_intervals(self):
-        # Bug introduced in 1.3.0, fixed in 1.5.2
-        assert I.closed(1, 2).to_atomic() <= I.closed(0, 3)
-        assert I.closed(1, 2) >= I.closed(0, 3).to_atomic()
-        assert I.closed(1, 2) <= I.closed(0, 3).to_atomic()
-        assert I.closed(1, 2).to_atomic() >= I.closed(0, 3)
-
 
 class TestIntervalContainment:
     def test_with_values(self):
@@ -570,18 +556,6 @@ class TestIntervalContainment:
         assert I.empty() in I.closed(0, 3)
         assert I.empty() in I.empty()
         assert I.closed(0, 0) not in I.empty()
-
-    def test_with_atomic_intervals(self):
-        # AtomicIntervals
-        assert I.closed(1, 2) in I.closed(0, 3).to_atomic()
-        assert I.closed(1, 2) in I.closed(1, 2).to_atomic()
-        assert I.open(1, 2) in I.closed(1, 2).to_atomic()
-        assert I.closed(1, 2) not in I.open(1, 2).to_atomic()
-        assert I.closed(0, 1) not in I.closed(1, 2).to_atomic()
-        assert I.closed(0, 2) not in I.closed(1, 3).to_atomic()
-        assert I.closed(-I.inf, I.inf) in I.closed(-I.inf, I.inf).to_atomic()
-        assert I.closed(0, 1) in I.closed(-I.inf, I.inf).to_atomic()
-        assert I.closed(-I.inf, I.inf) not in I.closed(0, 1).to_atomic()
 
     def test_proxy_method(self):
         i1, i2 = I.closed(0, 1), I.closed(2, 3)
@@ -813,5 +787,5 @@ class TestIntervalIteration:
 
     def test_empty(self):
         assert len(I.empty()) == 1
-        assert list(I.empty()) == [I.empty().to_atomic()]
-        assert I.empty()[0] == I.empty().to_atomic()
+        assert list(I.empty()) == [I.empty()]
+        assert I.empty()[0] == I.empty()

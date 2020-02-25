@@ -53,8 +53,8 @@ The test environment can be installed with `pip install python-intervals[test]` 
 
 ### Interval creation
 
-Assuming this library is imported using `import intervals as I`, intervals can be easily created using one of the
-following helpers:
+Assuming this library is imported using `import intervals as I`, intervals can be easily
+created using one of the following helpers:
 
 ```python
 >>> I.open(1, 2)
@@ -73,8 +73,15 @@ following helpers:
 ```
 
 Intervals created with this library are `Interval` instances.
-An `Interval` object encodes an interval set, i.e., a disjunction of atomic intervals that represent
-single intervals (e.g. `[1,2]`).
+These functions are shortcuts for the `I.Interval.from_atomic` static method:
+
+```python
+>>> I.Interval.from_atomic(I.OPEN, 1, 2, I.OPEN)
+(1,2)
+>>> I.Interval.from_atomic(I.CLOSED, 1, 2, I.CLOSED)
+[1,2]
+
+```
 
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
@@ -116,7 +123,9 @@ True
 
 ```
 
+An `Interval` instance is a disjunction of atomic intervals each representing a single interval (e.g. `[1,2]`).
 For convenience, intervals are automatically simplified:
+
 ```python
 >>> I.closed(0, 2) | I.closed(2, 4)
 [0,4]
@@ -330,8 +339,8 @@ Equality between intervals can be checked with the classical `==` operator:
 ```python
 >>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
 True
->>> I.closed(0, 2) == I.closed(0, 2).to_atomic()
-True
+>>> I.closed(0, 2) == I.open(0, 2)
+False
 
 ```
 
@@ -850,6 +859,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Infinities define a hash value.
  - `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
  - `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).
+ - Static method `Interval.from_atomic` to create an interval composed of a single atomic interval.
 
 #### Changed
  - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
@@ -861,7 +871,8 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `i.overlaps`: `adjacent`.
  - (breaking) `i.enclosure` is a property and no longer a method.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
- - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones. As a consequence, `AtomicInterval` instances are no longer exposed by this library.
+ - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
+ - (breaking) Class `AtomicInterval` is no longer part of the public API.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
