@@ -478,14 +478,19 @@ class Interval:
         """
         return Interval(AtomicInterval(left, lower, upper, right))
 
-    def to_atomic(self):
+    def as_atomic(self):
         """
-        Return the smallest atomic interval containing this interval.
-        Equivalent to .enclosure, except it returns an AtomicInterval instance.
+        Convert this interval to an AtomicInterval instance.
+        Raise a ValueError if the interval is not atomic.
+
+        This method is **NOT** part of the public API.
 
         :return: an AtomicInterval instance.
         """
-        return AtomicInterval(self.left, self.lower, self.upper, self.right)
+        if self.atomic:
+            return AtomicInterval(self.left, self.lower, self.upper, self.right)
+        else:
+            raise ValueError('{} is not atomic.'.format(self))
 
     @property
     def enclosure(self):
@@ -503,7 +508,7 @@ class Interval:
 
         If current interval is not atomic, it is extended or restricted such that
         its enclosure satisfies the new bounds. In other words, its new enclosure
-        will be equal to self.to_atomic().replace(left, lower, upper, right).
+        will be equal to self.enclosure.replace(left, lower, upper, right).
 
         Callable can be passed instead of values. In that case, it is called with the current
         corresponding value except if ignore_inf if set (default) and the corresponding
@@ -735,20 +740,20 @@ class Interval:
             return NotImplemented
 
     def __lt__(self, other):
-        other = other.to_atomic() if isinstance(other, Interval) else other
-        return self.to_atomic() < other
+        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
+        return self.enclosure.as_atomic() < other
 
     def __gt__(self, other):
-        other = other.to_atomic() if isinstance(other, Interval) else other
-        return self.to_atomic() > other
+        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
+        return self.enclosure.as_atomic() > other
 
     def __le__(self, other):
-        other = other.to_atomic() if isinstance(other, Interval) else other
-        return self.to_atomic() <= other
+        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
+        return self.enclosure.as_atomic() <= other
 
     def __ge__(self, other):
-        other = other.to_atomic() if isinstance(other, Interval) else other
-        return self.to_atomic() >= other
+        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
+        return self.enclosure.as_atomic() >= other
 
     def __hash__(self):
         return hash(tuple(self._intervals))

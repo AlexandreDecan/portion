@@ -882,6 +882,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 #### Removed
  - (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
+ - (breaking) `i.to_atomic()` is removed in favor of `i.enclosure`.
  - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
  - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.

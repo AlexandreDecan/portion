@@ -36,9 +36,9 @@ class TestHelpers:
 class TestInterval:
     def test_creation(self):
         assert I.Interval() == I.empty()
-        assert I.Interval(I.closed(0, 1).to_atomic()) == I.closed(0, 1)
+        assert I.Interval(I.closed(0, 1).as_atomic()) == I.closed(0, 1)
         assert I.Interval(I.closed(0, 1)) == I.closed(0, 1)
-        assert I.Interval(I.closed(0, 1).to_atomic(), I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
+        assert I.Interval(I.closed(0, 1).as_atomic(), I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
         assert I.Interval(I.closed(0, 1) | I.closed(2, 3)) == I.closed(0, 1) | I.closed(2, 3)
 
         with pytest.raises(TypeError):
@@ -46,7 +46,7 @@ class TestInterval:
 
     def test_creation_issue_19(self):
         # https://github.com/AlexandreDecan/python-intervals/issues/19
-        assert I.Interval(I.empty().to_atomic(), I.empty().to_atomic()) == I.empty()
+        assert I.Interval(I.empty().as_atomic(), I.empty().as_atomic()) == I.empty()
         assert I.Interval(I.empty(), I.empty()) == I.empty()
 
     def test_bounds(self):
@@ -92,7 +92,7 @@ class TestInterval:
 
     def test_hash_with_hashable(self):
         assert hash(I.closed(0, 1)) is not None
-        assert hash(I.closed(0, 1).to_atomic()) is not None
+        assert hash(I.closed(0, 1).as_atomic()) is not None
         assert hash(I.closed(0, 1)) != hash(I.closed(1, 2))
 
         assert hash(I.openclosed(-I.inf, 0)) is not None
@@ -124,16 +124,20 @@ class TestInterval:
     def test_to_atomic(self):
         intervals = [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)]
         for interval in intervals:
-            assert interval == I.Interval(interval.to_atomic())
+            assert interval == I.Interval(interval.as_atomic())
 
-        assert I.empty().to_atomic() == AtomicInterval(False, I.inf, -I.inf, False)
+        assert I.empty().as_atomic() == AtomicInterval(False, I.inf, -I.inf, False)
+
+    def test_to_atomic_on_non_atomic(self):
+        with pytest.raises(ValueError):
+            (I.closed(0, 2) | I.closed(4, 5)).as_atomic()
 
     @pytest.mark.parametrize('i', [I.closed(0, 1), I.openclosed(0, 1), I.closedopen(0, 1), I.open(0, 1), I.empty(), I.singleton(0)])
     def test_to_interval(self, i):
-        assert isinstance(i.to_atomic(), AtomicInterval)
-        assert isinstance(Interval(i.to_atomic()), Interval)
+        assert isinstance(i.as_atomic(), AtomicInterval)
+        assert isinstance(Interval(i.as_atomic()), Interval)
 
-        assert Interval(i.to_atomic()) == i
+        assert Interval(i.as_atomic()) == i
 
 
 class TestIntervalReplace:
@@ -299,7 +303,7 @@ class TestIntervalOverlaps():
 
     def test_overlaps_with_incompatible_types(self):
         with pytest.raises(TypeError):
-            I.closed(0, 1).to_atomic().overlaps(1)
+            I.closed(0, 1).as_atomic().overlaps(1)
         with pytest.raises(TypeError):
             I.closed(0, 1).overlaps(1)
 
@@ -353,14 +357,14 @@ class TestIntervalOverlaps():
 
 class TestIntervalComparison:
     @pytest.mark.parametrize('i1,i2,i3', [
-        (I.closed(0, 1).to_atomic(), I.closed(1, 2).to_atomic(), I.closed(2, 3).to_atomic()),
-        (I.open(0, 2).to_atomic(), I.open(1, 3).to_atomic(), I.open(2, 4).to_atomic()),
+        (I.closed(0, 1).as_atomic(), I.closed(1, 2).as_atomic(), I.closed(2, 3).as_atomic()),
+        (I.open(0, 2).as_atomic(), I.open(1, 3).as_atomic(), I.open(2, 4).as_atomic()),
         (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)),
         (I.open(0, 2), I.open(1, 3), I.open(2, 4)),
-        (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3).to_atomic()),
-        (I.open(0, 2), I.open(1, 3), I.open(2, 4).to_atomic()),
-        (I.closed(0, 1).to_atomic(), I.closed(1, 2), I.closed(2, 3)),
-        (I.open(0, 2).to_atomic(), I.open(1, 3), I.open(2, 4)),
+        (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3).as_atomic()),
+        (I.open(0, 2), I.open(1, 3), I.open(2, 4).as_atomic()),
+        (I.closed(0, 1).as_atomic(), I.closed(1, 2), I.closed(2, 3)),
+        (I.open(0, 2).as_atomic(), I.open(1, 3), I.open(2, 4)),
     ])
     def test_equalities(self, i1, i2, i3):
         assert i1 == i1
@@ -371,14 +375,14 @@ class TestIntervalComparison:
         assert not i1 == 1
 
     @pytest.mark.parametrize('i1,i2,i3', [
-        (I.closed(0, 1).to_atomic(), I.closed(1, 2).to_atomic(), I.closed(2, 3).to_atomic()),
-        (I.open(0, 2).to_atomic(), I.open(1, 3).to_atomic(), I.open(2, 4).to_atomic()),
+        (I.closed(0, 1).as_atomic(), I.closed(1, 2).as_atomic(), I.closed(2, 3).as_atomic()),
+        (I.open(0, 2).as_atomic(), I.open(1, 3).as_atomic(), I.open(2, 4).as_atomic()),
         (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3)),
         (I.open(0, 2), I.open(1, 3), I.open(2, 4)),
-        (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3).to_atomic()),
-        (I.open(0, 2), I.open(1, 3), I.open(2, 4).to_atomic()),
-        (I.closed(0, 1).to_atomic(), I.closed(1, 2), I.closed(2, 3)),
-        (I.open(0, 2).to_atomic(), I.open(1, 3), I.open(2, 4)),
+        (I.closed(0, 1), I.closed(1, 2), I.closed(2, 3).as_atomic()),
+        (I.open(0, 2), I.open(1, 3), I.open(2, 4).as_atomic()),
+        (I.closed(0, 1).as_atomic(), I.closed(1, 2), I.closed(2, 3)),
+        (I.open(0, 2).as_atomic(), I.open(1, 3), I.open(2, 4)),
     ])
     def test_inequalities(self, i1, i2, i3):
         assert i1 < i3 and i3 > i1
@@ -387,7 +391,7 @@ class TestIntervalComparison:
         assert not i1 < i2 and not i2 > i1
 
     def test_closed_atomic_with_values(self):
-        i = I.closed(0, 5).to_atomic()
+        i = I.closed(0, 5).as_atomic()
 
         assert -1 < i
         assert -1 <= i
@@ -405,7 +409,7 @@ class TestIntervalComparison:
         assert 0 >= i
 
     def test_open_atomic_with_values(self):
-        i = I.open(0, 5).to_atomic()
+        i = I.open(0, 5).as_atomic()
 
         assert -1 < i
         assert -1 <= i
@@ -423,7 +427,7 @@ class TestIntervalComparison:
         assert not (0 >= i)
 
     def test_atomic_with_infinities(self):
-        i = I.closed(0, 5).to_atomic()
+        i = I.closed(0, 5).as_atomic()
         assert -I.inf < i
         assert -I.inf <= i
         assert not (-I.inf > i)
@@ -434,7 +438,7 @@ class TestIntervalComparison:
         assert not (I.inf < i)
         assert not (I.inf <= i)
 
-        i = I.open(0, 5).to_atomic()
+        i = I.open(0, 5).as_atomic()
         assert -I.inf < i
         assert -I.inf <= i
         assert not (-I.inf > i)
@@ -445,7 +449,7 @@ class TestIntervalComparison:
         assert not (I.inf < i)
         assert not (I.inf <= i)
 
-    @pytest.mark.parametrize('i', [I.closedopen(0, 10).to_atomic(), I.closedopen(0, 10)])
+    @pytest.mark.parametrize('i', [I.closedopen(0, 10).as_atomic(), I.closedopen(0, 10)])
     def test_with_values(self, i):
         assert -1 < i
         assert -1 <= i
@@ -469,7 +473,7 @@ class TestIntervalComparison:
         assert not (-1 > i)
         assert not (-1 >= i)
 
-    @pytest.mark.parametrize('i', [I.closedopen(0, 10).to_atomic(), I.closedopen(0, 10)])
+    @pytest.mark.parametrize('i', [I.closedopen(0, 10).as_atomic(), I.closedopen(0, 10)])
     def test_with_infinities(self, i):
         assert -I.inf < i
         assert -I.inf <= i
@@ -563,7 +567,7 @@ class TestIntervalContainment:
         assert (i1 in i2) == i2.contains(i1)
 
     def test_atomic_proxy_method(self):
-        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        i1, i2 = I.closed(0, 1).as_atomic(), I.closed(2, 3).as_atomic()
         assert (1 in i1) == i1.contains(1)
         assert (i1 in i2) == i2.contains(i1)
 
@@ -598,7 +602,7 @@ class TestIntervalIntersection:
         assert i1 & i2 == i1.intersection(i2)
 
     def test_atomic_proxy_method(self):
-        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        i1, i2 = I.closed(0, 1).as_atomic(), I.closed(2, 3).as_atomic()
         assert i1 & i2 == i1.intersection(i2)
 
     def test_with_invalid_type(self):
@@ -608,10 +612,10 @@ class TestIntervalIntersection:
 
 class TestIntervalUnion:
     def test_atomic(self):
-        assert I.closed(1, 2).to_atomic() | I.closed(1, 2).to_atomic() == I.closed(1, 2).to_atomic()
-        assert I.closed(1, 4).to_atomic() | I.closed(2, 3).to_atomic() == I.closed(1, 4).to_atomic()
-        assert I.closed(1, 2).to_atomic() | I.closed(2, 3).to_atomic() == I.closed(2, 3).to_atomic() | I.closed(1, 2).to_atomic()
-        assert I.closed(1, 2).to_atomic() | I.closed(3, 4).to_atomic() == I.closed(1, 2) | I.closed(3, 4)
+        assert I.closed(1, 2).as_atomic() | I.closed(1, 2).as_atomic() == I.closed(1, 2).as_atomic()
+        assert I.closed(1, 4).as_atomic() | I.closed(2, 3).as_atomic() == I.closed(1, 4).as_atomic()
+        assert I.closed(1, 2).as_atomic() | I.closed(2, 3).as_atomic() == I.closed(2, 3).as_atomic() | I.closed(1, 2).as_atomic()
+        assert I.closed(1, 2).as_atomic() | I.closed(3, 4).as_atomic() == I.closed(1, 2) | I.closed(3, 4)
 
     def test_with_itself(self):
         assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
@@ -682,7 +686,7 @@ class TestIntervalUnion:
         assert i1 | i2 == i1.union(i2)
 
     def test_atomic_proxy_method(self):
-        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        i1, i2 = I.closed(0, 1).as_atomic(), I.closed(2, 3).as_atomic()
         assert i1 | i2 == i1.union(i2)
 
     def test_with_invalid_type(self):
@@ -715,7 +719,7 @@ class TestIntervalComplement:
         assert ~i2 == i2.complement()
 
     def test_atomic_proxy_method(self):
-        i1, i2 = I.closed(0, 1).to_atomic(), I.closed(2, 3).to_atomic()
+        i1, i2 = I.closed(0, 1).as_atomic(), I.closed(2, 3).as_atomic()
         assert ~i1 == i1.complement()
         assert ~i2 == i2.complement()
 
