@@ -1,17 +1,18 @@
 import operator
+from functools import partial
 
 from .const import inf
 
 
-def iterate(interval, incr, *, base=None, reverse=False):
+def iterate(interval, step, *, base=None, reverse=False):
     """
     Iterate on the (discrete) values of given interval.
 
     This function returns a (lazy) iterator over the values of given interval,
     starting from its lower bound and ending on its upper bound (if interval is not open).
-    Each returned value merely corresponds to lower + i * incr, where "incr" defines
-    the step between consecutive values. This parameter must be a (positive) value, even if
-    "reverse" is set to True. It also accepts a callable that is used to compute the next possible
+    Each returned value merely corresponds to lower + i * step, where "step" defines
+    the step between consecutive values.
+    It also accepts a callable that is used to compute the next possible
     value based on the current one.
 
     When a non-atomic interval is provided, this function chains the iterators obtained
@@ -24,7 +25,7 @@ def iterate(interval, incr, *, base=None, reverse=False):
     passed instead of the lower one.
 
     :param interval: an interval.
-    :param incr: (positive) step between values, or a callable that returns the next value.
+    :param step: step between values, or a callable that returns the next value.
     :param base: a callable that accepts a bound and returns an initial value to consider.
     :param reverse: set to True for descending order.
     :return: a lazy iterator.
@@ -34,7 +35,7 @@ def iterate(interval, incr, *, base=None, reverse=False):
 
     exclude = operator.lt if not reverse else operator.gt
     include = operator.le if not reverse else operator.ge
-    increment = incr if callable(incr) else (lambda x: x + incr if not reverse else x - incr)
+    step = step if callable(step) else partial(operator.add, step)
 
     value = base(interval.lower if not reverse else interval.upper)
     if (value == -inf and not reverse) or (value == inf and reverse):
@@ -44,8 +45,8 @@ def iterate(interval, incr, *, base=None, reverse=False):
         value = base(i.lower if not reverse else i.upper)
 
         while exclude(value, i):
-            value = increment(value)
+            value = step(value)
 
         while include(value, i):
             yield value
-            value = increment(value)
+            value = step(value)

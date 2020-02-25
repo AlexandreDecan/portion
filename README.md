@@ -11,8 +11,8 @@ This library provides data structure and operations for intervals in Python 3.5+
   * [Installation](#installation)
   * [Documentation & usage](#documentation--usage)
       * [Interval creation](#interval-creation)
+      * [Interval bounds & attributes](#interval-bounds--attributes)
       * [Interval operations](#interval-operations)
-      * [Interval properties & attributes](#interval-properties--attributes)
       * [Comparison operators](#comparison-operators)
       * [Interval transformation](#interval-transformation)
       * [Discrete iteration](#discrete-iteration)
@@ -124,6 +124,24 @@ True
 ```
 
 An `Interval` instance is a disjunction of atomic intervals each representing a single interval (e.g. `[1,2]`).
+Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
+
+```python
+>>> list(I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))
+[[0,1], (10,11), [20,21]]
+
+```
+
+Atomic intervals can also be retrieved by position:
+
+```python
+>>> (I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))[0]
+[0,1]
+>>> (I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))[-2]
+(10,11)
+
+```
+
 For convenience, intervals are automatically simplified:
 
 ```python
@@ -140,6 +158,86 @@ For convenience, intervals are automatically simplified:
 
 Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with `[2,3]` will **not** result
 in `[0,3]` even if there is no integer between `1` and `2`.
+
+
+
+[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
+### Interval bounds & attributes
+
+
+An `Interval` defines the following properties:
+
+ - `i.empty` is `True` if and only if the interval is empty.
+   ```python
+   >>> I.closed(0, 1).empty
+   False
+   >>> I.closed(0, 0).empty
+   False
+   >>> I.openclosed(0, 0).empty
+   True
+   >>> I.empty().empty
+   True
+
+   ```
+
+ - `i.atomic` is `True` if and only if the interval is a disjunction of a single (possibly empty) interval.
+   ```python
+   >>> I.closed(0, 2).atomic
+   True
+   >>> (I.closed(0, 1) | I.closed(1, 2)).atomic
+   True
+   >>> (I.closed(0, 1) | I.closed(2, 3)).atomic
+   False
+
+   ```
+
+ - `i.enclosure` refers to the smallest atomic interval that includes the current one.
+   ```python
+   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure
+   [0,3]
+
+   ```
+
+The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
+with its `left`, `right`, `lower` and `upper` attributes.
+The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
+By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
+
+```python
+>> I.CLOSED, I.OPEN
+CLOSED, OPEN
+>>> x = I.closedopen(0, 1)
+>>> x.left, x.lower, x.upper, x.right
+(CLOSED, 0, 1, OPEN)
+
+```
+
+If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
+while `right` and `upper` refer to the upper bound of its enclosure:
+
+```python
+>>> x = I.open(0, 1) | I.closed(3, 4)
+>>> x.left, x.lower, x.upper, x.right
+(OPEN, 0, 4, CLOSED)
+
+```
+
+One can easily check for some interval properties based on the bounds of an interval:
+
+```python
+>>> x = I.openclosed(-I.inf, 0)
+>>> # Check that interval is left/right closed
+>>> x.left == I.CLOSED, x.right == I.CLOSED
+(False, True)
+>>> # Check that interval is left/right bounded
+>>> x.lower == -I.inf, x.upper == I.inf
+(True, False)
+>>> # Check for singleton
+>>> x.lower == x.upper
+False
+
+```
+
 
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
@@ -230,104 +328,6 @@ in `[0,3]` even if there is no integer between `1` and `2`.
    False
 
    ```
-
-`Interval` instances are disjunction of atomic intervals.
-Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
-
-```python
->>> list(I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))
-[[0,1], (2,3), [21,24]]
-
-```
-
-Atomic intervals can also be retrieved by position:
-
-```python
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[0]
-[0,1]
->>> (I.open(2, 3) | I.closed(0, 1) | I.closed(21, 24))[-2]
-(2,3)
-
-```
-
-
-[&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
-### Interval properties & attributes
-
-
-An `Interval` defines the following properties:
-
- - `i.empty` is `True` if and only if the interval is empty.
-   ```python
-   >>> I.closed(0, 1).empty
-   False
-   >>> I.closed(0, 0).empty
-   False
-   >>> I.openclosed(0, 0).empty
-   True
-   >>> I.empty().empty
-   True
-
-   ```
-
- - `i.atomic` is `True` if and only if the interval is a disjunction of a single (possibly empty) interval.
-   ```python
-   >>> I.closed(0, 2).atomic
-   True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).atomic
-   True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).atomic
-   False
-
-   ```
-
- - `i.enclosure` refers to the smallest atomic interval that includes the current one.
-   ```python
-   >>> (I.closed(0, 1) | I.closed(2, 3)).enclosure
-   [0,3]
-
-   ```
-
-The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
-with its `left`, `right`, `lower` and `upper` attributes.
-The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
-By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
-
-```python
->> I.CLOSED, I.OPEN
-CLOSED, OPEN
->>> x = I.closedopen(0, 1)
->>> x.left, x.lower, x.upper, x.right
-(CLOSED, 0, 1, OPEN)
-
-```
-
-If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
-while `right` and `upper` refer to the upper bound of its enclosure:
-
-```python
->>> x = I.open(0, 1) | I.closed(3, 4)
->>> x.left, x.lower, x.upper, x.right
-(OPEN, 0, 4, CLOSED)
-
-```
-
-One can easily check for some interval properties based on the bounds of an interval:
-
-```python
->>> x = I.openclosed(-I.inf, 0)
->>> # Check that interval is left/right closed
->>> x.left == I.CLOSED, x.right == I.CLOSED
-(False, True)
->>> # Check that interval is left/right bounded
->>> x.lower == -I.inf, x.upper == I.inf
-(True, False)
->>> # Check for singleton
->>> x.lower == x.upper
-False
-
-```
-
 
 
 
@@ -486,16 +486,16 @@ conveniently used to transform intervals in presence of infinities.
 ### Discrete iteration
 
 The `iterate` function takes an interval, and returns a generator to iterate over
-the values of an interval. Obviously, as intervals are continuous, it is required to specify the increment
- `incr` between consecutive values. The iteration then starts from the lower bound and ends on the upper one,
+the values of an interval. Obviously, as intervals are continuous, it is required to specify the
+ `step` between consecutive values. The iteration then starts from the lower bound and ends on the upper one,
 given they are not excluded by the interval:
 
 ```python
->>> list(I.iterate(I.closed(0, 3), incr=1))
+>>> list(I.iterate(I.closed(0, 3), step=1))
 [0, 1, 2, 3]
->>> list(I.iterate(I.closed(0, 3), incr=2))
+>>> list(I.iterate(I.closed(0, 3), step=2))
 [0, 2]
->>> list(I.iterate(I.open(0, 3), incr=2))
+>>> list(I.iterate(I.open(0, 3), step=2))
 [2]
 
 ```
@@ -504,71 +504,71 @@ When an interval is not atomic, `iterate` consecutively iterates on all underlyi
 intervals, starting from each lower bound and ending on each upper one:
 
 ```python
->>> list(I.iterate(I.singleton(0) | I.singleton(1) | I.singleton(5), incr=2))  # Won't be [0]
-[0, 1, 5]
->>> list(I.iterate(I.closed(0, 2) | I.closed(5, 6), incr=3))  # Won't be [0, 6]
-[0, 5]
+>>> list(I.iterate(I.singleton(0) | I.singleton(3) | I.singleton(5), step=2))  # Won't be [0]
+[0, 3, 5]
+>>> list(I.iterate(I.closed(0, 2) | I.closed(4, 6), step=3))  # Won't be [0, 6]
+[0, 4]
 
 ```
 
-Iteration can be performed in reverse order by specifying `reverse=True`. In that case, `incr` will be
-subtracted instead of being added, implying that `incr` must always be a "positive" value:
-
-```python
->>> list(I.iterate(I.closed(0, 3), incr=1, reverse=True))  # Not incr=-1
-[3, 2, 1, 0]
->>> list(I.iterate(I.closed(0, 3), incr=2, reverse=True))  # Not incr=-2
-[3, 1]
-
-```
-
-Again, this library does not make any assumption about the objects being used in an interval, as long as they
-are comparable. However, it is not always possible to provide a meaningful value for `incr` (e.g., what would
-be the step between two consecutive characters?). In these cases, a callable can be passed instead of a value.
-This callable will be called with the current value, and is expected to return the next possible value.
-
-```python
->>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) + 1)))
-['a', 'b', 'c', 'd']
->>> # Notice the reversed order, mind the "- 1"
->>> list(I.iterate(I.closed('a', 'd'), incr=lambda d: chr(ord(d) - 1), reverse=True))
-['d', 'c', 'b', 'a']
-
-```
-
-By default, the iteration always starts on the lower bound (unless `reverse=True`) of each atomic interval.
+By default, the iteration always starts on the lower bound of each atomic interval.
 The `base` parameter can be used to change this behaviour, by specifying how the initial value to start
-the iteration on must be computed. This parameter accepts a callable that will be called with the lower
-bound (unless `reverse=True`) for each underlying atomic interval, and that must return the first value to
-consider instead of the lower bound.
-
-This can be helpful to deal with (semi-)infinite intervals, or to *align* the generated values of
-the iterator:
-
-```python
->>> # Restrict values of a (semi-)infinite interval
->>> list(I.iterate(I.openclosed(-I.inf, 2), incr=1, base=lambda x: max(0, x)))
-[0, 1, 2]
->>> # Align on integers
->>> list(I.iterate(I.closed(0.3, 4.9), incr=1, base=int))
-[1, 2, 3, 4]
-
-```
+the iteration from must be computed. This parameter accepts a callable that is called with the lower
+bound of each underlying atomic interval, and that returns the initial value to start the iteration from.
 
 The `base` parameter can be used to change how `iterate` applies on unions of atomic interval, by
 specifying a function that returns a single value, as illustrated next:
 
 ```python
->>> interval = I.closed(0, 1) | I.closed(2, 4) | I.closed(5, 6)
->>> list(I.iterate(interval, incr=3))  # Won't be [0, 3, 6]
-[0, 2, 5]
->>> list(I.iterate(interval, incr=3, base=lambda x: 0))
-[0, 3, 6]
+>>> base = lambda x: 0
+>>> list(I.iterate(I.singleton(0) | I.singleton(3) | I.singleton(5), step=2, base=base))
+[0]
+>>> list(I.iterate(I.closed(0, 2) | I.closed(4, 6), step=3, base=base))
+[0, 6]
 
 ```
 
-Notice that this approach can be extremely inefficient in terms of performance when the intervals
-are "far apart" each other.
+Notice that defining `base` such that it returns a single value can be extremely inefficient in
+terms of performance when the intervals are "far apart" each other (i.e., when the *gaps* between
+atomic intervals are large).
+
+The `base` parameter can also be helpful to deal with (semi-)infinite intervals, or to *align*
+the generated values of the iterator:
+
+```python
+>>> # Restrict values of a (semi-)infinite interval
+>>> list(I.iterate(I.openclosed(-I.inf, 2), step=1, base=lambda x: max(0, x)))
+[0, 1, 2]
+>>> # Align on integers
+>>> list(I.iterate(I.closed(0.3, 4.9), step=1, base=int))
+[1, 2, 3, 4]
+
+```
+
+Iteration can be performed in reverse order by specifying `reverse=True`.
+
+```python
+>>> list(I.iterate(I.closed(0, 3), step=-1, reverse=True))  # Mind step=-1
+[3, 2, 1, 0]
+>>> list(I.iterate(I.closed(0, 3), step=-2, reverse=True))  # Mind step=-2
+[3, 1]
+
+```
+
+Again, this library does not make any assumption about the objects being used in an interval, as long as they
+are comparable. However, it is not always possible to provide a meaningful value for `step` (e.g., what would
+be the step between two consecutive characters?). In these cases, a callable can be passed instead of a value.
+This callable will be called with the current value, and is expected to return the next possible value.
+
+```python
+>>> list(I.iterate(I.closed('a', 'd'), step=lambda d: chr(ord(d) + 1)))
+['a', 'b', 'c', 'd']
+>>> # Since we reversed the order, we changed plus to minus in step.
+>>> list(I.iterate(I.closed('a', 'd'), step=lambda d: chr(ord(d) - 1), reverse=True))
+['d', 'c', 'b', 'a']
+
+```
+
 
 
 [&uparrow; back to top](#python-data-structure-and-operations-for-intervals)
@@ -869,18 +869,20 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `iterate`: `base` and `reverse`;
    * for `i.replace`: `ignore_inf`;
    * for `i.overlaps`: `adjacent`.
+ - (breaking) `incr` is replaced by `step` in `iterate`.
+ - (breaking) For consistency with `range`, the `step` parameter in `iterate` is always added even if `reverse=True`.
  - (breaking) `i.enclosure` is a property and no longer a method.
- - (breaking) An interval is hashable if and only if its bounds are hashable.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
  - (breaking) Class `AtomicInterval` is no longer part of the public API.
+ - (breaking) An interval is hashable if and only if its bounds are hashable.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
  - Reorganise changelog with explicit categories.
 
 #### Removed
- - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
+ - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
  - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
