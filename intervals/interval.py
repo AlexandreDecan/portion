@@ -4,6 +4,10 @@ from .const import Bound, inf
 def open(lower, upper):
     """
     Create an open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :return: an interval.
     """
     return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.OPEN)
 
@@ -11,34 +15,51 @@ def open(lower, upper):
 def closed(lower, upper):
     """
     Create a closed interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :return: an interval.
     """
     return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.CLOSED)
 
 
 def openclosed(lower, upper):
     """
-    Create an left-open interval with given bounds.
+    Create a left-open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :return: an interval.
     """
     return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.CLOSED)
 
 
 def closedopen(lower, upper):
     """
-    Create an right-open interval with given bounds.
+    Create a right-open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :return: an interval.
     """
     return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.OPEN)
 
 
 def singleton(value):
     """
-    Create a singleton.
+    Create a singleton interval.
+
+    :param value: value of the lower and upper bounds.
+    :return: an interval.
     """
     return Interval.from_atomic(Bound.CLOSED, value, value, Bound.CLOSED)
 
 
 def empty():
     """
-    Create an empty set.
+    Create an empty interval.
+
+    :return: an interval.
     """
     if not hasattr(empty, '_instance'):
         empty._instance = Interval.from_atomic(Bound.OPEN, inf, -inf, Bound.OPEN)
@@ -49,7 +70,7 @@ class AtomicInterval:
     """
     This class represents an atomic interval.
 
-    An atomic interval is a single interval, with a lower and upper bounds,
+    An atomic interval is a single interval, with a lower and an upper bound,
     and two (closed or open) boundaries.
     """
 
@@ -129,7 +150,7 @@ class AtomicInterval:
         :param upper: (a function of) value of the upper bound.
         :param right: (a function of) right boundary.
         :param ignore_inf: ignore infinities if functions are provided (default is True).
-        :return: an Interval instance
+        :return: an AtomicInterval instance
         """
         if callable(left):
             left = left(self._left)
