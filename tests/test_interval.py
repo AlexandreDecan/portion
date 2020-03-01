@@ -735,6 +735,14 @@ class TestIntervalIteration:
         assert i1[2] == I.closed(10, 10)
         assert i1[-1] == I.closed(10, 10)
 
+    def test_slices(self):
+        items = [I.closed(5, 6), I.closed(7, 9), I.singleton(10)]
+        interval = Interval(*items)
+        assert interval[:] == items
+        assert interval[:2] == items[:2]
+        assert interval[::-1] == items[::-1]
+        assert interval[::2] == items[::2]
+
     def test_missing_index(self):
         i1 = I.closed(10, 10) | I.closed(5, 6) | I.closed(7, 8) | I.closed(8, 9)
         with pytest.raises(IndexError):

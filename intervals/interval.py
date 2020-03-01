@@ -430,7 +430,7 @@ class Interval:
                 successor = self._intervals[i + 1]
 
                 if current.mergeable(successor):
-                    interval = (current | successor)[0]  # Only a single item since they overlap
+                    interval = (current | successor)[0]  # List contains a single interval
                     self._intervals.pop(i)  # pop current
                     self._intervals.pop(i)  # pop successor
                     self._intervals.insert(i, interval)
@@ -564,14 +564,18 @@ class Interval:
         else:
             right = enclosure.right if right is None else right
 
+        if self.atomic:
+            return Interval.from_atomic(left, lower, upper, right)
+
         n_interval = self & Interval.from_atomic(left, lower, upper, right)
 
-        if len(n_interval) > 1:
-            lowest = n_interval._intervals[0].replace(left=left, lower=lower)
-            highest = n_interval._intervals[-1].replace(upper=upper, right=right)
-            return Interval(*[lowest] + n_interval._intervals[1:-1] + [highest])
+        # TODO: Can we merge these two?
+        if n_interval.atomic:
+            return n_interval.replace(left, lower, upper, right)
         else:
-            return Interval(n_interval._intervals[0].replace(left, lower, upper, right))
+            lowest = n_interval[0].replace(left=left, lower=lower)
+            highest = n_interval[-1].replace(upper=upper, right=right)
+            return Interval(*[lowest] + n_interval[1:-1] + [highest])
 
     def apply(self, func):
         """
@@ -674,7 +678,10 @@ class Interval:
         return iter([Interval(i) for i in self._intervals])
 
     def __getitem__(self, item):
-        return Interval(self._intervals[item])
+        if isinstance(item, slice):
+            return [Interval(i) for i in self._intervals[item]]
+        else:
+            return Interval(self._intervals[item])
 
     def __and__(self, other):
         if isinstance(other, Interval):
