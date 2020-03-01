@@ -242,11 +242,8 @@ class Interval:
             if isinstance(interval, Interval):
                 if not interval.empty:
                     self._intervals.extend(interval._intervals)
-            elif isinstance(interval, AtomicInterval):
-                if not interval.empty:
-                    self._intervals.append(interval)
             else:
-                raise TypeError('Parameters must be Interval or AtomicInterval instances')
+                raise TypeError('Parameters must be Interval instances')
 
         if len(self._intervals) == 0:
             # So we have at least one (empty) interval
@@ -261,11 +258,11 @@ class Interval:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
 
-                if current.mergeable(successor):
-                    interval = (current | successor)[0]  # List contains a single interval
+                union = (current | successor)
+                if len(union) == 1:
                     self._intervals.pop(i)  # pop current
                     self._intervals.pop(i)  # pop successor
-                    self._intervals.insert(i, interval)
+                    self._intervals.insert(i, union[0])
                 else:
                     i = i + 1
 
@@ -322,7 +319,9 @@ class Interval:
         :param upper: value of the upper bound.
         :param right: either CLOSED or OPEN.
         """
-        return Interval(AtomicInterval(left, lower, upper, right))
+        instance = Interval()
+        instance._intervals = [AtomicInterval(left, lower, upper, right)]
+        return instance
 
     @property
     def enclosure(self):
@@ -409,8 +408,8 @@ class Interval:
         """
         intervals = []
 
-        for i in self._intervals:
-            value = func(Interval.from_atomic(i.left, i.lower, i.upper, i.right))
+        for i in self:
+            value = func(i)
 
             if isinstance(value, Interval):
                 intervals.append(value)
@@ -493,22 +492,24 @@ class Interval:
         return len(self._intervals)
 
     def __iter__(self):
-        return iter([Interval(i) for i in self._intervals])
+        return iter([Interval.from_atomic(i.left, i.lower, i.upper, i.right) for i in self._intervals])
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return [Interval(i) for i in self._intervals[item]]
+            return [Interval.from_atomic(i.left, i.lower, i.upper, i.right) for i in self._intervals[item]]
         else:
-            return Interval(self._intervals[item])
+            i = self._intervals[item]
+            return Interval.from_atomic(i.left, i.lower, i.upper, i.right)
 
     def __and__(self, other):
         if isinstance(other, Interval):
-            intervals = other._intervals
-
             new_intervals = []
             for interval in self._intervals:
-                for o_interval in intervals:
-                    new_intervals.append(interval & o_interval)
+                for o_interval in other._intervals:
+                    i = interval & o_interval
+                    new_intervals.append(
+                        Interval.from_atomic(i.left, i.lower, i.upper, i.right)
+                    )
             return Interval(*new_intervals)
         else:
             return NotImplemented

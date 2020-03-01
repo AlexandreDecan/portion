@@ -1,7 +1,7 @@
 import re
 
 from .const import Bound, inf
-from .interval import AtomicInterval, Interval
+from .interval import Interval
 
 
 def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
@@ -57,7 +57,7 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
             lower = _convert(lower) if lower is not None else inf
             upper = _convert(upper) if upper is not None else lower
 
-            intervals.append(AtomicInterval(left, lower, upper, right))
+            intervals.append(Interval.from_atomic(left, lower, upper, right))
             string = string[match.end():]
 
     return Interval(*intervals)
@@ -130,7 +130,7 @@ def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
 
     for item in data:
         left, lower, upper, right = item
-        intervals.append(AtomicInterval(
+        intervals.append(Interval.from_atomic(
             Bound(left),
             _convert(lower),
             _convert(upper),
