@@ -72,6 +72,8 @@ class AtomicInterval:
 
     An atomic interval is a single interval, with a lower and an upper bound,
     and two (closed or open) boundaries.
+
+    This class is NOT part of the public API.
     """
 
     __slots__ = ('_left', '_lower', '_upper', '_right')
@@ -137,43 +139,6 @@ class AtomicInterval:
             (self._lower == self._upper and (self._left == Bound.OPEN or self._right == Bound.OPEN))
         )
 
-    def replace(self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True):
-        """
-        Create a new interval based on the current one and the provided values.
-
-        Callable can be passed instead of values. In that case, it is called with the current
-        corresponding value except if ignore_inf if set (default) and the corresponding
-        bound is an infinity.
-
-        :param left: (a function of) left boundary.
-        :param lower: (a function of) value of the lower bound.
-        :param upper: (a function of) value of the upper bound.
-        :param right: (a function of) right boundary.
-        :param ignore_inf: ignore infinities if functions are provided (default is True).
-        :return: an AtomicInterval instance
-        """
-        if callable(left):
-            left = left(self._left)
-        else:
-            left = self._left if left is None else left
-
-        if callable(lower):
-            lower = self._lower if ignore_inf and self._lower in [-inf, inf] else lower(self._lower)
-        else:
-            lower = self._lower if lower is None else lower
-
-        if callable(upper):
-            upper = self._upper if ignore_inf and self._upper in [-inf, inf] else upper(self._upper)
-        else:
-            upper = self._upper if upper is None else upper
-
-        if callable(right):
-            right = right(self._right)
-        else:
-            right = self._right if right is None else right
-
-        return AtomicInterval(left, lower, upper, right)
-
     def mergeable(self, other):
         """
         Test if given atomic interval can be merged with current one.
@@ -195,51 +160,6 @@ class AtomicInterval:
             return first._right == Bound.CLOSED or second._left == Bound.CLOSED
 
         return first._upper > second._lower
-
-    def intersection(self, other):
-        """
-        Return the intersection of two intervals.
-
-        :param other: an interval.
-        :return: the intersection of the intervals.
-        """
-        return self & other
-
-    def union(self, other):
-        """
-        Return the union of two intervals as a list of atomic intervals.
-
-        :param other: an interval.
-        :return: a list of intervals.
-        """
-        return self | other
-
-    def contains(self, item):
-        """
-        Test if given item is contained in this interval.
-        This method accepts atomic intervals, intervals and arbitrary values.
-
-        :param item: an atomic interval, an interval or any arbitrary value.
-        :return: True if given item is contained, False otherwise.
-        """
-        return item in self
-
-    def complement(self):
-        """
-        Return the complement of this interval as a list of intervals.
-
-        :return: a list of intervals.
-        """
-        return ~self
-
-    def difference(self, other):
-        """
-        Return the difference of two intervals as a list of intervals.
-
-        :param other: an interval.
-        :return: a list of intervals
-        """
-        return self - other
 
     def __and__(self, other):
         if isinstance(other, AtomicInterval):
@@ -287,38 +207,6 @@ class AtomicInterval:
         else:
             return NotImplemented
 
-    def __contains__(self, item):
-        if isinstance(item, AtomicInterval):
-            left = item._lower > self._lower or (
-                item._lower == self._lower and (item._left == self._left or self._left == Bound.CLOSED)
-            )
-            right = item._upper < self._upper or (
-                item._upper == self._upper and (item._right == self._right or self._right == Bound.CLOSED)
-            )
-            return left and right
-        else:
-            left = (item >= self._lower) if self._left == Bound.CLOSED else (item > self._lower)
-            right = (item <= self._upper) if self._right == Bound.CLOSED else (item < self._upper)
-            return left and right
-
-    def __invert__(self):
-        return [
-            AtomicInterval(Bound.OPEN, -inf, self._lower, ~self._left),
-            AtomicInterval(~self._right, self._upper, inf, Bound.OPEN)
-        ]
-
-    def __sub__(self, other):
-        if isinstance(other, AtomicInterval):
-            complement = ~other
-            result = []
-            for i in complement:
-                intersection = self & i
-                if not intersection.empty:
-                    result.append(intersection)
-            return result
-        else:
-            return NotImplemented
-
     def __eq__(self, other):
         if isinstance(other, AtomicInterval):
             return (
@@ -329,62 +217,6 @@ class AtomicInterval:
             )
         else:
             return NotImplemented
-
-    def __lt__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self._right == Bound.OPEN:
-                return self._upper <= other._lower
-            else:
-                return self._upper < other._lower or \
-                    (self._upper == other._lower and other._left == Bound.OPEN)
-        else:
-            return self._upper < other or (self._right == Bound.OPEN and self._upper == other)
-
-    def __gt__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self._left == Bound.OPEN:
-                return self._lower >= other._upper
-            else:
-                return self._lower > other._upper or \
-                    (self._lower == other._upper and other._right == Bound.OPEN)
-        else:
-            return self._lower > other or (self._left == Bound.OPEN and self._lower == other)
-
-    def __le__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self._right == Bound.OPEN:
-                return self._upper <= other._upper
-            else:
-                return self._upper < other._upper or \
-                    (self._upper == other._upper and other._right == Bound.CLOSED)
-        else:
-            return self._lower < other or (self._left == Bound.CLOSED and self._lower == other)
-
-    def __ge__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self._left == Bound.OPEN:
-                return self._lower >= other._lower
-            else:
-                return self._lower > other._lower or \
-                    (self._lower == other._lower and other._left == Bound.CLOSED)
-        else:
-            return self._upper > other or (self._right == Bound.CLOSED and self._upper == other)
-
-    def __hash__(self):
-        return hash((self._lower, self._upper))
-
-    def __repr__(self):
-        if self.empty:
-            return '()'
-        elif self._lower == self._upper:
-            return '[{}]'.format(repr(self._lower))
-        else:
-            return '{}{},{}{}'.format(
-                '[' if self._left == Bound.CLOSED else '(',
-                repr(self._lower),
-                repr(self._upper),
-                ']' if self._right == Bound.CLOSED else ')',
-            )
 
 
 class Interval:
@@ -492,21 +324,6 @@ class Interval:
         """
         return Interval(AtomicInterval(left, lower, upper, right))
 
-    def as_atomic(self):
-        """
-        Convert this interval to an AtomicInterval instance.
-        Raise ValueError if the interval is not atomic.
-        Using i.enclosure.as_atomic() ensures a resulting AtomicInterval.
-
-        This method is **NOT** part of the public API.
-
-        :return: an AtomicInterval instance.
-        """
-        if self.atomic:
-            return AtomicInterval(self.left, self.lower, self.upper, self.right)
-        else:
-            raise ValueError('{} is not atomic.'.format(self))
-
     @property
     def enclosure(self):
         """
@@ -569,7 +386,6 @@ class Interval:
 
         n_interval = self & Interval.from_atomic(left, lower, upper, right)
 
-        # TODO: Can we merge these two?
         if n_interval.atomic:
             return n_interval.replace(left, lower, upper, right)
         else:
@@ -579,25 +395,27 @@ class Interval:
 
     def apply(self, func):
         """
-        Apply a function on each of the underlying atomic intervals and return theeir union
+        Apply a function on each of the underlying atomic intervals and return their union
         as a new interval instance
 
         Given function is expected to return an interval (possibly empty or not atomic) or
         a 4-uple (left, lower, upper, right) whose values correspond to the parameters of
         Interval.from_atomic(left, lower, upper, right).
 
+        This method is merely a shortcut for Interval(*list(map(func, self))).
+
         :param func: function to apply on each underlying atomic interval.
         :return: an Interval instance.
         """
         intervals = []
 
-        for interval in self._intervals:
-            value = func(interval)
+        for i in self._intervals:
+            value = func(Interval.from_atomic(i.left, i.lower, i.upper, i.right))
 
-            if isinstance(value, (Interval, AtomicInterval)):
+            if isinstance(value, Interval):
                 intervals.append(value)
             elif isinstance(value, tuple):
-                intervals.append(AtomicInterval(*value))
+                intervals.append(Interval.from_atomic(*value))
             else:
                 raise TypeError('Unsupported return type {} for {}'.format(type(value), value))
 
@@ -702,16 +520,21 @@ class Interval:
             return NotImplemented
 
     def __contains__(self, item):
-        if isinstance(item, Interval):
-            for o_interval in item._intervals:
-                for interval in self._intervals:
-                    if o_interval in self:
-                        break
-                else:
-                    return False
-            return True
+        if self.atomic:
+            if isinstance(item, Interval):
+                left = item.lower > self.lower or (
+                    item.lower == self.lower and (item.left == self.left or self.left == Bound.CLOSED)
+                )
+                right = item.upper < self.upper or (
+                    item.upper == self.upper and (item.right == self.right or self.right == Bound.CLOSED)
+                )
+                return left and right
+            else:
+                left = (item >= self.lower) if self.left == Bound.CLOSED else (item > self.lower)
+                right = (item <= self.upper) if self.right == Bound.CLOSED else (item < self.upper)
+                return left and right
         else:
-            for interval in self._intervals:
+            for interval in self:
                 if item in interval:
                     return True
             return False
@@ -720,7 +543,7 @@ class Interval:
         complements = []
         for i in self._intervals:
             complements.append(Interval(
-                Interval.from_atomic(Bound.OPEN, -inf, i._lower, ~i._left),
+                Interval.from_atomic(Bound.OPEN, -inf, i.lower, ~i._left),
                 Interval.from_atomic(~i._right, i._upper, inf, Bound.OPEN)
             ))
 
@@ -743,23 +566,61 @@ class Interval:
             return NotImplemented
 
     def __lt__(self, other):
-        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
-        return self.enclosure.as_atomic() < other
+        if isinstance(other, Interval):
+            if self.right == Bound.OPEN:
+                return self.upper <= other.lower
+            else:
+                return self.upper < other.lower or \
+                    (self.upper == other.lower and other.left == Bound.OPEN)
+        else:
+            return self.upper < other or (self.right == Bound.OPEN and self.upper == other)
 
     def __gt__(self, other):
-        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
-        return self.enclosure.as_atomic() > other
+        if isinstance(other, Interval):
+            if self.left == Bound.OPEN:
+                return self.lower >= other.upper
+            else:
+                return self.lower > other.upper or \
+                    (self.lower == other.upper and other.right == Bound.OPEN)
+        else:
+            return self.lower > other or (self.left == Bound.OPEN and self.lower == other)
 
     def __le__(self, other):
-        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
-        return self.enclosure.as_atomic() <= other
+        if isinstance(other, Interval):
+            if self.right == Bound.OPEN:
+                return self.upper <= other.upper
+            else:
+                return self.upper < other.upper or \
+                    (self.upper == other.upper and other.right == Bound.CLOSED)
+        else:
+            return self.lower < other or (self.left == Bound.CLOSED and self.lower == other)
 
     def __ge__(self, other):
-        other = other.enclosure.as_atomic() if isinstance(other, Interval) else other
-        return self.enclosure.as_atomic() >= other
+        if isinstance(other, Interval):
+            if self.left == Bound.OPEN:
+                return self.lower >= other.lower
+            else:
+                return self.lower > other.lower or \
+                    (self.lower == other.lower and other.left == Bound.CLOSED)
+        else:
+            return self.upper > other or (self.right == Bound.CLOSED and self.upper == other)
 
     def __hash__(self):
-        return hash(tuple(self._intervals))
+        return hash(tuple([self.lower, self.upper]))
 
     def __repr__(self):
-        return ' | '.join(repr(i) for i in self._intervals)
+        if self.empty:
+            return '()'
+        elif self.lower == self.upper:
+            return '[{}]'.format(repr(self.lower))
+        else:
+            return ' | '.join(
+                '{}{},{}{}'.format(
+                    '[' if i.left == Bound.CLOSED else '(',
+                    repr(i.lower),
+                    repr(i.upper),
+                    ']' if i.right == Bound.CLOSED else ')',
+                )
+                for i in self._intervals
+            )
+
