@@ -174,17 +174,14 @@ class AtomicInterval:
 
         return AtomicInterval(left, lower, upper, right)
 
-    def overlaps(self, other, *, adjacent=False):
+    def mergeable(self, other):
         """
-        Test if intervals have any overlapping value.
-
-        If 'adjacent' is set to True (default is False), then it returns True for adjacent
-        intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
-        This is useful to see whether two intervals can be merged or not.
+        Test if given atomic interval can be merged with current one.
+        Two intervals are mergeable if their union is an atomic interval
+        (i.e. they overlap or are adjacent).
 
         :param other: an atomic interval.
-        :param adjacent: set to True to accept adjacent intervals as well.
-        :return: True if intervals overlap, False otherwise.
+        :return: True if mergeable, False otherwise.
         """
         if not isinstance(other, AtomicInterval):
             raise TypeError('Only AtomicInterval instances are supported.')
@@ -195,10 +192,7 @@ class AtomicInterval:
             first, second = other, self
 
         if first._upper == second._lower:
-            if adjacent:
-                return first._right == Bound.CLOSED or second._left == Bound.CLOSED
-            else:
-                return first._right == Bound.CLOSED and second._left == Bound.CLOSED
+            return first._right == Bound.CLOSED or second._left == Bound.CLOSED
 
         return first._upper > second._lower
 
@@ -213,12 +207,10 @@ class AtomicInterval:
 
     def union(self, other):
         """
-        Return the union of two intervals. If the union cannot be represented using a single
-        atomic interval, return an Interval instance (which corresponds to an union of atomic
-        intervals).
+        Return the union of two intervals as a list of atomic intervals.
 
         :param other: an interval.
-        :return: the union of the intervals.
+        :return: a list of intervals.
         """
         return self | other
 
@@ -234,21 +226,18 @@ class AtomicInterval:
 
     def complement(self):
         """
-        Return the complement of this interval.
+        Return the complement of this interval as a list of intervals.
 
-        Complementing an interval always results in an Interval instance, even if the complement
-        can be encoded as a single atomic interval.
-
-        :return: the complement of this interval.
+        :return: a list of intervals.
         """
         return ~self
 
     def difference(self, other):
         """
-        Return the difference of two intervals.
+        Return the difference of two intervals as a list of intervals.
 
         :param other: an interval.
-        :return: the difference of the intervals.
+        :return: a list of intervals
         """
         return self - other
 
@@ -277,7 +266,7 @@ class AtomicInterval:
 
     def __or__(self, other):
         if isinstance(other, AtomicInterval):
-            if self.overlaps(other, adjacent=True):
+            if self.mergeable(other):
                 if self._lower == other._lower:
                     lower = self._lower
                     left = self._left if self._left == Bound.CLOSED else other._left
@@ -292,9 +281,9 @@ class AtomicInterval:
                     upper = max(self._upper, other._upper)
                     right = self._right if upper == self._upper else other._right
 
-                return AtomicInterval(left, lower, upper, right)
+                return [AtomicInterval(left, lower, upper, right)]
             else:
-                return Interval(self, other)
+                return [self, other]
         else:
             return NotImplemented
 
@@ -313,14 +302,20 @@ class AtomicInterval:
             return left and right
 
     def __invert__(self):
-        return Interval(
+        return [
             AtomicInterval(Bound.OPEN, -inf, self._lower, ~self._left),
             AtomicInterval(~self._right, self._upper, inf, Bound.OPEN)
-        )
+        ]
 
     def __sub__(self, other):
         if isinstance(other, AtomicInterval):
-            return self & ~other
+            complement = ~other
+            result = []
+            for i in complement:
+                intersection = self & i
+                if not intersection.empty:
+                    result.append(intersection)
+            return result
         else:
             return NotImplemented
 
@@ -434,8 +429,8 @@ class Interval:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
 
-                if current.overlaps(successor, adjacent=True):
-                    interval = current | successor
+                if current.mergeable(successor):
+                    interval = (current | successor)[0]  # Only a single item since they overlap
                     self._intervals.pop(i)  # pop current
                     self._intervals.pop(i)  # pop successor
                     self._intervals.insert(i, interval)
@@ -569,7 +564,7 @@ class Interval:
         else:
             right = enclosure.right if right is None else right
 
-        n_interval = self & AtomicInterval(left, lower, upper, right)
+        n_interval = self & Interval.from_atomic(left, lower, upper, right)
 
         if len(n_interval) > 1:
             lowest = n_interval._intervals[0].replace(left=left, lower=lower)
@@ -615,28 +610,15 @@ class Interval:
         """
         return (self & other).empty and (self | other).atomic
 
-    def overlaps(self, other, *, adjacent=False):
+    def overlaps(self, other):
         """
         Test if intervals have any overlapping value.
 
-        If 'adjacent' is set to True (default is False), then it returns True for adjacent
-        intervals as well (e.g., [1, 2) and [2, 3], but not [1, 2) and (2, 3]).
-        This is useful to see whether two intervals can be merged or not.
-
         :param other: an interval.
-        :param adjacent: set to True to accept adjacent intervals as well.
         :return: True if intervals overlap, False otherwise.
         """
-        if isinstance(other, AtomicInterval):
-            for interval in self._intervals:
-                if interval.overlaps(other, adjacent=adjacent):
-                    return True
-            return False
-        elif isinstance(other, Interval):
-            for o_interval in other._intervals:
-                if self.overlaps(o_interval, adjacent=adjacent):
-                    return True
-            return False
+        if isinstance(other, Interval):
+            return not (self & other).empty
         else:
             raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
@@ -695,11 +677,8 @@ class Interval:
         return Interval(self._intervals[item])
 
     def __and__(self, other):
-        if isinstance(other, (AtomicInterval, Interval)):
-            if isinstance(other, AtomicInterval):
-                intervals = [other]
-            else:
-                intervals = other._intervals
+        if isinstance(other, Interval):
+            intervals = other._intervals
 
             new_intervals = []
             for interval in self._intervals:
@@ -709,31 +688,21 @@ class Interval:
         else:
             return NotImplemented
 
-    def __rand__(self, other):
-        return self & other
-
     def __or__(self, other):
-        if isinstance(other, AtomicInterval):
-            return self | Interval(other)
-        elif isinstance(other, Interval):
-            return Interval(*(list(self._intervals) + list(other._intervals)))
+        if isinstance(other, Interval):
+            return Interval(self, other)
         else:
             return NotImplemented
-
-    def __ror__(self, other):
-        return self | other
 
     def __contains__(self, item):
         if isinstance(item, Interval):
             for o_interval in item._intervals:
-                if o_interval not in self:
+                for interval in self._intervals:
+                    if o_interval in self:
+                        break
+                else:
                     return False
             return True
-        elif isinstance(item, AtomicInterval):
-            for interval in self._intervals:
-                if item in interval:
-                    return True
-            return False
         else:
             for interval in self._intervals:
                 if item in interval:
@@ -741,20 +710,24 @@ class Interval:
             return False
 
     def __invert__(self):
-        complements = [~i for i in self._intervals]
+        complements = []
+        for i in self._intervals:
+            complements.append(Interval(
+                Interval.from_atomic(Bound.OPEN, -inf, i._lower, ~i._left),
+                Interval.from_atomic(~i._right, i._upper, inf, Bound.OPEN)
+            ))
+
         intersection = complements[0]
-        for interval in complements:
-            intersection = intersection & interval
+        for i in complements[1:]:
+            intersection = intersection & i
+
         return intersection
 
     def __sub__(self, other):
-        if isinstance(other, (AtomicInterval, Interval)):
+        if isinstance(other, Interval):
             return self & ~other
         else:
             return NotImplemented
-
-    def __rsub__(self, other):
-        return other & ~self
 
     def __eq__(self, other):
         if isinstance(other, Interval):

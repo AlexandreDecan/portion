@@ -314,17 +314,10 @@ False
    ```
 
  - `i.overlaps(other)` tests if there is an overlap between two intervals.
- This method accepts an `adjacent` parameter which defaults to `False`.
- If `True`, it accepts adjacent intervals as well (e.g., [1, 2) and [2, 3] but not
- [1, 2) and (2, 3]). This is useful to check whether two intervals can be merged or not.
    ```python
    >>> I.closed(1, 2).overlaps(I.closed(2, 3))
    True
    >>> I.closed(1, 2).overlaps(I.open(2, 3))
-   False
-   >>> I.closed(1, 2).overlaps(I.openclosed(2, 3), adjacent=True)
-   True
-   >>> I.closedopen(1, 2).overlaps(I.openclosed(2, 3), adjacent=True)
    False
 
    ```
@@ -867,13 +860,11 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
    * for `iterate`: `base` and `reverse`;
-   * for `i.replace`: `ignore_inf`;
-   * for `i.overlaps`: `adjacent`.
+   * for `i.replace`: `ignore_inf`.
  - (breaking) `incr` is replaced by `step` in `iterate`.
  - (breaking) For consistency with `range`, the `step` parameter in `iterate` is always added even if `reverse=True`.
  - (breaking) `i.enclosure` is a property and no longer a method.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
- - (breaking) Class `AtomicInterval` is no longer part of the public API.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Restructure package in modules instead of a flat file.
@@ -881,10 +872,11 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - Reorganise changelog with explicit categories.
 
 #### Removed
+ - (breaking) Class `AtomicInterval` is no longer part of the public API.
  - (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
  - (breaking) `i.to_atomic()` is removed in favor of `i.enclosure`.
  - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
- - (breaking) Remove deprecated `permissive` in `.overlaps` (use `adjacent` instead).
+ - (breaking) Remove deprecated `permissive` in `.overlaps`.
  - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
 #### Fixed

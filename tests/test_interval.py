@@ -303,56 +303,7 @@ class TestIntervalOverlaps():
 
     def test_overlaps_with_incompatible_types(self):
         with pytest.raises(TypeError):
-            I.closed(0, 1).as_atomic().overlaps(1)
-        with pytest.raises(TypeError):
             I.closed(0, 1).overlaps(1)
-
-    def test_adjacent_overlaps(self):
-        assert I.closed(1, 2).overlaps(I.closed(2, 3), adjacent=True)
-        assert I.closed(1, 2).overlaps(I.closedopen(2, 3), adjacent=True)
-        assert I.openclosed(1, 2).overlaps(I.closed(2, 3), adjacent=True)
-        assert I.openclosed(1, 2).overlaps(I.closedopen(2, 3), adjacent=True)
-
-    def test_adjacent_overlaps_with_itself(self):
-        assert I.closed(0, 1).overlaps(I.closed(0, 1), adjacent=True)
-        assert I.closed(0, 1).overlaps(I.open(0, 1), adjacent=True)
-        assert I.open(0, 1).overlaps(I.closed(0, 1), adjacent=True)
-        assert I.closed(0, 1).overlaps(I.openclosed(0, 1), adjacent=True)
-        assert I.closed(0, 1).overlaps(I.closedopen(0, 1), adjacent=True)
-
-    def test_adjacent_overlaps_with_nonoverlaping(self):
-        assert not I.closed(0, 1).overlaps(I.closed(3, 4), adjacent=True)
-        assert not I.closed(3, 4).overlaps(I.closed(0, 1), adjacent=True)
-
-    def test_adjacent_overlaps_with_edge_cases(self):
-        assert I.closed(0, 1).overlaps(I.open(1, 2), adjacent=True)
-        assert I.closed(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
-        assert I.closedopen(0, 1).overlaps(I.closed(1, 2), adjacent=True)
-        assert I.closedopen(0, 1).overlaps(I.closedopen(1, 2), adjacent=True)
-        assert not I.closedopen(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
-        assert not I.closedopen(0, 1).overlaps(I.open(1, 2), adjacent=True)
-        assert not I.open(0, 1).overlaps(I.open(1, 2), adjacent=True)
-
-    def test_adjacent_overlaps_with_empty(self):
-        assert not I.empty().overlaps(I.open(-I.inf, I.inf), adjacent=True)
-        assert not I.open(-I.inf, I.inf).overlaps(I.empty(), adjacent=True)
-
-    def test_overlaps_issue_13(self):
-        # https://github.com/AlexandreDecan/python-intervals/issues/13
-        assert not I.closed(0, 1).overlaps(I.openclosed(1, 2))
-        assert not I.closedopen(0, 1).overlaps(I.closed(1, 2))
-        assert not I.closed(1, 1).overlaps(I.openclosed(1, 2))
-        assert not I.closedopen(1, 1).overlaps(I.closed(1, 2))
-        assert not I.openclosed(1, 2).overlaps(I.closed(0, 1))
-        assert not I.openclosed(1, 2).overlaps(I.closed(1, 1))
-
-    def test_overlaps_issue_13_with_adjacent(self):
-        # https://github.com/AlexandreDecan/python-intervals/issues/13
-        assert I.closed(0, 1).overlaps(I.openclosed(1, 2), adjacent=True)
-        assert I.closedopen(0, 1).overlaps(I.closed(1, 2), adjacent=True)
-        assert I.closed(1, 1).overlaps(I.openclosed(1, 2), adjacent=True)
-        assert I.openclosed(1, 2).overlaps(I.closed(0, 1), adjacent=True)
-        assert I.openclosed(1, 2).overlaps(I.closed(1, 1), adjacent=True)
 
 
 class TestIntervalComparison:
@@ -612,10 +563,10 @@ class TestIntervalIntersection:
 
 class TestIntervalUnion:
     def test_atomic(self):
-        assert I.closed(1, 2).as_atomic() | I.closed(1, 2).as_atomic() == I.closed(1, 2).as_atomic()
-        assert I.closed(1, 4).as_atomic() | I.closed(2, 3).as_atomic() == I.closed(1, 4).as_atomic()
-        assert I.closed(1, 2).as_atomic() | I.closed(2, 3).as_atomic() == I.closed(2, 3).as_atomic() | I.closed(1, 2).as_atomic()
-        assert I.closed(1, 2).as_atomic() | I.closed(3, 4).as_atomic() == I.closed(1, 2) | I.closed(3, 4)
+        assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
+        assert I.closed(1, 4) | I.closed(2, 3) == I.closed(1, 4)
+        assert I.closed(1, 2) | I.closed(2, 3) == I.closed(2, 3) | I.closed(1, 2)
+        assert I.closed(1, 2) | I.closed(3, 4) == I.closed(1, 2) | I.closed(3, 4)
 
     def test_with_itself(self):
         assert I.closed(1, 2) | I.closed(1, 2) == I.closed(1, 2)
