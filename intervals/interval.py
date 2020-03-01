@@ -95,12 +95,6 @@ class AtomicInterval:
         self._upper = upper
         self._right = right if upper not in [inf, -inf] else Bound.OPEN
 
-        if self.empty:
-            self._left = Bound.OPEN
-            self._lower = inf
-            self._upper = -inf
-            self._right = Bound.OPEN
-
     @property
     def left(self):
         """
@@ -128,16 +122,6 @@ class AtomicInterval:
         Right boundary is either CLOSED or OPEN.
         """
         return self._right
-
-    @property
-    def empty(self):
-        """
-        True if interval is empty, False otherwise.
-        """
-        return (
-            self._lower > self._upper or
-            (self._lower == self._upper and (self._left == Bound.OPEN or self._right == Bound.OPEN))
-        )
 
     def mergeable(self, other):
         """
@@ -288,7 +272,10 @@ class Interval:
         """
         True if interval is empty, False otherwise.
         """
-        return self._intervals[0].empty
+        return (
+            self.lower > self.upper or
+            (self.lower == self.upper and (self.left == Bound.OPEN or self.right == Bound.OPEN))
+        )
 
     @property
     def atomic(self):
@@ -309,7 +296,13 @@ class Interval:
         :param right: either CLOSED or OPEN.
         """
         instance = Interval()
+        left = left if lower not in [inf, -inf] else Bound.OPEN
+        right = right if upper not in [inf, -inf] else Bound.OPEN
+
         instance._intervals = [AtomicInterval(left, lower, upper, right)]
+        if instance.empty:
+            instance._intervals = [AtomicInterval(Bound.OPEN, inf, -inf, Bound.OPEN)]
+
         return instance
 
     @property
@@ -495,10 +488,24 @@ class Interval:
             new_intervals = []
             for interval in self._intervals:
                 for o_interval in other._intervals:
-                    i = interval & o_interval
-                    new_intervals.append(
-                        Interval.from_atomic(i.left, i.lower, i.upper, i.right)
-                    )
+                    if interval.lower == o_interval.lower:
+                        lower = interval.lower
+                        left = interval.left if interval.left == Bound.OPEN else o_interval.left
+                    else:
+                        lower = max(interval.lower, o_interval.lower)
+                        left = interval.left if lower == interval.lower else o_interval.left
+
+                    if interval.upper == o_interval.upper:
+                        upper = interval.upper
+                        right = interval.right if interval.right == Bound.OPEN else o_interval.right
+                    else:
+                        upper = min(interval.upper, o_interval.upper)
+                        right = interval.right if upper == interval.upper else o_interval.right
+
+                    if lower <= upper:
+                        new_intervals.append(Interval.from_atomic(left, lower, upper, right))
+                    else:
+                        new_intervals.append(Interval.from_atomic(Bound.OPEN, lower, lower, Bound.OPEN))
             return Interval(*new_intervals)
         else:
             return NotImplemented
