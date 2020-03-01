@@ -849,7 +849,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
 
 #### Added
  - An `adjacent` method to test whether two intervals are adjacent.
- - Static method `Interval.from_atomic` to create an interval composed of a single atomic interval.
+ - Static method `Interval.from_atomic(left, lower, upper, right)` to create an interval composed of a single atomic interval (replaces `AtomicInterval(left, lower, upper, right)`).
  - `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
  - `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).
  - Infinities define a hash value.
