@@ -385,14 +385,13 @@ class Interval:
         return len(self._intervals)
 
     def __iter__(self):
-        return iter([Interval.from_atomic(i.left, i.lower, i.upper, i.right) for i in self._intervals])
+        return iter([Interval.from_atomic(*i) for i in self._intervals])
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return [Interval.from_atomic(i.left, i.lower, i.upper, i.right) for i in self._intervals[item]]
+            return [Interval.from_atomic(*i) for i in self._intervals[item]]
         else:
-            i = self._intervals[item]
-            return Interval.from_atomic(i.left, i.lower, i.upper, i.right)
+            return Interval.from_atomic(*self._intervals[item])
 
     def __and__(self, other):
         if isinstance(other, Interval):
@@ -416,7 +415,9 @@ class Interval:
                     if lower <= upper:
                         new_intervals.append(Interval.from_atomic(left, lower, upper, right))
                     else:
-                        new_intervals.append(Interval.from_atomic(Bound.OPEN, lower, lower, Bound.OPEN))
+                        new_intervals.append(Interval.from_atomic(
+                            Bound.OPEN, lower, lower, Bound.OPEN
+                        ))
             return Interval(*new_intervals)
         else:
             return NotImplemented
@@ -431,10 +432,12 @@ class Interval:
         if self.atomic:
             if isinstance(item, Interval):
                 left = item.lower > self.lower or (
-                    item.lower == self.lower and (item.left == self.left or self.left == Bound.CLOSED)
+                    item.lower == self.lower and
+                    (item.left == self.left or self.left == Bound.CLOSED)
                 )
                 right = item.upper < self.upper or (
-                    item.upper == self.upper and (item.right == self.right or self.right == Bound.CLOSED)
+                    item.upper == self.upper and
+                    (item.right == self.right or self.right == Bound.CLOSED)
                 )
                 return left and right
             else:
@@ -543,4 +546,3 @@ class Interval:
                 )
                 for i in self._intervals
             )
-
