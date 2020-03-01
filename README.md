@@ -72,17 +72,6 @@ created using one of the following helpers:
 
 ```
 
-Intervals created with this library are `Interval` instances.
-These functions are shortcuts for the `I.Interval.from_atomic` static method:
-
-```python
->>> I.Interval.from_atomic(I.OPEN, 1, 2, I.OPEN)
-(1,2)
->>> I.Interval.from_atomic(I.CLOSED, 1, 2, I.CLOSED)
-[1,2]
-
-```
-
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
 ```python
@@ -123,6 +112,7 @@ True
 
 ```
 
+Intervals created with this library are `Interval` instances.
 An `Interval` instance is a disjunction of atomic intervals each representing a single interval (e.g. `[1,2]`).
 Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
 
