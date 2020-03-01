@@ -207,17 +207,6 @@ class AtomicInterval:
         else:
             return NotImplemented
 
-    def __eq__(self, other):
-        if isinstance(other, AtomicInterval):
-            return (
-                    self._left == other._left and
-                    self._lower == other._lower and
-                    self._upper == other._upper and
-                    self._right == other._right
-            )
-        else:
-            return NotImplemented
-
 
 class Interval:
     """
@@ -562,7 +551,19 @@ class Interval:
 
     def __eq__(self, other):
         if isinstance(other, Interval):
-            return self._intervals == other._intervals
+            if len(other._intervals) != len(self._intervals):
+                return False
+
+            for a, b in zip(self._intervals, other._intervals):
+                eq = (
+                    a.left == b.left and
+                    a.lower == b.lower and
+                    a.upper == b.upper and
+                    a.right == b.right
+                )
+                if not eq:
+                    return False
+            return True
         else:
             return NotImplemented
 
