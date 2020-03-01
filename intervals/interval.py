@@ -9,8 +9,8 @@ def mergeable(a, b):
     """
     Tester whether two atomic intervals can be merged (i.e. they overlap or are adjacent).
 
-    :param a: an Atomic interval.
-    :param b: an Atomic interval.
+    :param a: an atomic interval.
+    :param b: an atomic interval.
     :return: True if mergeable, False otherwise.
     """
     if a.lower < b.lower or (a.lower == b.lower and a.left == Bound.CLOSED):
@@ -413,11 +413,13 @@ class Interval:
                         right = interval.right if upper == interval.upper else o_interval.right
 
                     if lower <= upper:
-                        new_intervals.append(Interval.from_atomic(left, lower, upper, right))
+                        new_interval = Interval.from_atomic(left, lower, upper, right)
                     else:
-                        new_intervals.append(Interval.from_atomic(
-                            Bound.OPEN, lower, lower, Bound.OPEN
-                        ))
+                        new_interval = Interval.from_atomic(Bound.OPEN, lower, lower, Bound.OPEN)
+
+                    if not new_interval.empty:
+                        new_intervals.append(new_interval)
+
             return Interval(*new_intervals)
         else:
             return NotImplemented
