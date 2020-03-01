@@ -1,7 +1,7 @@
 import pytest
 
 import intervals as I
-from intervals.interval import AtomicInterval, Interval
+from intervals.interval import Interval
 
 
 class TestHelpers:

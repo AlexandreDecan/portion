@@ -1,4 +1,27 @@
+from collections import namedtuple
 from .const import Bound, inf
+
+
+Atomic = namedtuple('Atomic', ['left', 'lower', 'upper', 'right'])
+
+
+def mergeable(a, b):
+    """
+    Tester whether two atomic intervals can be merged (i.e. they overlap or are adjacent).
+
+    :param a: an Atomic interval.
+    :param b: an Atomic interval.
+    :return: True if mergeable, False otherwise.
+    """
+    if a.lower < b.lower or (a.lower == b.lower and a.left == Bound.CLOSED):
+        first, second = a, b
+    else:
+        first, second = b, a
+
+    if first.upper == second.lower:
+        return first.right == Bound.CLOSED or second.left == Bound.CLOSED
+
+    return first.upper > second.lower
 
 
 def open(lower, upper):
@@ -66,138 +89,12 @@ def empty():
     return empty._instance
 
 
-class AtomicInterval:
-    """
-    This class represents an atomic interval.
-
-    An atomic interval is a single interval, with a lower and an upper bound,
-    and two (closed or open) boundaries.
-
-    This class is NOT part of the public API.
-    """
-
-    __slots__ = ('_left', '_lower', '_upper', '_right')
-
-    def __init__(self, left, lower, upper, right):
-        """
-        Create an atomic interval.
-
-        If a bound is set to infinity (regardless of its sign), the corresponding boundary will
-        be exclusive.
-
-        :param left: either CLOSED or OPEN.
-        :param lower: value of the lower bound.
-        :param upper: value of the upper bound.
-        :param right: either CLOSED or OPEN.
-        """
-        self._left = left if lower not in [inf, -inf] else Bound.OPEN
-        self._lower = lower
-        self._upper = upper
-        self._right = right if upper not in [inf, -inf] else Bound.OPEN
-
-    @property
-    def left(self):
-        """
-        Left boundary is either CLOSED or OPEN.
-        """
-        return self._left
-
-    @property
-    def lower(self):
-        """
-        Lower bound value.
-        """
-        return self._lower
-
-    @property
-    def upper(self):
-        """
-        Upper bound value.
-        """
-        return self._upper
-
-    @property
-    def right(self):
-        """
-        Right boundary is either CLOSED or OPEN.
-        """
-        return self._right
-
-    def mergeable(self, other):
-        """
-        Test if given atomic interval can be merged with current one.
-        Two intervals are mergeable if their union is an atomic interval
-        (i.e. they overlap or are adjacent).
-
-        :param other: an atomic interval.
-        :return: True if mergeable, False otherwise.
-        """
-        if not isinstance(other, AtomicInterval):
-            raise TypeError('Only AtomicInterval instances are supported.')
-
-        if self._lower < other.lower or (self._lower == other.lower and self._left == Bound.CLOSED):
-            first, second = self, other
-        else:
-            first, second = other, self
-
-        if first._upper == second._lower:
-            return first._right == Bound.CLOSED or second._left == Bound.CLOSED
-
-        return first._upper > second._lower
-
-    def __and__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self._lower == other._lower:
-                lower = self._lower
-                left = self._left if self._left == Bound.OPEN else other._left
-            else:
-                lower = max(self._lower, other._lower)
-                left = self._left if lower == self._lower else other._left
-
-            if self._upper == other._upper:
-                upper = self._upper
-                right = self._right if self._right == Bound.OPEN else other._right
-            else:
-                upper = min(self._upper, other._upper)
-                right = self._right if upper == self._upper else other._right
-
-            if lower <= upper:
-                return AtomicInterval(left, lower, upper, right)
-            else:
-                return AtomicInterval(Bound.OPEN, lower, lower, Bound.OPEN)
-        else:
-            return NotImplemented
-
-    def __or__(self, other):
-        if isinstance(other, AtomicInterval):
-            if self.mergeable(other):
-                if self._lower == other._lower:
-                    lower = self._lower
-                    left = self._left if self._left == Bound.CLOSED else other._left
-                else:
-                    lower = min(self._lower, other._lower)
-                    left = self._left if lower == self._lower else other._left
-
-                if self._upper == other._upper:
-                    upper = self._upper
-                    right = self._right if self._right == Bound.CLOSED else other._right
-                else:
-                    upper = max(self._upper, other._upper)
-                    right = self._right if upper == self._upper else other._right
-
-                return [AtomicInterval(left, lower, upper, right)]
-            else:
-                return [self, other]
-        else:
-            return NotImplemented
-
-
 class Interval:
     """
     This class represents an interval.
 
     An interval is an (automatically simplified) union of atomic intervals.
-    It can be created with Interval.from_atomic(), or by passing intervals to __init__, or by using
+    It can be created with Interval.from_atomic(), by passing intervals to __init__, or by using
     one of the helpers provided in this module (open, closed, openclosed, etc.)
     """
 
@@ -220,7 +117,7 @@ class Interval:
 
         if len(self._intervals) == 0:
             # So we have at least one (empty) interval
-            self._intervals.append(AtomicInterval(Bound.OPEN, inf, -inf, Bound.OPEN))
+            self._intervals.append(Atomic(Bound.OPEN, inf, -inf, Bound.OPEN))
         else:
             # Sort intervals by lower bound
             self._intervals.sort(key=lambda i: i.lower)
@@ -231,11 +128,25 @@ class Interval:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
 
-                union = (current | successor)
-                if len(union) == 1:
+                if mergeable(current, successor):
+                    if current.lower == successor.lower:
+                        lower = current.lower
+                        left = current.left if current.left == Bound.CLOSED else successor.left
+                    else:
+                        lower = min(current.lower, successor.lower)
+                        left = current.left if lower == current.lower else successor.left
+
+                    if current.upper == successor.upper:
+                        upper = current.upper
+                        right = current.right if current.right == Bound.CLOSED else successor.right
+                    else:
+                        upper = max(current.upper, successor.upper)
+                        right = current.right if upper == current.upper else successor.right
+
+                    union = Atomic(left, lower, upper, right)
                     self._intervals.pop(i)  # pop current
                     self._intervals.pop(i)  # pop successor
-                    self._intervals.insert(i, union[0])
+                    self._intervals.insert(i, union)
                 else:
                     i = i + 1
 
@@ -299,9 +210,9 @@ class Interval:
         left = left if lower not in [inf, -inf] else Bound.OPEN
         right = right if upper not in [inf, -inf] else Bound.OPEN
 
-        instance._intervals = [AtomicInterval(left, lower, upper, right)]
+        instance._intervals = [Atomic(left, lower, upper, right)]
         if instance.empty:
-            instance._intervals = [AtomicInterval(Bound.OPEN, inf, -inf, Bound.OPEN)]
+            instance._intervals = [Atomic(Bound.OPEN, inf, -inf, Bound.OPEN)]
 
         return instance
 
@@ -540,8 +451,8 @@ class Interval:
         complements = []
         for i in self._intervals:
             complements.append(Interval(
-                Interval.from_atomic(Bound.OPEN, -inf, i.lower, ~i._left),
-                Interval.from_atomic(~i._right, i._upper, inf, Bound.OPEN)
+                Interval.from_atomic(Bound.OPEN, -inf, i.lower, ~i.left),
+                Interval.from_atomic(~i.right, i.upper, inf, Bound.OPEN)
             ))
 
         intersection = complements[0]
