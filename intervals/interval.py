@@ -212,7 +212,7 @@ class Interval:
 
         instance._intervals = [Atomic(left, lower, upper, right)]
         if instance.empty:
-            instance._intervals = [Atomic(Bound.OPEN, inf, -inf, Bound.OPEN)]
+            return Interval()
 
         return instance
 
