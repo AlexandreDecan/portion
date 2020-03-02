@@ -843,7 +843,7 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - `i.empty` to check for interval emptiness (replaces `i.is_empty()`).
  - `i.atomic` to check for interval atomicity (replaces `i.is_atomic()`).
  - Infinities define a hash value.
- - `Interval.__getitems__` supports slicing.
+ - `Interval.__getitem__` supports slicing.
 
 #### Changed
  - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
@@ -858,14 +858,15 @@ This library adheres to a [semantic versioning](https://semver.org) scheme.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
+ - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
  - Reorganise changelog with explicit categories.
 
 #### Removed
  - (breaking) Class `AtomicInterval` is no longer part of the public API.
- - (breaking) `i.to_atomic()` (use `i.enclosure` instead).
- - (breaking) `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
+ - (breaking) Remove `i.to_atomic()` (use `i.enclosure` instead).
+ - (breaking) Remove `i.is_empty()` and `i.is_atomic()`, replaced by `i.empty` and `i.atomic`.
  - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) Remove deprecated `permissive` in `.overlaps`.
  - (breaking) Remove `adjacent` in `.overlaps`, use `.adjacent` method instead.
