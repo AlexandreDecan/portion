@@ -24,6 +24,7 @@
  - (breaking) An interval is hashable if and only if its bounds are hashable.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
+ - Increased performance for `complement` and `intersection`.
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
  - Reorganise changelog with explicit categories.

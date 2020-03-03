@@ -396,29 +396,25 @@ class Interval:
     def __and__(self, other):
         if isinstance(other, Interval):
             new_intervals = []
-            for interval in self._intervals:
-                for o_interval in other._intervals:
-                    if interval.lower == o_interval.lower:
-                        lower = interval.lower
-                        left = interval.left if interval.left == Bound.OPEN else o_interval.left
+            for i in self._intervals:
+                for o in other._intervals:
+                    if i.lower == o.lower:
+                        lower = i.lower
+                        left = i.left if i.left == Bound.OPEN else o.left
                     else:
-                        lower = max(interval.lower, o_interval.lower)
-                        left = interval.left if lower == interval.lower else o_interval.left
+                        lower = max(i.lower, o.lower)
+                        left = i.left if lower == i.lower else o.left
 
-                    if interval.upper == o_interval.upper:
-                        upper = interval.upper
-                        right = interval.right if interval.right == Bound.OPEN else o_interval.right
+                    if i.upper == o.upper:
+                        upper = i.upper
+                        right = i.right if i.right == Bound.OPEN else o.right
                     else:
-                        upper = min(interval.upper, o_interval.upper)
-                        right = interval.right if upper == interval.upper else o_interval.right
+                        upper = min(i.upper, o.upper)
+                        right = i.right if upper == i.upper else o.right
 
-                    if lower <= upper:
-                        new_interval = Interval.from_atomic(left, lower, upper, right)
-                    else:
-                        new_interval = Interval.from_atomic(Bound.OPEN, lower, lower, Bound.OPEN)
-
-                    if not new_interval.empty:
-                        new_intervals.append(new_interval)
+                    intersection = Interval.from_atomic(left, lower, upper, right)
+                    if not intersection.empty:
+                        new_intervals.append(intersection)
 
             return Interval(*new_intervals)
         else:
@@ -453,18 +449,17 @@ class Interval:
             return False
 
     def __invert__(self):
-        complements = []
-        for i in self._intervals:
-            complements.append(Interval(
-                Interval.from_atomic(Bound.OPEN, -inf, i.lower, ~i.left),
-                Interval.from_atomic(~i.right, i.upper, inf, Bound.OPEN)
-            ))
+        complements = [
+            Interval.from_atomic(Bound.OPEN, -inf, self.lower, ~self.left),
+            Interval.from_atomic(~self.right, self.upper, inf, Bound.OPEN)
+        ]
 
-        intersection = complements[0]
-        for i in complements[1:]:
-            intersection = intersection & i
+        for i, j in zip(self._intervals[:-1], self._intervals[1:]):
+            complements.append(
+                Interval.from_atomic(~i.right, i.upper, j.lower, ~j.left)
+            )
 
-        return intersection
+        return Interval(*complements)
 
     def __sub__(self, other):
         if isinstance(other, Interval):

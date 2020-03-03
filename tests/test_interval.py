@@ -613,6 +613,10 @@ class TestIntervalComplement:
         assert ~I.closed(1, 2) == I.open(-I.inf, 1) | I.open(2, I.inf)
         assert ~I.open(1, 2) == I.openclosed(-I.inf, 1) | I.closedopen(2, I.inf)
 
+    def test_union(self):
+        assert ~(I.singleton(0) | I.singleton(5) | I.singleton(10)) == I.open(-I.inf, 0) | I.open(0, 5) | I.open(5, 10) | I.open(10, I.inf)
+        assert ~(I.open(0, 1) | I.closed(2, 3) | I.open(4, 5)) == I.openclosed(-I.inf, 0) | I.closedopen(1, 2) | I.openclosed(3, 4) | I.closedopen(5, I.inf)
+
     @pytest.mark.parametrize('i', [I.closed(0, 1), I.open(0, 1), I.openclosed(0, 1), I.closedopen(0, 1)])
     def test_identity(self, i):
         for interval in i:
