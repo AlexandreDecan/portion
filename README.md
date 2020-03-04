@@ -50,7 +50,7 @@ This will install the latest available version from [PyPI](https://pypi.org/proj
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals)
 and can be installed with `pip install git+https://github.com/AlexandreDecan/python-intervals`.
 
-The test environment can be installed with `pip install python-intervals[test]` and relies on [PyTest](https://docs.pytest.org/en/latest/).
+The test environment can be installed with `pip install python-intervals[test]` and relies on [pytest](https://docs.pytest.org/en/latest/).
 
 
 ## Documentation & usage
