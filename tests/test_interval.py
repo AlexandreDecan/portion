@@ -519,6 +519,11 @@ class TestIntervalIntersection:
         assert I.closed(0, 3) & I.closed(2, 4) == I.closed(2, 3)
         assert I.open(0, 3) & I.closed(2, 4) == I.closedopen(2, 3)
 
+    def test_with_union(self):
+        assert (I.closed(0, 2) | I.closed(4, 6)) & (I.closed(0, 1) | I.closed(4, 5)) == I.closed(0, 1) | I.closed(4, 5)
+        assert (I.closed(0, 2) | I.closed(4, 6)) & (I.closed(-1, 1) | I.closed(3, 6)) == I.closed(0, 1) | I.closed(4, 6)
+        assert (I.closed(0, 2) | I.closed(4, 6)) & (I.closed(1, 4) | I.singleton(5)) == I.closed(1, 2) | I.singleton(4) | I.singleton(5)
+
     def test_empty(self):
         assert (I.closed(0, 1) & I.closed(2, 3)).empty
         assert I.closed(0, 1) & I.empty() == I.empty()

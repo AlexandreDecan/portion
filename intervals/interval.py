@@ -394,31 +394,52 @@ class Interval:
             return Interval.from_atomic(*self._intervals[item])
 
     def __and__(self, other):
-        if isinstance(other, Interval):
-            new_intervals = []
-            for i in self._intervals:
-                for o in other._intervals:
-                    if i.lower == o.lower:
-                        lower = i.lower
-                        left = i.left if i.left == Bound.OPEN else o.left
-                    else:
-                        lower = max(i.lower, o.lower)
-                        left = i.left if lower == i.lower else o.left
-
-                    if i.upper == o.upper:
-                        upper = i.upper
-                        right = i.right if i.right == Bound.OPEN else o.right
-                    else:
-                        upper = min(i.upper, o.upper)
-                        right = i.right if upper == i.upper else o.right
-
-                    intersection = Interval.from_atomic(left, lower, upper, right)
-                    if not intersection.empty:
-                        new_intervals.append(intersection)
-
-            return Interval(*new_intervals)
-        else:
+        if not isinstance(other, Interval):
             return NotImplemented
+
+        if self.atomic and other.atomic:
+            if self.lower == other.lower:
+                lower = self.lower
+                left = self.left if self.left == Bound.OPEN else other.left
+            else:
+                lower = max(self.lower, other.lower)
+                left = self.left if lower == self.lower else other.left
+
+            if self.upper == other.upper:
+                upper = self.upper
+                right = self.right if self.right == Bound.OPEN else other.right
+            else:
+                upper = min(self.upper, other.upper)
+                right = self.right if upper == self.upper else other.right
+
+            return Interval.from_atomic(left, lower, upper, right)
+        else:
+            intersections = []
+
+            i_iter = iter(self)
+            o_iter = iter(other)
+            i_current = next(i_iter)
+            o_current = next(o_iter)
+
+            while i_current is not None and o_current is not None:
+                if i_current < o_current:
+                    i_current = next(i_iter, None)
+                elif o_current < i_current:
+                    o_current = next(o_iter, None)
+                else:
+                    # i_current and o_current have an overlap
+                    intersections.append(i_current & o_current)
+
+                    if i_current <= o_current:
+                        # o_current can still intersect next i
+                        i_current = next(i_iter, None)
+                    elif o_current <= i_current:
+                        # i_current can still intersect next o
+                        o_current = next(o_iter, None)
+                    else:
+                        assert False
+
+            return Interval(*intersections)
 
     def __or__(self, other):
         if isinstance(other, Interval):
@@ -442,10 +463,11 @@ class Interval:
                 selfiter = iter(self)
                 current = next(selfiter)
 
-                for o in item:
-                    while current < o:
+                for other in item:
+                    while current < other:
                         current = next(selfiter)
-                    if o not in current:
+                    # here current and other could have an overlap
+                    if current is None or other not in current:
                         return False
                 return True
         else:

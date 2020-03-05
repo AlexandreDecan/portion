@@ -3,15 +3,14 @@
 ## 2.0.0 (unreleased)
 
 ### Added
+ - `i.empty` to check for interval emptiness.
+ - `i.atomic` to check for interval atomicity.
  - An `adjacent` method to test whether two intervals are adjacent.
- - Static method `Interval.from_atomic(left, lower, upper, right)` to create an interval composed of a single atomic interval (replaces `AtomicInterval(left, lower, upper, right)`).
- - `Interval.empty` to check for interval emptiness (replaces `Interval.is_empty()`).
- - `Interval.atomic` to check for interval atomicity (replaces `Interval.is_atomic()`).
+ - `i.__getitem__` supports slices.
  - Infinities define a hash value.
- - `Interval.__getitem__` supports slicing.
+ - Static method `Interval.from_atomic(left, lower, upper, right)` to create an interval composed of a single atomic interval (replaces `AtomicInterval(left, lower, upper, right)`).
 
 ### Changed
- - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
  - (breaking) Many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
@@ -19,9 +18,10 @@
    * for `Interval.replace`: `ignore_inf`.
  - (breaking) `incr` is replaced by `step` in `iterate`.
  - (breaking) For consistency with `range`, the `step` parameter in `iterate` is always added even if `reverse=True`.
- - (breaking) `Interval.enclosure` is a property and no longer a method.
+ - (breaking) `i.enclosure` is a property and no longer a method.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
+ - Huge performance increase for `.intersection`, `.complement`, `.contains` and `.difference`.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
  - Restructure package in modules instead of a flat file.
@@ -29,17 +29,18 @@
  - Reorganise changelog with explicit categories.
 
 ### Removed
- - (breaking) Class `AtomicInterval` is no longer part of the public API.
- - (breaking) Remove `Interval.to_atomic()` (use `Interval.enclosure` instead).
- - (breaking) Remove `Interval.is_empty()` and `Interval.is_atomic()`, replaced by `Interval.empty` and `Interval.atomic`.
+ - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
+ - (breaking) `AtomicInterval` is a `namedtuple` and is no longer part of the public API.
+ - (breaking) Remove `i.to_atomic()` (use `i.enclosure` instead).
+ - (breaking) Remove `i.is_empty()` (use `i.empty` instead).
+ - (breaking) Remove `i.is_atomic()` (use `i.atomic` instead).
  - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
- - (breaking) Remove deprecated `permissive` in `Interval.overlaps`.
- - (breaking) Remove `adjacent` in `Interval.overlaps`, use `Interval.adjacent` method instead.
+ - (breaking) Remove deprecated `permissive` in `i.overlaps`.
+ - (breaking) Remove `adjacent` in `i.overlaps`, use `i.adjacent` method instead.
  - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
 ### Fixed
  - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
- - Huge performance increase for `Interval.complement` and `Interval.contains`.
 
 
 
