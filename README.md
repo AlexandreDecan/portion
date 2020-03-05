@@ -434,6 +434,8 @@ its enclosure satisfies the new bounds.
 >>> i.replace(lower=4)
 (4,10]
 
+```
+
 To apply an arbitrary transformation on an interval, intervals expose an `apply` method.
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
 The function is expected to return either an `Interval`, or a 4-uple `(left, lower, upper, right)`.
@@ -505,6 +507,17 @@ By default, the iteration always starts on the lower bound of each underlying at
 The `base` parameter can be used to change this behaviour, by specifying how the initial value to start
 the iteration from must be computed. This parameter accepts a callable that is called with the lower
 bound of each underlying atomic interval, and that returns the initial value to start the iteration from.
+It can be helpful to deal with (semi-)infinite intervals, or to *align* the generated values of the iterator:
+
+```python
+>>> # Align on integers
+>>> list(I.iterate(I.closed(0.3, 4.9), step=1, base=int))
+[1, 2, 3, 4]
+>>> # Restrict values of a (semi-)infinite interval
+>>> list(I.iterate(I.openclosed(-I.inf, 2), step=1, base=lambda x: max(0, x)))
+[0, 1, 2]
+
+```
 
 The `base` parameter can be used to change how `iterate` applies on unions of atomic interval, by
 specifying a function that returns a single value, as illustrated next:
@@ -522,20 +535,7 @@ Notice that defining `base` such that it returns a single value can be extremely
 terms of performance when the intervals are "far apart" each other (i.e., when the *gaps* between
 atomic intervals are large).
 
-The `base` parameter can also be helpful to deal with (semi-)infinite intervals, or to *align*
-the generated values of the iterator:
-
-```python
->>> # Restrict values of a (semi-)infinite interval
->>> list(I.iterate(I.openclosed(-I.inf, 2), step=1, base=lambda x: max(0, x)))
-[0, 1, 2]
->>> # Align on integers
->>> list(I.iterate(I.closed(0.3, 4.9), step=1, base=int))
-[1, 2, 3, 4]
-
-```
-
-Iteration can be performed in reverse order by specifying `reverse=True`.
+Finally, iteration can be performed in reverse order by specifying `reverse=True`.
 
 ```python
 >>> list(I.iterate(I.closed(0, 3), step=-1, reverse=True))  # Mind step=-1
@@ -804,7 +804,7 @@ The function to convert bounds can be specified with the `conv` parameter.
 
 ```
 
-Intervals can be imported from such a list of 4-uples with `from_data`.
+Intervals can be imported from such a list of 4-tuples with `from_data`.
 The same set of parameters can be used to specify how bounds and infinities are converted.
 
 ```python
