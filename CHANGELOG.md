@@ -21,7 +21,7 @@
  - (breaking) `i.enclosure` is a property and no longer a method.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
- - Huge performance increase for `.intersection`, `.complement`, `.contains` and `.difference`.
+ - Huge performance increase for creation, union, intersection, complement, and difference of intervals ([#21](https://github.com/AlexandreDecan/python-intervals/issues/21)).
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
  - Restructure package in modules instead of a flat file.
