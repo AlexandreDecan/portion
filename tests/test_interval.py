@@ -453,6 +453,15 @@ class TestIntervalContainment:
         assert 1 not in I.open(0, 1)
         assert 1 not in I.open(1, 2)
 
+        assert 1 in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+        assert 5 in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+        assert 10 in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+
+        assert -1 not in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+        assert 3 not in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+        assert 7 not in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+        assert 11 not in I.closed(0, 2) | I.closed(4, 6) | I.closed(8, 10)
+
     def test_with_infinities(self):
         assert 1 in I.closed(-I.inf, I.inf)
         assert 1 in I.closed(-I.inf, 1)
@@ -462,6 +471,8 @@ class TestIntervalContainment:
 
         assert I.inf not in I.closed(-I.inf, I.inf)
         assert -I.inf not in I.closed(-I.inf, I.inf)
+
+        assert I.inf not in I.closed(0, 1)
 
     def test_with_empty(self):
         assert 1 not in I.empty()
@@ -486,11 +497,13 @@ class TestIntervalContainment:
 
         assert I.closed(0, 1) | I.closed(2, 3) not in I.closed(0, 2)
         assert I.closed(0, 1) | I.closed(2, 3) not in I.closed(0, 1) | I.closedopen(2, 3)
+        assert I.closed(0, 1) | I.closed(2, 3) not in I.closed(0, 1) | I.closedopen(2, 3) | I.openclosed(3, 4)
 
     def test_with_empty_intervals(self):
         assert I.empty() in I.closed(0, 3)
         assert I.empty() in I.empty()
         assert I.closed(0, 0) not in I.empty()
+        assert I.singleton(0) | I.singleton(1) not in I.empty()
 
     def test_proxy_method(self):
         i1, i2 = I.closed(0, 1), I.closed(2, 3)

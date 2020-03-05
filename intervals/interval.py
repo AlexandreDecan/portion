@@ -332,7 +332,19 @@ class Interval:
         :return: True if intervals overlap, False otherwise.
         """
         if isinstance(other, Interval):
-            return not (self & other).empty
+            i_iter = iter(self)
+            o_iter = iter(other)
+            i_current = next(i_iter)
+            o_current = next(o_iter)
+
+            while i_current is not None and o_current is not None:
+                if i_current < o_current:
+                    i_current = next(i_iter, None)
+                elif o_current < i_current:
+                    o_current = next(o_iter, None)
+                else:
+                    return True
+            return False
         else:
             raise TypeError('Unsupported type {} for {}'.format(type(other), other))
 
@@ -467,7 +479,7 @@ class Interval:
                     while current < other:
                         current = next(selfiter)
                     # here current and other could have an overlap
-                    if current is None or other not in current:
+                    if other not in current:
                         return False
                 return True
         else:
