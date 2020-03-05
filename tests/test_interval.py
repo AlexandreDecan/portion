@@ -479,6 +479,14 @@ class TestIntervalContainment:
         assert I.closed(0, 1) in I.closed(-I.inf, I.inf)
         assert I.closed(-I.inf, I.inf) not in I.closed(0, 1)
 
+    def test_with_unions(self):
+        assert I.closed(0, 1) | I.closed(2, 3) in I.closed(0, 4)
+        assert I.closed(0, 1) | I.closed(2, 3) in I.closed(0, 1) | I.closed(2, 3)
+        assert I.closed(0, 1) | I.closed(2, 3) in I.closed(0, 0) | I.closed(0, 1) | I.closed(2, 3)
+
+        assert I.closed(0, 1) | I.closed(2, 3) not in I.closed(0, 2)
+        assert I.closed(0, 1) | I.closed(2, 3) not in I.closed(0, 1) | I.closedopen(2, 3)
+
     def test_with_empty_intervals(self):
         assert I.empty() in I.closed(0, 3)
         assert I.empty() in I.empty()

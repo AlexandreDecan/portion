@@ -239,7 +239,7 @@ False
 
 `Interval` instances support the following operations:
 
- - `i.intersection(other)` or `i & other` return the intersection of two intervals.
+ - `i.intersection(other)` and `i & other` return the intersection of two intervals.
    ```python
    >>> I.closed(0, 2) & I.closed(1, 3)
    [1,2]
@@ -252,7 +252,7 @@ False
 
    ```
 
- - `i.union(other)` or `i | other` return the union of two intervals.
+ - `i.union(other)` and `i | other` return the union of two intervals.
    ```python
    >>> I.closed(0, 1) | I.closed(1, 2)
    [0,2]
@@ -261,7 +261,7 @@ False
 
    ```
 
- - `i.complement(other)` or `~i` return the complement of the interval.
+ - `i.complement(other)` and `~i` return the complement of the interval.
    ```python
    >>> ~I.closed(0, 1)
    (-inf,0) | (1,+inf)
@@ -272,7 +272,7 @@ False
 
    ```
 
- - `i.difference(other)` or `i - other` return the difference between `i` and `other`.
+ - `i.difference(other)` and `i - other` return the difference between `i` and `other`.
    ```python
    >>> I.closed(0,2) - I.closed(1,2)
    [0,1)
@@ -281,7 +281,7 @@ False
 
    ```
 
- - `i.contains(other)` or `other in i` return True if given item is contained in the interval.
+ - `i.contains(other)` and `other in i` hold if given item is contained in the interval.
  It supports intervals and arbitrary comparable values.
    ```python
    >>> 2 in I.closed(0, 2)
@@ -359,8 +359,7 @@ False
 
 Intervals can also be compared with single values. If `i` is an interval and `x` a value, then
 `x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the
-left of the upper bound of `i`. This behaviour is similar to the one that could be obtained by first
-converting `x` to a singleton interval.
+left of the upper bound of `i`.
 
 ```python
 >>> 5 < I.closed(0, 10)
@@ -374,6 +373,8 @@ True
 
 ```
 
+This behaviour is similar to the one that could be obtained by first converting `x` to a
+singleton interval (except for infinities since they resolve to empty intervals).
 
 Note that all these semantics differ from classical comparison operators.
 As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
@@ -385,10 +386,12 @@ False
 False
 >>> I.empty() < I.empty()
 True
+>>> I.empty() < I.closed(0, 1) and I.empty() > I.closed(0, 1)
+True
 
 ```
 
-Finally, intervals are hashable as long as their bounds are hashable (`I.inf` and `-I.inf` have a hash value).
+Finally, intervals are hashable as long as their bounds are hashable (and we have defined a hash value for `I.inf` and `-I.inf`).
 
 
 

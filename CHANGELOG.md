@@ -24,7 +24,6 @@
  - (breaking) An interval is hashable if and only if its bounds are hashable.
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
- - Huge performance increase for `Interval.complement` ([#20](https://github.com/AlexandreDecan/python-intervals/issues/20)).
  - Restructure package in modules instead of a flat file.
  - Reorganise tests in modules and classes instead of a flat file.
  - Reorganise changelog with explicit categories.
@@ -40,6 +39,7 @@
 
 ### Fixed
  - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
+ - Huge performance increase for `Interval.complement` and `Interval.contains`.
 
 
 

@@ -427,8 +427,8 @@ class Interval:
             return NotImplemented
 
     def __contains__(self, item):
-        if self.atomic:
-            if isinstance(item, Interval):
+        if isinstance(item, Interval):
+            if self.atomic:
                 left = item.lower > self.lower or (
                     item.lower == self.lower and
                     (item.left == self.left or self.left == Bound.CLOSED)
@@ -439,12 +439,21 @@ class Interval:
                 )
                 return left and right
             else:
-                left = (item >= self.lower) if self.left == Bound.CLOSED else (item > self.lower)
-                right = (item <= self.upper) if self.right == Bound.CLOSED else (item < self.upper)
-                return left and right
+                selfiter = iter(self)
+                current = next(selfiter)
+
+                for o in item:
+                    while current < o:
+                        current = next(selfiter)
+                    if o not in current:
+                        return False
+                return True
         else:
-            for interval in self:
-                if item in interval:
+            # Item is a value
+            for i in self._intervals:
+                left = (item >= i.lower) if i.left == Bound.CLOSED else (item > i.lower)
+                right = (item <= i.upper) if i.right == Bound.CLOSED else (item < i.upper)
+                if left and right:
                     return True
             return False
 
