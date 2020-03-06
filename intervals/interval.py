@@ -84,9 +84,7 @@ def empty():
 
     :return: an interval.
     """
-    if not hasattr(empty, '_instance'):
-        empty._instance = Interval.from_atomic(Bound.OPEN, inf, -inf, Bound.OPEN)
-    return empty._instance
+    return Interval.from_atomic(Bound.OPEN, inf, -inf, Bound.OPEN)
 
 
 class Interval:

@@ -29,9 +29,6 @@ class TestHelpers:
         assert I.singleton(I.inf) == I.empty()
         assert I.singleton(-I.inf) == I.empty()
 
-    def test_empty_is_singleton(self):
-        assert I.empty() is I.empty()
-
 
 class TestInterval:
     def test_creation(self):
