@@ -1,14 +1,14 @@
-# Python data structure and operations for intervals
+# portion: Python data structure and operations for intervals
 
-[![Travis](https://travis-ci.org/AlexandreDecan/python-intervals.svg?branch=master)](https://travis-ci.org/AlexandreDecan/python-intervals)
-[![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/python-intervals/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/python-intervals?branch=master)
-[![License](https://img.shields.io/pypi/l/python-intervals)](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt)
-[![PyPI](https://img.shields.io/pypi/v/python-intervals)](https://pypi.org/project/python-intervals)
-[![Changelog](https://img.shields.io/github/release-date/AlexandreDecan/python-intervals)](https://pypi.org/project/python-intervals)
-[![Commits](https://img.shields.io/github/last-commit/AlexandreDecan/python-intervals)](https://github.com/AlexandreDecan/python-intervals/commits/)
+[![Travis](https://travis-ci.org/AlexandreDecan/portion.svg?branch=master)](https://travis-ci.org/AlexandreDecan/portion)
+[![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
+[![License](https://img.shields.io/pypi/l/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
+[![PyPI](https://img.shields.io/pypi/v/portion)](https://pypi.org/project/portion)
+[![Changelog](https://img.shields.io/github/release-date/AlexandreDecan/portion)](https://pypi.org/project/portion)
+[![Commits](https://img.shields.io/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
-This library provides data structure and operations for intervals in Python 3.5+.
+The `portion` library (formerly distributed as `python-intervals`) provides data structure and operations for intervals in Python 3.5+.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or (semi-)infinite intervals.
@@ -21,7 +21,9 @@ This library provides data structure and operations for intervals in Python 3.5+
  - Import and export intervals to strings and to Python built-in data types.
  - Heavily tested with high code coverage.
 
-**Latest release:** 1.10.0 on 2019-09-26 ([changes](https://github.com/AlexandreDecan/python-intervals/blob/master/CHANGELOG.md), [documentation](https://github.com/AlexandreDecan/python-intervals/blob/1.10.0/README.md)).
+**Latest release:**
+ - `portion`: 2.0.0 on 2020-03-06 ([changes](https://github.com/AlexandreDecan/portion/blob/2.0.0/CHANGELOG.md), [documentation](https://github.com/AlexandreDecan/portion/blob/2.0.0/README.md)).
+ - `python-intervals`: 1.10.0 on 2019-09-26 ([changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog), [documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md)).
 
 
 ## Table of contents
@@ -44,34 +46,34 @@ This library provides data structure and operations for intervals in Python 3.5+
 
 ## Installation
 
-You can use `pip` to install it, as usual: `pip install python-intervals`.
+You can use `pip` to install it, as usual: `pip install portion`.
 
-This will install the latest available version from [PyPI](https://pypi.org/project/python-intervals).
-Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/python-intervals)
-and can be installed with `pip install git+https://github.com/AlexandreDecan/python-intervals`.
+This will install the latest available version from [PyPI](https://pypi.org/project/portion).
+Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion)
+and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 
-The test environment can be installed with `pip install python-intervals[test]` and relies on [pytest](https://docs.pytest.org/en/latest/).
+The test environment can be installed with `pip install portion[test]` and relies on [pytest](https://docs.pytest.org/en/latest/).
 
 
 ## Documentation & usage
 
 ### Interval creation
 
-Assuming this library is imported using `import intervals as I`, intervals can be easily
+Assuming this library is imported using `import portion as P`, intervals can be easily
 created using one of the following helpers:
 
 ```python
->>> I.open(1, 2)
+>>> P.open(1, 2)
 (1,2)
->>> I.closed(1, 2)
+>>> P.closed(1, 2)
 [1,2]
->>> I.openclosed(1, 2)
+>>> P.openclosed(1, 2)
 (1,2]
->>> I.closedopen(1, 2)
+>>> P.closedopen(1, 2)
 [1,2)
->>> I.singleton(1)
+>>> P.singleton(1)
 [1]
->>> I.empty()
+>>> P.empty()
 ()
 
 ```
@@ -79,39 +81,39 @@ created using one of the following helpers:
 The bounds of an interval can be any arbitrary values, as long as they are comparable:
 
 ```python
->>> I.closed(1.2, 2.4)
+>>> P.closed(1.2, 2.4)
 [1.2,2.4]
->>> I.closed('a', 'z')
+>>> P.closed('a', 'z')
 ['a','z']
 >>> import datetime
->>> I.closed(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
+>>> P.closed(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
 [datetime.date(2011, 3, 15),datetime.date(2013, 10, 10)]
 
 ```
 
 
-Infinite and semi-infinite intervals are supported using `I.inf` and `-I.inf` as upper or lower bounds.
+Infinite and semi-infinite intervals are supported using `P.inf` and `-P.inf` as upper or lower bounds.
 These two objects support comparison with any other object.
 When infinities are used as a lower or upper bound, the corresponding boundary is automatically converted to an open one.
 
 ```python
->>> I.inf > 'a', I.inf > 0, I.inf > True
+>>> P.inf > 'a', P.inf > 0, P.inf > True
 (True, True, True)
->>> I.openclosed(-I.inf, 0)
+>>> P.openclosed(-P.inf, 0)
 (-inf,0]
->>> I.closed(-I.inf, I.inf)  # Automatically converted to an open interval
+>>> P.closed(-P.inf, P.inf)  # Automatically converted to an open interval
 (-inf,+inf)
 
 ```
 
-Empty intervals always resolve to `(I.inf, -I.inf)`, regardless of the provided bounds:
+Empty intervals always resolve to `(P.inf, -P.inf)`, regardless of the provided bounds:
 
 ```python
->>> I.empty() == I.open(I.inf, -I.inf)
+>>> P.empty() == P.open(P.inf, -P.inf)
 True
->>> I.closed(4, 3) == I.open(I.inf, -I.inf)
+>>> P.closed(4, 3) == P.open(P.inf, -P.inf)
 True
->>> I.openclosed('a', 'a') == I.open(I.inf, -I.inf)
+>>> P.openclosed('a', 'a') == P.open(P.inf, -P.inf)
 True
 
 ```
@@ -121,7 +123,7 @@ An `Interval` instance is a disjunction of atomic intervals each representing a 
 Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
 
 ```python
->>> list(I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))
+>>> list(P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))
 [[0,1], (10,11), [20,21]]
 
 ```
@@ -129,9 +131,9 @@ Intervals can be iterated to access the underlying atomic intervals, sorted by t
 Atomic intervals can also be retrieved by position:
 
 ```python
->>> (I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))[0]
+>>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[0]
 [0,1]
->>> (I.open(10, 11) | I.closed(0, 1) | I.closed(20, 21))[-2]
+>>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[-2]
 (10,11)
 
 ```
@@ -139,13 +141,13 @@ Atomic intervals can also be retrieved by position:
 For convenience, intervals are automatically simplified:
 
 ```python
->>> I.closed(0, 2) | I.closed(2, 4)
+>>> P.closed(0, 2) | P.closed(2, 4)
 [0,4]
->>> I.closed(1, 2) | I.closed(3, 4) | I.closed(2, 3)
+>>> P.closed(1, 2) | P.closed(3, 4) | P.closed(2, 3)
 [1,4]
->>> I.empty() | I.closed(0, 1)
+>>> P.empty() | P.closed(0, 1)
 [0,1]
->>> I.closed(1, 2) | I.closed(2, 3) | I.closed(4, 5)
+>>> P.closed(1, 2) | P.closed(2, 3) | P.closed(4, 5)
 [1,3] | [4,5]
 
 ```
@@ -163,44 +165,44 @@ An `Interval` defines the following properties:
 
  - `i.empty` is `True` if and only if the interval is empty.
    ```python
-   >>> I.closed(0, 1).empty
+   >>> P.closed(0, 1).empty
    False
-   >>> I.closed(0, 0).empty
+   >>> P.closed(0, 0).empty
    False
-   >>> I.openclosed(0, 0).empty
+   >>> P.openclosed(0, 0).empty
    True
-   >>> I.empty().empty
+   >>> P.empty().empty
    True
 
    ```
 
  - `i.atomic` is `True` if and only if the interval is a disjunction of a single (possibly empty) interval.
    ```python
-   >>> I.closed(0, 2).atomic
+   >>> P.closed(0, 2).atomic
    True
-   >>> (I.closed(0, 1) | I.closed(1, 2)).atomic
+   >>> (P.closed(0, 1) | P.closed(1, 2)).atomic
    True
-   >>> (I.closed(0, 1) | I.closed(2, 3)).atomic
+   >>> (P.closed(0, 1) | P.closed(2, 3)).atomic
    False
 
    ```
 
  - `i.enclosure` refers to the smallest atomic interval that includes the current one.
    ```python
-   >>> (I.closed(0, 1) | I.open(2, 3)).enclosure
+   >>> (P.closed(0, 1) | P.open(2, 3)).enclosure
    [0,3)
 
    ```
 
 The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
 with its `left`, `right`, `lower` and `upper` attributes.
-The `left` and `right` bounds are either `I.CLOSED` or `I.OPEN`.
-By definition, `I.CLOSED == ~I.OPEN` and vice-versa.
+The `left` and `right` bounds are either `P.CLOSED` or `P.OPEN`.
+By definition, `P.CLOSED == ~P.OPEN` and vice-versa.
 
 ```python
->> I.CLOSED, I.OPEN
+>> P.CLOSED, P.OPEN
 CLOSED, OPEN
->>> x = I.closedopen(0, 1)
+>>> x = P.closedopen(0, 1)
 >>> x.left, x.lower, x.upper, x.right
 (CLOSED, 0, 1, OPEN)
 
@@ -210,7 +212,7 @@ If the interval is not atomic, then `left` and `lower` refer to the lower bound 
 while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```python
->>> x = I.open(0, 1) | I.closed(3, 4)
+>>> x = P.open(0, 1) | P.closed(3, 4)
 >>> x.left, x.lower, x.upper, x.right
 (OPEN, 0, 4, CLOSED)
 
@@ -219,12 +221,12 @@ while `right` and `upper` refer to the upper bound of its enclosure:
 One can easily check for some interval properties based on the bounds of an interval:
 
 ```python
->>> x = I.openclosed(-I.inf, 0)
+>>> x = P.openclosed(-P.inf, 0)
 >>> # Check that interval is left/right closed
->>> x.left == I.CLOSED, x.right == I.CLOSED
+>>> x.left == P.CLOSED, x.right == P.CLOSED
 (False, True)
 >>> # Check that interval is left/right bounded
->>> x.lower == -I.inf, x.upper == I.inf
+>>> x.lower == -P.inf, x.upper == P.inf
 (True, False)
 >>> # Check for singleton
 >>> x.lower == x.upper
@@ -241,42 +243,42 @@ False
 
  - `i.intersection(other)` and `i & other` return the intersection of two intervals.
    ```python
-   >>> I.closed(0, 2) & I.closed(1, 3)
+   >>> P.closed(0, 2) & P.closed(1, 3)
    [1,2]
-   >>> I.closed(0, 4) & I.open(2, 3)
+   >>> P.closed(0, 4) & P.open(2, 3)
    (2,3)
-   >>> I.closed(0, 2) & I.closed(2, 3)
+   >>> P.closed(0, 2) & P.closed(2, 3)
    [2]
-   >>> I.closed(0, 2) & I.closed(3, 4)
+   >>> P.closed(0, 2) & P.closed(3, 4)
    ()
 
    ```
 
  - `i.union(other)` and `i | other` return the union of two intervals.
    ```python
-   >>> I.closed(0, 1) | I.closed(1, 2)
+   >>> P.closed(0, 1) | P.closed(1, 2)
    [0,2]
-   >>> I.closed(0, 1) | I.closed(2, 3)
+   >>> P.closed(0, 1) | P.closed(2, 3)
    [0,1] | [2,3]
 
    ```
 
  - `i.complement(other)` and `~i` return the complement of the interval.
    ```python
-   >>> ~I.closed(0, 1)
+   >>> ~P.closed(0, 1)
    (-inf,0) | (1,+inf)
-   >>> ~(I.open(-I.inf, 0) | I.open(1, I.inf))
+   >>> ~(P.open(-P.inf, 0) | P.open(1, P.inf))
    [0,1]
-   >>> ~I.open(-I.inf, I.inf)
+   >>> ~P.open(-P.inf, P.inf)
    ()
 
    ```
 
  - `i.difference(other)` and `i - other` return the difference between `i` and `other`.
    ```python
-   >>> I.closed(0,2) - I.closed(1,2)
+   >>> P.closed(0,2) - P.closed(1,2)
    [0,1)
-   >>> I.closed(0, 4) - I.closed(1, 2)
+   >>> P.closed(0, 4) - P.closed(1, 2)
    [0,1) | (2,4]
 
    ```
@@ -284,11 +286,11 @@ False
  - `i.contains(other)` and `other in i` hold if given item is contained in the interval.
  It supports intervals and arbitrary comparable values.
    ```python
-   >>> 2 in I.closed(0, 2)
+   >>> 2 in P.closed(0, 2)
    True
-   >>> 2 in I.open(0, 2)
+   >>> 2 in P.open(0, 2)
    False
-   >>> I.open(0, 1) in I.closed(0, 2)
+   >>> P.open(0, 1) in P.closed(0, 2)
    True
 
    ```
@@ -296,22 +298,22 @@ False
  - `i.adjacent(other)` tests if the two intervals are adjacent.
  Two intervals are adjacent if their intersection is empty, and their union is an atomic interval.
    ```python
-   >>> I.closed(0, 1).adjacent(I.openclosed(1, 2))
+   >>> P.closed(0, 1).adjacent(P.openclosed(1, 2))
    True
-   >>> I.closed(0, 1).adjacent(I.closed(1, 2))
+   >>> P.closed(0, 1).adjacent(P.closed(1, 2))
    False
-   >>> (I.closed(0, 1) | I.closed(2, 3)).adjacent(I.open(1, 2) | I.open(3, 4))
+   >>> (P.closed(0, 1) | P.closed(2, 3)).adjacent(P.open(1, 2) | P.open(3, 4))
    True
-   >>> I.closed(0, 1).adjacent(I.open(1, 2) | I.open(10, 11))
+   >>> P.closed(0, 1).adjacent(P.open(1, 2) | P.open(10, 11))
    False
 
    ```
 
  - `i.overlaps(other)` tests if there is an overlap between two intervals.
    ```python
-   >>> I.closed(1, 2).overlaps(I.closed(2, 3))
+   >>> P.closed(1, 2).overlaps(P.closed(2, 3))
    True
-   >>> I.closed(1, 2).overlaps(I.open(2, 3))
+   >>> P.closed(1, 2).overlaps(P.open(2, 3))
    False
 
    ```
@@ -324,9 +326,9 @@ False
 Equality between intervals can be checked with the classical `==` operator:
 
 ```python
->>> I.closed(0, 2) == I.closed(0, 1) | I.closed(1, 2)
+>>> P.closed(0, 2) == P.closed(0, 1) | P.closed(1, 2)
 True
->>> I.closed(0, 2) == I.open(0, 2)
+>>> P.closed(0, 2) == P.open(0, 2)
 False
 
 ```
@@ -337,9 +339,9 @@ For instance, `a < b` holds if `a` is entirely on the left of the lower bound of
 on the right of the upper bound of `b`.
 
 ```python
->>> I.closed(0, 1) < I.closed(2, 3)
+>>> P.closed(0, 1) < P.closed(2, 3)
 True
->>> I.closed(0, 1) < I.closed(1, 2)
+>>> P.closed(0, 1) < P.closed(1, 2)
 False
 
 ```
@@ -348,11 +350,11 @@ Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `
 holds if `a` is entirely on the right of the lower bound of `b`.
 
 ```python
->>> I.closed(0, 1) <= I.closed(2, 3)
+>>> P.closed(0, 1) <= P.closed(2, 3)
 True
->>> I.closed(0, 2) <= I.closed(1, 3)
+>>> P.closed(0, 2) <= P.closed(1, 3)
 True
->>> I.closed(0, 3) <= I.closed(1, 2)
+>>> P.closed(0, 3) <= P.closed(1, 2)
 False
 
 ```
@@ -362,13 +364,13 @@ Intervals can also be compared with single values. If `i` is an interval and `x`
 left of the upper bound of `i`.
 
 ```python
->>> 5 < I.closed(0, 10)
+>>> 5 < P.closed(0, 10)
 False
->>> 5 <= I.closed(0, 10)
+>>> 5 <= P.closed(0, 10)
 True
->>> I.closed(0, 10) < 5
+>>> P.closed(0, 10) < 5
 False
->>> I.closed(0, 10) <= 5
+>>> P.closed(0, 10) <= 5
 True
 
 ```
@@ -380,18 +382,18 @@ Note that all these semantics differ from classical comparison operators.
 As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
 
 ```python
->>> I.closed(0, 4) <= I.closed(1, 2) or I.closed(0, 4) >= I.closed(1, 2)
+>>> P.closed(0, 4) <= P.closed(1, 2) or P.closed(0, 4) >= P.closed(1, 2)
 False
->>> I.closed(0, 4) < I.closed(1, 2) or I.closed(0, 4) > I.closed(1, 2)
+>>> P.closed(0, 4) < P.closed(1, 2) or P.closed(0, 4) > P.closed(1, 2)
 False
->>> I.empty() < I.empty()
+>>> P.empty() < P.empty()
 True
->>> I.empty() < I.closed(0, 1) and I.empty() > I.closed(0, 1)
+>>> P.empty() < P.closed(0, 1) and P.empty() > P.closed(0, 1)
 True
 
 ```
 
-Finally, intervals are hashable as long as their bounds are hashable (and we have defined a hash value for `I.inf` and `-I.inf`).
+Finally, intervals are hashable as long as their bounds are hashable (and we have defined a hash value for `P.inf` and `-P.inf`).
 
 
 
@@ -402,10 +404,10 @@ Intervals are immutable but provide a `replace` method to create a new interval 
 current one. This method accepts four optional parameters `left`, `lower`, `upper`, and `right`:
 
 ```python
->>> i = I.closed(0, 2)
->>> i.replace(I.OPEN, -1, 3, I.CLOSED)
+>>> i = P.closed(0, 2)
+>>> i.replace(P.OPEN, -1, 3, P.CLOSED)
 (-1,3]
->>> i.replace(lower=1, right=I.OPEN)
+>>> i.replace(lower=1, right=P.OPEN)
 [1,2)
 
 ```
@@ -414,9 +416,9 @@ Functions can be passed instead of values. If a function is passed, it is called
 value except if the corresponding bound is an infinity and parameter `ignore_inf` if set to `False`.
 
 ```python
->>> I.closed(0, 2).replace(upper=lambda x: 2 * x)
+>>> P.closed(0, 2).replace(upper=lambda x: 2 * x)
 [0,4]
->>> i = I.closedopen(0, I.inf)
+>>> i = P.closedopen(0, P.inf)
 >>> i.replace(upper=lambda x: 10)  # No change, infinity is ignored
 [0,+inf)
 >>> i.replace(upper=lambda x: 10, ignore_inf=False)  # Infinity is not ignored
@@ -428,8 +430,8 @@ When `replace` is applied on an interval that is not atomic, it is extended and/
 its enclosure satisfies the new bounds.
 
 ```python
->>> i = I.openclosed(0, 1) | I.closed(5, 10)
->>> i.replace(I.CLOSED, -1, 8, I.OPEN)
+>>> i = P.openclosed(0, 1) | P.closed(5, 10)
+>>> i.replace(P.CLOSED, -1, 8, P.OPEN)
 [-1,1] | [5,8)
 >>> i.replace(lower=4)
 (4,10]
@@ -441,7 +443,7 @@ This method accepts a function that will be applied on each of the underlying at
 The function is expected to return either an `Interval`, or a 4-uple `(left, lower, upper, right)`.
 
 ```python
->>> i = I.closed(2, 3) | I.open(4, 5)
+>>> i = P.closed(2, 3) | P.open(4, 5)
 >>> # Increment bound values
 >>> i.apply(lambda x: (x.left, x.lower + 1, x.upper + 1, x.right))
 [3,4] | (5,6)
@@ -456,7 +458,7 @@ Because the latter allows functions to be passed as parameters and can ignore in
 conveniently used to transform intervals in presence of infinities.
 
 ```python
->>> i = I.openclosed(-I.inf, 0) | I.closed(3, 4) | I.closedopen(8, I.inf)
+>>> i = P.openclosed(-P.inf, 0) | P.closed(3, 4) | P.closedopen(8, P.inf)
 >>> # Increment bound values
 >>> i.apply(lambda x: x.replace(upper=lambda v: v + 1))
 (-inf,1] | [3,5] | [8,+inf)
@@ -467,7 +469,7 @@ conveniently used to transform intervals in presence of infinities.
 >>> i.apply(lambda x: x.replace(left=lambda v: ~v, right=lambda v: ~v))
 (-inf,0) | (3,4) | (8,+inf)
 >>> # Replace infinities with -10 and 10
->>> conv = lambda v: -10 if v == -I.inf else (10 if v == I.inf else v)
+>>> conv = lambda v: -10 if v == -P.inf else (10 if v == P.inf else v)
 >>> i.apply(lambda x: x.replace(lower=conv, upper=conv, ignore_inf=False))
 (-10,0] | [3,4] | [8,10)
 
@@ -483,11 +485,11 @@ the values of an interval. Obviously, as intervals are continuous, it is require
 given they are not excluded by the interval:
 
 ```python
->>> list(I.iterate(I.closed(0, 3), step=1))
+>>> list(P.iterate(P.closed(0, 3), step=1))
 [0, 1, 2, 3]
->>> list(I.iterate(I.closed(0, 3), step=2))
+>>> list(P.iterate(P.closed(0, 3), step=2))
 [0, 2]
->>> list(I.iterate(I.open(0, 3), step=2))
+>>> list(P.iterate(P.open(0, 3), step=2))
 [2]
 
 ```
@@ -496,9 +498,9 @@ When an interval is not atomic, `iterate` consecutively iterates on all underlyi
 intervals, starting from each lower bound and ending on each upper one:
 
 ```python
->>> list(I.iterate(I.singleton(0) | I.singleton(3) | I.singleton(5), step=2))  # Won't be [0]
+>>> list(P.iterate(P.singleton(0) | P.singleton(3) | P.singleton(5), step=2))  # Won't be [0]
 [0, 3, 5]
->>> list(I.iterate(I.closed(0, 2) | I.closed(4, 6), step=3))  # Won't be [0, 6]
+>>> list(P.iterate(P.closed(0, 2) | P.closed(4, 6), step=3))  # Won't be [0, 6]
 [0, 4]
 
 ```
@@ -511,10 +513,10 @@ It can be helpful to deal with (semi-)infinite intervals, or to *align* the gene
 
 ```python
 >>> # Align on integers
->>> list(I.iterate(I.closed(0.3, 4.9), step=1, base=int))
+>>> list(P.iterate(P.closed(0.3, 4.9), step=1, base=int))
 [1, 2, 3, 4]
 >>> # Restrict values of a (semi-)infinite interval
->>> list(I.iterate(I.openclosed(-I.inf, 2), step=1, base=lambda x: max(0, x)))
+>>> list(P.iterate(P.openclosed(-P.inf, 2), step=1, base=lambda x: max(0, x)))
 [0, 1, 2]
 
 ```
@@ -524,9 +526,9 @@ specifying a function that returns a single value, as illustrated next:
 
 ```python
 >>> base = lambda x: 0
->>> list(I.iterate(I.singleton(0) | I.singleton(3) | I.singleton(5), step=2, base=base))
+>>> list(P.iterate(P.singleton(0) | P.singleton(3) | P.singleton(5), step=2, base=base))
 [0]
->>> list(I.iterate(I.closed(0, 2) | I.closed(4, 6), step=3, base=base))
+>>> list(P.iterate(P.closed(0, 2) | P.closed(4, 6), step=3, base=base))
 [0, 6]
 
 ```
@@ -538,9 +540,9 @@ atomic intervals are large).
 Finally, iteration can be performed in reverse order by specifying `reverse=True`.
 
 ```python
->>> list(I.iterate(I.closed(0, 3), step=-1, reverse=True))  # Mind step=-1
+>>> list(P.iterate(P.closed(0, 3), step=-1, reverse=True))  # Mind step=-1
 [3, 2, 1, 0]
->>> list(I.iterate(I.closed(0, 3), step=-2, reverse=True))  # Mind step=-2
+>>> list(P.iterate(P.closed(0, 3), step=-2, reverse=True))  # Mind step=-2
 [3, 1]
 
 ```
@@ -551,10 +553,10 @@ be the step between two consecutive characters?). In these cases, a callable can
 This callable will be called with the current value, and is expected to return the next possible value.
 
 ```python
->>> list(I.iterate(I.closed('a', 'd'), step=lambda d: chr(ord(d) + 1)))
+>>> list(P.iterate(P.closed('a', 'd'), step=lambda d: chr(ord(d) + 1)))
 ['a', 'b', 'c', 'd']
 >>> # Since we reversed the order, we changed plus to minus in step.
->>> list(I.iterate(I.closed('a', 'd'), step=lambda d: chr(ord(d) - 1), reverse=True))
+>>> list(P.iterate(P.closed('a', 'd'), step=lambda d: chr(ord(d) - 1), reverse=True))
 ['d', 'c', 'b', 'a']
 
 ```
@@ -570,8 +572,8 @@ equality.
 
 
 ```python
->>> d = I.IntervalDict()
->>> d[I.closed(0, 3)] = 'banana'
+>>> d = P.IntervalDict()
+>>> d[P.closed(0, 3)] = 'banana'
 >>> d[4] = 'apple'
 >>> d
 {[0,3]: 'banana', [4]: 'apple'}
@@ -582,7 +584,7 @@ When a value is defined for an interval that overlaps an existing one, it is aut
 to take the new value into account:
 
 ```python
->>> d[I.closed(2, 4)] = 'orange'
+>>> d[P.closed(2, 4)] = 'orange'
 >>> d
 {[0,2): 'banana', [2,4]: 'orange'}
 
@@ -607,13 +609,13 @@ When an interval is used as a key, a new `IntervalDict` containing the values
 for that interval is returned:
 
 ```python
->>> d[~I.empty()]  # Get all values, similar to d.copy()
+>>> d[~P.empty()]  # Get all values, similar to d.copy()
 {[0,2): 'banana', [2,4]: 'orange'}
->>> d[I.closed(1, 3)]
+>>> d[P.closed(1, 3)]
 {[1,2): 'banana', [2,3]: 'orange'}
->>> d[I.closed(-2, 1)]
+>>> d[P.closed(-2, 1)]
 {[0,1]: 'banana'}
->>> d[I.closed(-2, -1)]
+>>> d[P.closed(-2, -1)]
 {}
 
 ```
@@ -623,11 +625,11 @@ This value is used to "fill the gaps" if the queried interval is not completely
 covered by the `IntervalDict`:
 
 ```python
->>> d.get(I.closed(-2, 1), default='peach')
+>>> d.get(P.closed(-2, 1), default='peach')
 {[-2,0): 'peach', [0,1]: 'banana'}
->>> d.get(I.closed(-2, -1), default='peach')
+>>> d.get(P.closed(-2, -1), default='peach')
 {[-2,-1]: 'peach'}
->>> d.get(I.singleton(1), default='peach')  # Key is covered, default is not used
+>>> d.get(P.singleton(1), default='peach')  # Key is covered, default is not used
 {[1]: 'banana'}
 
 ```
@@ -669,8 +671,8 @@ while values corresponding to intersecting keys are combined together using the 
 function, as illustrated hereafter:
 
 ```python
->>> d1 = I.IntervalDict({I.closed(0, 2): 'banana'})
->>> d2 = I.IntervalDict({I.closed(1, 3): 'orange'})
+>>> d1 = P.IntervalDict({P.closed(0, 2): 'banana'})
+>>> d2 = P.IntervalDict({P.closed(1, 3): 'orange'})
 >>> concat = lambda x, y: x + '/' + y
 >>> d1.combine(d2, how=concat)
 {[0,1): 'banana', [1,2]: 'banana/orange', (2,3]: 'orange'}
@@ -701,7 +703,7 @@ Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and 
 Intervals can be exported to string, either using `repr` (as illustrated above) or with the `to_string` function.
 
 ```python
->>> I.to_string(I.closedopen(0, 1))
+>>> P.to_string(P.closedopen(0, 1))
 '[0,1)'
 
 ```
@@ -721,8 +723,8 @@ The way string representations are built can be easily parametrized using the va
 ...   'ninf': '-oo',
 ...   'conv': lambda v: '"{}"'.format(v),
 ... }
->>> x = I.openclosed(0, 1) | I.closed(2, I.inf)
->>> I.to_string(x, **params)
+>>> x = P.openclosed(0, 1) | P.closed(2, P.inf)
+>>> P.to_string(x, **params)
 '.."0" - "1"> or <"2" - +oo..'
 
 ```
@@ -731,12 +733,12 @@ Similarly, intervals can be created from a string using the `from_string` functi
 A conversion function (`conv` parameter) has to be provided to convert a bound (as string) to a value.
 
 ```python
->>> I.from_string('[0, 1]', conv=int) == I.closed(0, 1)
+>>> P.from_string('[0, 1]', conv=int) == P.closed(0, 1)
 True
->>> I.from_string('[1.2]', conv=float) == I.singleton(1.2)
+>>> P.from_string('[1.2]', conv=float) == P.singleton(1.2)
 True
 >>> converter = lambda s: datetime.datetime.strptime(s, '%Y/%m/%d')
->>> I.from_string('[2011/03/15, 2013/10/10]', conv=converter)
+>>> P.from_string('[2011/03/15, 2013/10/10]', conv=converter)
 [datetime.datetime(2011, 3, 15, 0, 0),datetime.datetime(2013, 10, 10, 0, 0)]
 
 ```
@@ -757,7 +759,7 @@ Notice that as `from_string` expects regular expression patterns, we need to esc
 ...   'ninf': '-oo',
 ...   'conv': lambda v: int(v[1:-1]),
 ... }
->>> I.from_string(s, **params)
+>>> P.from_string(s, **params)
 (0,1] | [2,+inf)
 
 ```
@@ -767,7 +769,7 @@ the `bound` parameter can be used to specify the regular expression that should 
 
 ```python
 >>> s = '[(0, 1), (2, 3)]'  # Bounds are expected to be tuples
->>> I.from_string(s, conv=eval, bound=r'\(.+?\)')
+>>> P.from_string(s, conv=eval, bound=r'\(.+?\)')
 [(0, 1),(2, 3)]
 
 ```
@@ -777,10 +779,10 @@ the `bound` parameter can be used to specify the regular expression that should 
 ### Import & export intervals to Python built-in data types
 
 Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to support JSON serialization.
-`I.CLOSED` and `I.OPEN` are represented by Boolean values `True` (inclusive) and `False` (exclusive).
+`P.CLOSED` and `P.OPEN` are represented by Boolean values `True` (inclusive) and `False` (exclusive).
 
 ```python
->>> I.to_data(I.openclosed(0, 2))
+>>> P.to_data(P.openclosed(0, 2))
 [(False, 0, 2, True)]
 
 ```
@@ -789,8 +791,8 @@ The values used to represent positive and negative infinities can be specified w
 `pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
 ```python
->>> x = I.openclosed(0, 1) | I.closedopen(2, I.inf)
->>> I.to_data(x)
+>>> x = P.openclosed(0, 1) | P.closedopen(2, P.inf)
+>>> P.to_data(x)
 [(False, 0, 1, True), (True, 2, inf, False)]
 
 ```
@@ -798,8 +800,8 @@ The values used to represent positive and negative infinities can be specified w
 The function to convert bounds can be specified with the `conv` parameter.
 
 ```python
->>> x = I.closedopen(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
->>> I.to_data(x, conv=lambda v: (v.year, v.month, v.day))
+>>> x = P.closedopen(datetime.date(2011, 3, 15), datetime.date(2013, 10, 10))
+>>> P.to_data(x, conv=lambda v: (v.year, v.month, v.day))
 [(True, (2011, 3, 15), (2013, 10, 10), False)]
 
 ```
@@ -809,7 +811,7 @@ The same set of parameters can be used to specify how bounds and infinities are 
 
 ```python
 >>> x = [(True, (2011, 3, 15), (2013, 10, 10), False)]
->>> I.from_data(x, conv=lambda v: datetime.date(*v))
+>>> P.from_data(x, conv=lambda v: datetime.date(*v))
 [datetime.date(2011, 3, 15),datetime.date(2013, 10, 10))
 
 ```
@@ -818,7 +820,7 @@ The same set of parameters can be used to specify how bounds and infinities are 
 ## Changelog
 
 This library adheres to a [semantic versioning](https://semver.org) scheme.
-See [CHANGELOG.md](https://github.com/AlexandreDecan/python-intervals/blob/master/CHANGELOG.md) for the list of changes.
+See [CHANGELOG.md](https://github.com/AlexandreDecan/portion/blob/master/CHANGELOG.md) for the list of changes.
 
 
 
@@ -831,15 +833,15 @@ Feel free to report bugs or suggest new features using GitHub issues and/or pull
 
 ## License
 
-Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/python-intervals/blob/master/LICENSE.txt).
+Distributed under [LGPLv3 - GNU Lesser General Public License, version 3](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt).
 
 You can refer to this library using:
 
 ```
-@software{python-intervals,
+@software{portion,
   author = {Decan, Alexandre},
-  title = {python-intervals: Python data structure and operations for intervals},
-  url = {https://github.com/AlexandreDecan/python-intervals},
+  title = {portion: Python data structure and operations for intervals},
+  url = {https://github.com/AlexandreDecan/portion},
 }
 ```
 

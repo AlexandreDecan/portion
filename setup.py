@@ -6,12 +6,12 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
     long_description = f.read()
 
 setup(
-    name='python-intervals',
-    version='2.0.0',
+    name='portion',
+    version='2.0.0rc1',
     license='LGPL3',
 
     author='Alexandre Decan',
-    url='https://github.com/AlexandreDecan/python-intervals',
+    url='https://github.com/AlexandreDecan/portion',
 
     description='Python data structure and operations for intervals',
     long_description=long_description,
@@ -40,7 +40,7 @@ setup(
     ],
     keywords='interval operation range math',
 
-    packages=find_packages(include=['intervals']),
+    packages=find_packages(include=['portion']),
     python_requires='~=3.5',
 
     install_requires=[],

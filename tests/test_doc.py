@@ -1,13 +1,13 @@
 import doctest
 
-import intervals as I
+import portion as P
 
 
 def test_readme():
     failure = None
 
     try:
-        doctest.testfile('../README.md', raise_on_error=True, globs={'I': I})
+        doctest.testfile('../README.md', raise_on_error=True, globs={'P': P})
     except doctest.DocTestFailure as e:
         failure = e.example.want, e.got, e.example.source
 

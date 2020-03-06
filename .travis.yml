@@ -12,7 +12,7 @@ install:
 - pip install pip -U
 - pip install -e .[test,travis]
 script:
-- coverage run --source intervals -m pytest
+- coverage run --source portion -m pytest
 after_success:
 - coveralls
 matrix:

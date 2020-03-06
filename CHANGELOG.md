@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0 (2020-03-06)
 
 ### Added
  - `i.empty` to check for interval emptiness.
@@ -11,6 +11,7 @@
  - Static method `Interval.from_atomic(left, lower, upper, right)` to create an interval composed of a single atomic interval (replaces `AtomicInterval(left, lower, upper, right)`).
 
 ### Changed
+ - (breaking) `python-intervals` has been renamed `portion`.
  - (breaking) Many (optional) parameters are converted to keyword-only arguments:
    * for `from_string` and `to_string`: `bound`, `disj`, `sep`, `left_open`, `left_closed`, `right_open`, `right_closed`, `pinf` and `ninf`;
    * for `from_data` and `to_data`: `pinf` and `ninf`;
@@ -21,7 +22,7 @@
  - (breaking) `i.enclosure` is a property and no longer a method.
  - (breaking) Indexing or iterating on the atomic intervals of an `Interval` returns `Interval` instances instead of `AtomicInterval` ones.
  - (breaking) An interval is hashable if and only if its bounds are hashable.
- - Huge performance increase for creation, union, intersection, complement and difference of intervals ([#21](https://github.com/AlexandreDecan/python-intervals/issues/21)).
+ - Huge performance increase for creation, union, intersection, complement and difference of intervals ([#21](https://github.com/AlexandreDecan/portion/issues/21)).
  - `CLOSED` and `OPEN` are members of the `Bound` enumeration.
  - Large refactoring to encapsulate `AtomicInterval` and all its operations in `Interval`.
  - Restructure package in modules instead of a flat file.
@@ -30,7 +31,7 @@
 
 ### Removed
  - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
- - (breaking) `AtomicInterval` is a `namedtuple` and is no longer part of the public API.
+ - (breaking) `AtomicInterval` is a `namedtuple` and is no longer part of the public APP.
  - (breaking) Remove `i.to_atomic()` (use `i.enclosure` instead).
  - (breaking) Remove `i.is_empty()` (use `i.empty` instead).
  - (breaking) Remove `i.is_atomic()` (use `i.atomic` instead).
@@ -40,7 +41,7 @@
  - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
 ### Fixed
- - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/python-intervals/issues/19)).
+ - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/portion/issues/19)).
 
 
 
@@ -61,8 +62,8 @@
  - Deprecate `permissive` in `.overlaps` in favour of `adjacent`.
 
 ### Fixed
- - `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/python-intervals/issues/12)).
- - `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/python-intervals/issues/13)).
+ - `.union` when intervals share a bound, one inclusive and one exclusive ([#12](https://github.com/AlexandreDecan/portion/issues/12)).
+ - `.overlaps` when intervals share a lower bound, and one interval is contained within the other one ([#13](https://github.com/AlexandreDecan/portion/issues/13)).
 
 
 ## 1.8.0 (2018-12-15)
@@ -74,28 +75,28 @@
  - Intervals can be compared with single values as well.
 
 ### Changed
- - `I.empty()` returns the same instance to save memory.
+ - `P.empty()` returns the same instance to save memory.
  - Infinities are singleton objects.
- - Set `len(I.empty()) = 1` and `I.empty()[0] == I.empty().to_atomic()` for consistency.
+ - Set `len(P.empty()) = 1` and `P.empty()[0] == P.empty().to_atomic()` for consistency.
 
 
 ## 1.7.0 (2018-12-06)
 
 ### Added
- - Import from and export to Python built-in data types (a list of 4-uples) with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/python-intervals/issues/6)).
+ - Import from and export to Python built-in data types (a list of 4-uples) with `from_data` and `to_data` ([#6](https://github.com/AlexandreDecan/portion/issues/6)).
  - Examples for arbitrary interval transformations.
 
 
 ## 1.6.0 (2018-08-29)
 
 ### Added
- - Support for customized infinity representation in `to_string` and `from_string` ([#3](https://github.com/AlexandreDecan/python-intervals/issues/3)).
+ - Support for customized infinity representation in `to_string` and `from_string` ([#3](https://github.com/AlexandreDecan/portion/issues/3)).
 
 
 ## 1.5.4 (2018-07-29)
 
 ### Fixed
- - `.overlaps` ([#2](https://github.com/AlexandreDecan/python-intervals/issues/2)).
+ - `.overlaps` ([#2](https://github.com/AlexandreDecan/portion/issues/2)).
 
 
 ## 1.5.3 (2018-06-21)
@@ -113,7 +114,7 @@
 ## 1.5.1 (2018-04-25)
 
 ### Fixed
- - [#1](https://github.com/AlexandreDecan/python-intervals/issues/1) by making empty intervals always resolving to `(I.inf, -I.inf)`.
+ - [#1](https://github.com/AlexandreDecan/portion/issues/1) by making empty intervals always resolving to `(P.inf, -P.inf)`.
 
 
 ## 1.5.0 (2018-04-17)
@@ -125,8 +126,8 @@
 ## 1.4.0 (2018-04-17)
 
 ### Added
- - Function `I.to_string` to export an interval to a string, with many options to customize the representation.
- - Function `I.from_string` to create an interval from a string, with many options to customize the parsing.
+ - Function `P.to_string` to export an interval to a string, with many options to customize the representation.
+ - Function `P.from_string` to create an interval from a string, with many options to customize the parsing.
 
 
 ## 1.3.2 (2018-04-13)
@@ -179,7 +180,7 @@
 
 ## 1.0.3 (2018-04-03)
 
- - Initial release on PyPI.
+ - Initial release on PyPP.
 
 
 ## 1.0.0 (2018-04-03)
