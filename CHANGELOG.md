@@ -38,11 +38,10 @@
  - (breaking) `CLOSED` and `OPEN` do no longer define an implicit Boolean value. Use `~` instead of `not` to invert a bound.
  - (breaking) Remove deprecated `permissive` in `i.overlaps`.
  - (breaking) Remove `adjacent` in `i.overlaps`, use `i.adjacent` method instead.
- - Package meta-data (e.g., `__version__`, `__url__`, etc.) moved to `setup.py`.
 
 ### Fixed
  - Fix an issue where an interval can be composed of duplicated empty intervals ([#19](https://github.com/AlexandreDecan/portion/issues/19)).
-
+ - Fix performance issues when intervals composed of hundreds of atomic intervals are complemented ([#20](https://github.com/AlexandreDecan/portion/issues/21))
 
 
 ## 1.10.0 (2019-09-26)
