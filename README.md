@@ -1,4 +1,4 @@
-# portion: Python data structure and operations for intervals
+# portion - data structure and operations for intervals
 
 [![Travis](https://travis-ci.org/AlexandreDecan/portion.svg?branch=master)](https://travis-ci.org/AlexandreDecan/portion)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
@@ -22,8 +22,10 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
  - Heavily tested with high code coverage.
 
 **Latest release:**
- - `portion`: 2.0.0 on 2020-03-06 ([changes](https://github.com/AlexandreDecan/portion/blob/2.0.0/CHANGELOG.md), [documentation](https://github.com/AlexandreDecan/portion/blob/2.0.0/README.md)).
- - `python-intervals`: 1.10.0 on 2019-09-26 ([changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog), [documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md)).
+ - `portion`: 2.0.0 on 2020-03-06 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.0.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.0.0/CHANGELOG.md)).
+ - `python-intervals`: 1.10.0 on 2019-09-26 ([documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog)).
+
+ Note that `python-intervals` will no longer receive updates since it has been replaced by `portion`.
 
 
 ## Table of contents
