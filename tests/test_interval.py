@@ -29,6 +29,28 @@ class TestHelpers:
         assert P.singleton(-P.inf) == P.empty()
 
 
+class TestRepr:
+    def test_simple(self):
+        assert repr(P.closed(0, 1)) == '[0,1]'
+        assert repr(P.openclosed(0, 1)) == '(0,1]'
+        assert repr(P.closedopen(0, 1)) == '[0,1)'
+        assert repr(P.open(0, 1)) == '(0,1)'
+
+    def test_infinities(self):
+        assert repr(P.closed(-P.inf, P.inf)) == '(-inf,+inf)'
+
+    def test_empty(self):
+        assert repr(P.empty()) == '()'
+
+    def test_singleton(self):
+        assert repr(P.singleton(4)) == '[4]'
+
+    def test_union(self):
+        assert repr(P.closed(0, 1) | P.open(3, 4)) == '[0,1] | (3,4)'
+        # https://github.com/AlexandreDecan/portion/issues/22
+        assert repr(P.singleton(1) | P.singleton(2)) == '[1] | [2]'
+
+
 class TestInterval:
     def test_creation(self):
         assert P.Interval() == P.empty()
