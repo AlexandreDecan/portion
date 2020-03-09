@@ -154,8 +154,9 @@ For convenience, intervals are automatically simplified:
 
 ```
 
-Note that discrete intervals are **not** supported, e.g., combining `[0,1]` with `[2,3]` will **not** result
-in `[0,3]` even if there is no integer between `1` and `2`.
+Note that discrete intervals are **not** supported by `portion` (but they can be simulated though).
+For example, combining `[0,1]` with `[2,3]` will **not** result in `[0,3]` even if there is
+no integer between `1` and `2`.
 
 
 
