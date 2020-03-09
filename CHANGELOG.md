@@ -1,5 +1,12 @@
 # Changelog
 
+## Development
+
+### Fixed
+
+ - Fix invalid representations of non-atomic intervals composed of a singleton ([#22](https://github.com/AlexandreDecan/portion/issues/22)).
+
+
 ## 2.0.0 (2020-03-06)
 
 ### Added
