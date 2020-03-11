@@ -281,7 +281,7 @@ class Interval:
         else:
             lowest = n_interval[0].replace(left=left, lower=lower)
             highest = n_interval[-1].replace(upper=upper, right=right)
-            return Interval(*[lowest] + n_interval[1:-1] + [highest])
+            return Interval(lowest, *n_interval[1:-1], highest)
 
     def apply(self, func):
         """
