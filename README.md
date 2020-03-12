@@ -2,10 +2,9 @@
 
 [![Travis](https://travis-ci.org/AlexandreDecan/portion.svg?branch=master)](https://travis-ci.org/AlexandreDecan/portion)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
-[![License](https://img.shields.io/pypi/l/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
-[![PyPI](https://img.shields.io/pypi/v/portion)](https://pypi.org/project/portion)
-[![Changelog](https://img.shields.io/github/release-date/AlexandreDecan/portion)](https://pypi.org/project/portion)
-[![Commits](https://img.shields.io/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
+[![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
+[![PyPI](https://badgen.net/pypi/v/portion)](https://pypi.org/project/portion)
+[![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
 The `portion` library (formerly distributed as `python-intervals`) provides data structure and operations for intervals in Python 3.5+.
