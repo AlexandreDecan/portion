@@ -4,21 +4,25 @@ from .interval import Interval, singleton
 from collections.abc import MutableMapping
 
 
+def _sort(i):
+    return (i[0].lower, i[0].left is Bound.CLOSED, i[0].upper, i[0].right is Bound.OPEN)
+
+
 class IntervalDict(MutableMapping):
     """
     An IntervalDict is a dict-like data structure that maps from intervals to data,
     where keys can be single values or Interval instances.
 
-    When Interval instances are used as keys, its behaviour merely corresponds to
+    When keys are Interval instances, its behaviour merely corresponds to
     range queries and it returns IntervalDict instances corresponding to the
-    subset of values covered by the interval. When single values are used as keys,
-    its behaviour corresponds to built-in dict.
-
-    KeyError are only raised when values are used as keys. When intervals are used,
-    and if there is no matching value, an empty IntervalDict is returned instead.
+    subset of values covered by the given interval. If no matching value is
+    found, an empty IntervalDict is returned.
+    When keys are "single values", its behaviour corresponds to the one of Python
+    built-in dict. When no matchin value is found, a KeyError is raised.
 
     Note that this class does not aim to have the best performance, but is
-    provided mainly for convenience.
+    provided mainly for convenience. Its performance mainly depends on the
+    number of distinct values (not keys) that are stored.
     """
 
     __slots__ = ('_items', )
@@ -93,10 +97,7 @@ class IntervalDict(MutableMapping):
 
         :return: a sorted list of 2-uples.
         """
-        def func(i):
-            return (i[0].lower, i[0].left is Bound.CLOSED, i[0].upper, i[0].right is Bound.OPEN)
-
-        return sorted(self._items, key=func)
+        return sorted(self._items, key=_sort)
 
     def keys(self):
         """
