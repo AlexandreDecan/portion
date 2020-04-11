@@ -1,7 +1,7 @@
 from .const import Bound
 from .interval import Interval, singleton
 
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping, Mapping
 
 
 def _sort(i):
@@ -33,9 +33,8 @@ class IntervalDict(MutableMapping):
 
         If no argument is given, an empty IntervalDict is created. If an argument
         is given, and is a mapping object (e.g., another IntervalDict), an
-        new IntervalDict with the same key-value pairs is created.
-
-        If an iterable is provided, it has to be a list of (key, value) pairs.
+        new IntervalDict with the same key-value pairs is created. If an
+        iterable is provided, it has to be a list of (key, value) pairs.
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
@@ -188,7 +187,7 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: mapping or iterable.
         """
-        if hasattr(mapping_or_iterable, 'items'):
+        if isinstance(mapping_or_iterable, Mapping):
             data = mapping_or_iterable.items()
         else:
             data = mapping_or_iterable
