@@ -238,3 +238,34 @@ class TestIntervalDict:
         assert a.items() == [(P.closed(-1, 1), 2), (P.openclosed(1, 2), 0), (P.closed(4, 5), 1)]
 
         assert P.IntervalDict([(0, 0), (1, 1)]) == P.IntervalDict([(1, 1), (0, 0)])
+
+    def test_update_with_intervaldict(self):
+        d = P.IntervalDict()
+        d2 = P.IntervalDict()
+
+        d[1] = 'c'
+        d2[1] = 'a'
+        d2[2] = 'b'
+
+        d.update(d2)
+        assert d[1] == 'a'
+        assert d[2] == 'b'
+        assert len(d) == 2
+
+    def test_update_with_mapping(self):
+        d = P.IntervalDict()
+        d2 = {1: 'a', 2: 'b'}
+
+        d.update(d2)
+        assert d[1] == 'a'
+        assert d[2] == 'b'
+        assert len(d) == 2
+
+    def test_update_with_iterable(self):
+        d = P.IntervalDict()
+        d2 = {1: 'a', 2: 'b'}
+
+        d.update(d2.items())
+        assert d[1] == 'a'
+        assert d[2] == 'b'
+        assert len(d) == 2
