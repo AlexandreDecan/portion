@@ -100,9 +100,9 @@ class Interval:
 
     def __init__(self, *intervals):
         """
-        Create an interval from a list of intervals.
+        Create a disjunction of zero, one or more intervals.
 
-        :param intervals: a list of intervals.
+        :param intervals: zero, one or more intervals.
         """
         self._intervals = list()
 
@@ -121,7 +121,7 @@ class Interval:
             self._intervals.sort(key=lambda i: i.lower)
 
             i = 0
-            # Attempt to merge consecutive intervals
+            # Try to merge consecutive intervals
             while i < len(self._intervals) - 1:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
