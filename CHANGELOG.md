@@ -39,7 +39,7 @@
 
 ### Removed
  - (breaking) Drop support for Python 2.7 and 3.4 since they reached end-of-life.
- - (breaking) `AtomicInterval` is a `namedtuple` and is no longer part of the public APP.
+ - (breaking) `AtomicInterval` is a `namedtuple` and is no longer part of the public API.
  - (breaking) Remove `i.to_atomic()` (use `i.enclosure` instead).
  - (breaking) Remove `i.is_empty()` (use `i.empty` instead).
  - (breaking) Remove `i.is_atomic()` (use `i.atomic` instead).
