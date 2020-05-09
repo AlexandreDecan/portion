@@ -508,6 +508,9 @@ class TestIntervalContainment:
         assert P.closed(0, 1) in P.closed(-P.inf, P.inf)
         assert P.closed(-P.inf, P.inf) not in P.closed(0, 1)
 
+        # https://github.com/AlexandreDecan/portion/issues/28
+        assert P.closed(5, 6) not in P.closed(1, 2) | P.closed(3, 4)
+
     def test_with_unions(self):
         assert P.closed(0, 1) | P.closed(2, 3) in P.closed(0, 4)
         assert P.closed(0, 1) | P.closed(2, 3) in P.closed(0, 1) | P.closed(2, 3)
