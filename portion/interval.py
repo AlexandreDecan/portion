@@ -475,7 +475,11 @@ class Interval:
 
                 for other in item:
                     while current < other:
-                        current = next(selfiter)
+                        try:
+                            current = next(selfiter)
+                        except StopIteration:
+                            return False
+
                     # here current and other could have an overlap
                     if other not in current:
                         return False
