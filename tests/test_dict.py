@@ -200,7 +200,7 @@ class TestIntervalDict:
     def test_popitem(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         t = d.popitem()
-        assert t.as_dict() == {P.closed(0, 3): 0}
+        assert t == (P.closed(0, 3), 0)
         assert len(d) == 0
 
     def test_popitem_with_empty(self):

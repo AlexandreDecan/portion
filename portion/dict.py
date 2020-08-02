@@ -25,7 +25,7 @@ class IntervalDict(MutableMapping):
     number of distinct values (not keys) that are stored.
     """
 
-    __slots__ = ('_items', )
+    __slots__ = ('_storage', )
 
     def __init__(self, mapping_or_iterable=None):
         """
@@ -38,7 +38,7 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
-        self._items = list()  # List of (interval, value) pairs
+        self._storage = dict()  # Mapping from intervals to values
 
         if mapping_or_iterable is not None:
             self.update(mapping_or_iterable)
@@ -47,7 +47,7 @@ class IntervalDict(MutableMapping):
         """
         Remove all items from the IntervalDict.
         """
-        self._items.clear()
+        self._storage.clear()
 
     def copy(self):
         """
@@ -88,7 +88,7 @@ class IntervalDict(MutableMapping):
         :param value: value to look for.
         :return: an Interval instance.
         """
-        return Interval(*(i for i, v in self._items if v == value))
+        return Interval(*(i for i, v in self._storage.items() if v == value))
 
     def items(self):
         """
@@ -96,7 +96,7 @@ class IntervalDict(MutableMapping):
 
         :return: a sorted list of 2-uples.
         """
-        return sorted(self._items, key=_sort)
+        return sorted(self._storage.items(), key=_sort)
 
     def keys(self):
         """
@@ -120,11 +120,12 @@ class IntervalDict(MutableMapping):
 
         :return: an Interval.
         """
-        return Interval(*(i for i, v in self._items))
+        return Interval(*self._storage.keys())
 
     def pop(self, key, default=None):
         """
-        Return and remove given key.
+        Remove key and return the corresponding value if key is not an Interval.
+        If key is an interval, it returns an IntervalDict instance.
 
         This method combines self[key] and del self[key]. If a default value
         is provided and is not None, it uses self.get(key, default) instead of
@@ -148,14 +149,12 @@ class IntervalDict(MutableMapping):
 
     def popitem(self):
         """
-        Pop an arbitrary existing key.
+        Remove and return some (key, value) pair as a 2-tuple.
+        Raise KeyError if D is empty.
 
-        :return: an IntervalDict
+        :return: a (key, value) pair.
         """
-        try:
-            return self.pop(self._items[-1][0])
-        except IndexError:
-            raise KeyError('Instance is empty.')
+        return self._storage.popitem()
 
     def setdefault(self, key, default=None):
         """
@@ -235,18 +234,18 @@ class IntervalDict(MutableMapping):
 
         :return: a Python dict.
         """
-        return dict(self._items)
+        return dict(self._storage)
 
     def __getitem__(self, key):
         if isinstance(key, Interval):
             items = []
-            for i, v in self._items:
+            for i, v in self._storage.items():
                 intersection = key & i
                 if not intersection.empty:
                     items.append((intersection, v))
             return IntervalDict(items)
         else:
-            for i, v in self._items:
+            for i, v in self._storage.items():
                 if key in i:
                     return v
             raise KeyError(key)
@@ -259,7 +258,7 @@ class IntervalDict(MutableMapping):
 
         new_items = []
         found = False
-        for i, v in self._items:
+        for i, v in self._storage.items():
             if value == v:
                 found = True
                 new_items.append((i | interval, v))
@@ -273,7 +272,7 @@ class IntervalDict(MutableMapping):
         if not found:
             new_items.append((interval, value))
 
-        self._items = new_items
+        self._storage = dict(new_items)
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -283,7 +282,7 @@ class IntervalDict(MutableMapping):
 
         new_items = []
         found = False
-        for i, v in self._items:
+        for i, v in self._storage.items():
             if i.overlaps(interval):
                 found = True
                 remaining = i - interval
@@ -292,16 +291,16 @@ class IntervalDict(MutableMapping):
             else:
                 new_items.append((i, v))
 
-        self._items = new_items
+        self._storage = dict(new_items)
 
         if not found and not isinstance(key, Interval):
             raise KeyError(key)
 
     def __iter__(self):
-        return iter(self.keys())
+        return iter(self._storage)
 
     def __len__(self):
-        return len(self._items)
+        return len(self._storage)
 
     def __contains__(self, key):
         return key in self.domain()

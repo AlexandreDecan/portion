@@ -7,6 +7,13 @@
  - `IntervalDict.as_dict()` to export its content to a classical Python `dict`.
 
 
+## Fixed
+ - `IntervalDict.popitem()` now returns a (key, value) pair instead of an `IntervalDict`.
+ - The documentation of `IntervalDict.pop()` now correctly states that the value (and not the key)
+ is returned.
+
+
+
 ## 2.0.2 (2020-05-09)
 
 ### Fixed
