@@ -7,7 +7,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 
 setup(
     name='portion',
-    version='2.0.2',
+    version='2.1.0',
     license='LGPLv3',
 
     author='Alexandre Decan',
@@ -43,7 +43,9 @@ setup(
     packages=find_packages(include=['portion']),
     python_requires='~=3.5',
 
-    install_requires=[],
+    install_requires=[
+        'sortedcontainers ~= 2.2.2',
+    ],
     extras_require={
         'test': ['pytest ~= 5.0.1'],
         'travis': ['coverage ~= 5.0.3', 'coveralls ~= 1.11.1']

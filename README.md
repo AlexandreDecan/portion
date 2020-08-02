@@ -21,7 +21,7 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
  - Heavily tested with high code coverage.
 
 **Latest release:**
- - `portion`: 2.0.2 on 2020-05-09 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.0.2/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.0.2/CHANGELOG.md)).
+ - `portion`: 2.1.0 on 2020-05-09 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.1.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.1.0/CHANGELOG.md)).
  - `python-intervals`: 1.10.0 on 2019-09-26 ([documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog)).
 
  Note that `python-intervals` will no longer receive updates since it has been replaced by `portion`.
@@ -651,17 +651,17 @@ value is defined:
 ```
 
 The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
-This method always returns a single `Interval` instance, where `.keys` returns a list
-of disjoint intervals, one for each stored value.
+This method always returns a single `Interval` instance, where `.keys` returns
+disjoint intervals, one for each stored value.
 
 ```python
 >>> d.domain()
 [0,4]
->>> d.keys()
+>>> list(d.keys())
 [[0,2), [2,4]]
->>> d.values()
+>>> list(d.values())
 ['banana', 'orange']
->>> d.items()
+>>> list(d.items())
 [([0,2), 'banana'), ([2,4], 'orange')]
 
 ```
@@ -697,6 +697,8 @@ by querying the resulting `IntervalDict` as follows:
 
 Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
 `.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
+For convenience, one can export the content of an `IntervalDict` to a classical Python `dict` using
+the `as_dict` method.
 
 
 [&uparrow; back to top](#table-of-contents)
