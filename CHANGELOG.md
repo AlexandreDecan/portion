@@ -1,11 +1,13 @@
 # Changelog
 
 
-## Not yet released
+## 2.1.0 (not yet released)
 
 ### Added
  - `IntervalDict.as_dict()` to export its content to a classical Python `dict`.
 
+## Changed
+ - `IntervalDict.keys()`, `values()` and `items()` return view objects instead of lists.
 
 ## Fixed
  - `IntervalDict.popitem()` now returns a (key, value) pair instead of an `IntervalDict`.

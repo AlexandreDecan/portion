@@ -3,6 +3,8 @@ from .interval import Interval, singleton
 
 from collections.abc import MutableMapping, Mapping
 
+from sortedcontainers import SortedDict
+
 
 def _sort(i):
     return (i[0].lower, i[0].left is Bound.CLOSED, i[0].upper, i[0].right is Bound.OPEN)
@@ -38,7 +40,7 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
-        self._storage = dict()  # Mapping from intervals to values
+        self._storage = SortedDict(_sort)  # Mapping from intervals to values
 
         if mapping_or_iterable is not None:
             self.update(mapping_or_iterable)
@@ -92,27 +94,33 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return a sorted list of (Interval, value) pairs.
+        Return a set-like object providing a view on contained items.
 
-        :return: a sorted list of 2-uples.
+        Note that currently, the view is not self-updating!
+
+        :return: a set-like object.
         """
-        return sorted(self._storage.items(), key=_sort)
+        return self._storage.items()
 
     def keys(self):
         """
-        Return the list of underlying Interval instances.
+        Return a set-like object providing a view on existing keys.
 
-        :return: a list of intervals.
+        Note that currently, the view is not self-updating!
+
+        :return: a set-like object.
         """
-        return [i for i, v in self.items()]
+        return self._storage.keys()
 
     def values(self):
         """
-        Return the list of values.
+        Return a set-like object providing a view on contained values.
 
-        :return: a list of values.
+        Note that currently, the view is not self-updating!
+
+        :return: a set-like object.
         """
-        return [v for i, v in self.items()]
+        return self._storage.values()
 
     def domain(self):
         """
@@ -272,7 +280,7 @@ class IntervalDict(MutableMapping):
         if not found:
             new_items.append((interval, value))
 
-        self._storage = dict(new_items)
+        self._storage = SortedDict(_sort, new_items)
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -291,7 +299,7 @@ class IntervalDict(MutableMapping):
             else:
                 new_items.append((i, v))
 
-        self._storage = dict(new_items)
+        self._storage = SortedDict(_sort, new_items)
 
         if not found and not isinstance(key, Interval):
             raise KeyError(key)
@@ -314,6 +322,6 @@ class IntervalDict(MutableMapping):
 
     def __eq__(self, other):
         if isinstance(other, IntervalDict):
-            return self.items() == other.items()
+            return self.as_dict() == other.as_dict()
         else:
             return NotImplemented
