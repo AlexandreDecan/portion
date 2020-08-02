@@ -18,16 +18,16 @@ class TestIntervalDict:
 
     def test_with_intervals(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
-        assert d[P.open(-P.inf, P.inf)].items() == [(P.closed(0, 2), 0)]
-        assert d[P.closed(0, 2)].items() == [(P.closed(0, 2), 0)]
-        assert d[P.closed(-1, 0)].items() == [(P.singleton(0), 0)]
-        assert d[P.closed(-2, -1)].items() == []
-        assert d.get(P.closed(0, 2)).items() == [(P.closed(0, 2), 0)]
-        assert d.get(P.closed(-2, -1)).items() == [(P.closed(-2, -1), None)]
-        assert d.get(P.closed(-1, 0)).items() == [(P.closedopen(-1, 0), None), (P.singleton(0), 0)]
+        assert d[P.open(-P.inf, P.inf)].as_dict() == {P.closed(0, 2): 0}
+        assert d[P.closed(0, 2)].as_dict() == {P.closed(0, 2): 0}
+        assert d[P.closed(-1, 0)].as_dict() == {P.singleton(0): 0}
+        assert d[P.closed(-2, -1)].as_dict() == {}
+        assert d.get(P.closed(0, 2)).as_dict() == {P.closed(0, 2): 0}
+        assert d.get(P.closed(-2, -1)).as_dict() == {P.closed(-2, -1): None}
+        assert d.get(P.closed(-1, 0)).as_dict() == {P.closedopen(-1, 0): None, P.singleton(0): 0}
 
         d[P.closed(1, 3)] = 1
-        assert d.items() == [(P.closedopen(0, 1), 0), (P.closed(1, 3), 1)]
+        assert d.as_dict() == {P.closedopen(0, 1): 0, P.closed(1, 3): 1}
         assert len(d) == 2
         assert d[0] == 0
         assert d.get(0, -1) == 0
@@ -43,19 +43,19 @@ class TestIntervalDict:
         # Set values
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         d[3] = 2
-        assert d.items() == [(P.closed(0, 2), 0), (P.singleton(3), 2)]
+        assert d.as_dict() == {P.closed(0, 2): 0, P.singleton(3): 2}
         d[3] = 3
-        assert d.items() == [(P.closed(0, 2), 0), (P.singleton(3), 3)]
+        assert d.as_dict() == {P.closed(0, 2): 0, P.singleton(3): 3}
         d[P.closed(0, 2)] = 1
-        assert d.items() == [(P.closed(0, 2), 1), (P.singleton(3), 3)]
+        assert d.as_dict() == {P.closed(0, 2): 1, P.singleton(3): 3}
         d[P.closed(-1, 1)] = 2
-        assert d.items() == [(P.closed(-1, 1), 2), (P.openclosed(1, 2), 1), (P.singleton(3), 3)]
+        assert d.as_dict() == {P.closed(-1, 1): 2, P.openclosed(1, 2): 1, P.singleton(3): 3}
 
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         d[P.closed(-1, 4)] = 1
-        assert d.items() == [(P.closed(-1, 4), 1)]
+        assert d.as_dict() == {P.closed(-1, 4): 1}
         d[P.closed(5, 6)] = 1
-        assert d.items() == [(P.closed(-1, 4) | P.closed(5, 6), 1)]
+        assert d.as_dict() == {P.closed(-1, 4) | P.closed(5, 6): 1}
 
     def test_delete_value(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
@@ -74,17 +74,17 @@ class TestIntervalDict:
     def test_delete_interval(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         del d[P.closed(-1, 1)]
-        assert d.items() == [(P.openclosed(1, 2), 0)]
+        assert d.as_dict() == {P.openclosed(1, 2): 0}
 
     def test_delete_interval_out_of_bound(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         del d[P.closed(-10, -9)]
-        assert d.items() == [(P.closed(0, 2), 0)]
+        assert d.as_dict() == {P.closed(0, 2): 0}
 
     def test_delete_empty_interval(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         del d[P.empty()]
-        assert d.items() == [(P.closed(0, 2), 0)]
+        assert d.as_dict() == {P.closed(0, 2): 0}
 
     def test_setdefault_with_values(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
@@ -96,27 +96,31 @@ class TestIntervalDict:
     def test_setdefault_with_intervals(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         t = d.setdefault(P.closed(-2, -1), -1)
-        assert t.items() == [(P.closed(-2, -1), -1)]
-        assert d.items() == [(P.closed(-2, -1), -1), (P.closed(0, 2), 0)]
+        assert t.as_dict() == {P.closed(-2, -1): -1}
+        assert d.as_dict() == {P.closed(-2, -1): -1, P.closed(0, 2): 0}
 
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         t = d.setdefault(P.closed(-1, 1), 2)
-        assert t.items() == [(P.closedopen(-1, 0), 2), (P.closed(0, 1), 0)]
-        assert d.items() == [(P.closedopen(-1, 0), 2), (P.closed(0, 2), 0)]
+        assert t.as_dict() == {P.closedopen(-1, 0): 2, P.closed(0, 1): 0}
+        assert d.as_dict() == {P.closedopen(-1, 0): 2, P.closed(0, 2): 0}
 
     def test_iterators(self):
         d = P.IntervalDict([(P.closedopen(0, 1), 0), (P.closedopen(1, 3), 1), (P.singleton(3), 2)])
 
-        assert d.keys() == [P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)]
+        assert set(d.keys()) == set([P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)])
         assert d.domain() == P.closed(0, 3)
-        assert d.values() == [0, 1, 2]
-        assert d.items() == list(zip(d.keys(), d.values()))
-        assert list(d) == d.keys()
+        assert set(d.values()) == set([0, 1, 2])
+        assert set(d.items()) == set([
+            (P.closedopen(0, 1), 0),
+            (P.closedopen(1, 3), 1),
+            (P.singleton(3), 2),
+        ])
+        assert set(d) == set(d.keys())
 
     def test_iterators_on_empty(self):
-        assert P.IntervalDict().values() == []
-        assert P.IntervalDict().items() == []
-        assert P.IntervalDict().keys() == []
+        assert len(P.IntervalDict().values()) == 0
+        assert len(P.IntervalDict().as_dict()) == 0
+        assert len(P.IntervalDict().keys()) == 0
         assert P.IntervalDict().domain() == P.empty()
 
     def test_combine_empty(self):
@@ -186,17 +190,17 @@ class TestIntervalDict:
     def test_pop_interval(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         t = d.pop(P.closed(0, 1))
-        assert t.items() == [(P.closed(0, 1), 0)]
-        assert d.items() == [(P.openclosed(1, 3), 0)]
+        assert t.as_dict() == {P.closed(0, 1): 0}
+        assert d.as_dict() == {P.openclosed(1, 3): 0}
 
         t = d.pop(P.closed(0, 2), 1)
-        assert t.items() == [(P.closed(0, 1), 1), (P.openclosed(1, 2), 0)]
-        assert d.items() == [(P.openclosed(2, 3), 0)]
+        assert t.as_dict() == {P.closed(0, 1): 1, P.openclosed(1, 2): 0}
+        assert d.as_dict() == {P.openclosed(2, 3): 0}
 
     def test_popitem(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         t = d.popitem()
-        assert t.items() == [(P.closed(0, 3), 0)]
+        assert t.as_dict() == {P.closed(0, 3): 0}
         assert len(d) == 0
 
     def test_popitem_with_empty(self):
@@ -235,7 +239,7 @@ class TestIntervalDict:
         assert a != d
         assert a == b
         assert a != 1
-        assert a.items() == [(P.closed(-1, 1), 2), (P.openclosed(1, 2), 0), (P.closed(4, 5), 1)]
+        assert a.as_dict() == {P.closed(-1, 1): 2, P.openclosed(1, 2): 0, P.closed(4, 5): 1}
 
         assert P.IntervalDict([(0, 0), (1, 1)]) == P.IntervalDict([(1, 1), (0, 0)])
 
