@@ -96,8 +96,6 @@ class IntervalDict(MutableMapping):
         """
         Return a set-like object providing a view on contained items.
 
-        Note that currently, the view is not self-updating!
-
         :return: a set-like object.
         """
         return self._storage.items()
@@ -106,8 +104,6 @@ class IntervalDict(MutableMapping):
         """
         Return a set-like object providing a view on existing keys.
 
-        Note that currently, the view is not self-updating!
-
         :return: a set-like object.
         """
         return self._storage.keys()
@@ -115,8 +111,6 @@ class IntervalDict(MutableMapping):
     def values(self):
         """
         Return a set-like object providing a view on contained values.
-
-        Note that currently, the view is not self-updating!
 
         :return: a set-like object.
         """
@@ -264,23 +258,22 @@ class IntervalDict(MutableMapping):
         if interval.empty:
             return
 
-        new_items = []
         found = False
         for i, v in self._storage.items():
             if value == v:
                 found = True
-                new_items.append((i | interval, v))
+                # Extend existing key
+                self._storage.pop(i)
+                self._storage[i | interval] = v
             elif i.overlaps(interval):
+                # Reduce existing key
                 remaining = i - interval
+                self._storage.pop(i)
                 if not remaining.empty:
-                    new_items.append((remaining, v))
-            else:
-                new_items.append((i, v))
+                    self._storage[remaining] = v
 
         if not found:
-            new_items.append((interval, value))
-
-        self._storage = SortedDict(_sort, new_items)
+            self._storage[interval] = value
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -288,18 +281,14 @@ class IntervalDict(MutableMapping):
         if interval.empty:
             return
 
-        new_items = []
         found = False
         for i, v in self._storage.items():
             if i.overlaps(interval):
                 found = True
                 remaining = i - interval
+                self._storage.pop(i)
                 if not remaining.empty:
-                    new_items.append((remaining, v))
-            else:
-                new_items.append((i, v))
-
-        self._storage = SortedDict(_sort, new_items)
+                    self._storage[remaining] = v
 
         if not found and not isinstance(key, Interval):
             raise KeyError(key)
