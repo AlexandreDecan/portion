@@ -1,5 +1,12 @@
 # Changelog
 
+
+## Not yet released
+
+### Added
+ - `IntervalDict.as_dict()` to export its content to a classical Python `dict`.
+
+
 ## 2.0.2 (2020-05-09)
 
 ### Fixed

@@ -196,20 +196,6 @@ class IntervalDict(MutableMapping):
             i = singleton(i) if not isinstance(i, Interval) else i
             self[i] = v
 
-    def __getitem__(self, key):
-        if isinstance(key, Interval):
-            items = []
-            for i, v in self._items:
-                intersection = key & i
-                if not intersection.empty:
-                    items.append((intersection, v))
-            return IntervalDict(items)
-        else:
-            for i, v in self._items:
-                if key in i:
-                    return v
-            raise KeyError(key)
-
     def combine(self, other, how):
         """
         Return a new IntervalDict that combines the values from current and
@@ -242,6 +228,28 @@ class IntervalDict(MutableMapping):
                     new_items.append((i, v))
 
         return IntervalDict(new_items)
+
+    def as_dict(self):
+        """
+        Return the content as a classical Python dict.
+
+        :return: a Python dict.
+        """
+        return dict(self._items)
+
+    def __getitem__(self, key):
+        if isinstance(key, Interval):
+            items = []
+            for i, v in self._items:
+                intersection = key & i
+                if not intersection.empty:
+                    items.append((intersection, v))
+            return IntervalDict(items)
+        else:
+            for i, v in self._items:
+                if key in i:
+                    return v
+            raise KeyError(key)
 
     def __setitem__(self, key, value):
         interval = key if isinstance(key, Interval) else singleton(key)
