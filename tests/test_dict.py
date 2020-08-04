@@ -273,3 +273,17 @@ class TestIntervalDict:
         assert d[1] == 'a'
         assert d[2] == 'b'
         assert len(d) == 2
+
+    def test_views(self):
+        d = P.IntervalDict({P.closed(0, 2):3, P.closed(3, 4): 2})
+
+        k, v, i = d.keys(), d.values(), d.items()
+        assert len(k) == len(v) == len(i) == len(d)
+        assert list(k) == [P.closed(0, 2), P.closed(3,4)]
+        assert list(v) == [3, 2]
+        assert list(i) == [(P.closed(0, 2), 3), (P.closed(3, 4), 2)]
+
+        d[5] = 4
+        assert list(k) == list(d.keys())
+        assert list(v) == list(d.values())
+        assert list(i) == list(d.items())
