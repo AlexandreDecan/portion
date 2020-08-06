@@ -109,12 +109,12 @@ class TestIntervalDict:
 
         assert set(d.keys()) == set([P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)])
         assert d.domain() == P.closed(0, 3)
-        assert set(d.values()) == set([0, 1, 2])
-        assert set(d.items()) == set([
+        assert set(d.values()) == {0, 1, 2}
+        assert set(d.items()) == {
             (P.closedopen(0, 1), 0),
             (P.closedopen(1, 3), 1),
             (P.singleton(3), 2),
-        ])
+        }
         assert set(d) == set(d.keys())
 
     def test_iterators_on_empty(self):
@@ -122,6 +122,20 @@ class TestIntervalDict:
         assert len(P.IntervalDict().as_dict()) == 0
         assert len(P.IntervalDict().keys()) == 0
         assert P.IntervalDict().domain() == P.empty()
+
+    def test_views(self):
+        d = P.IntervalDict({P.closed(0, 2):3, P.closed(3, 4): 2})
+
+        k, v, i = d.keys(), d.values(), d.items()
+        assert len(k) == len(v) == len(i) == len(d)
+        assert list(k) == [P.closed(0, 2), P.closed(3,4)]
+        assert list(v) == [3, 2]
+        assert list(i) == [(P.closed(0, 2), 3), (P.closed(3, 4), 2)]
+
+        d[5] = 4
+        assert list(k) == list(d.keys())
+        assert list(v) == list(d.values())
+        assert list(i) == list(d.items())
 
     def test_combine_empty(self):
         add = lambda x, y: x + y
@@ -273,17 +287,3 @@ class TestIntervalDict:
         assert d[1] == 'a'
         assert d[2] == 'b'
         assert len(d) == 2
-
-    def test_views(self):
-        d = P.IntervalDict({P.closed(0, 2):3, P.closed(3, 4): 2})
-
-        k, v, i = d.keys(), d.values(), d.items()
-        assert len(k) == len(v) == len(i) == len(d)
-        assert list(k) == [P.closed(0, 2), P.closed(3,4)]
-        assert list(v) == [3, 2]
-        assert list(i) == [(P.closed(0, 2), 3), (P.closed(3, 4), 2)]
-
-        d[5] = 4
-        assert list(k) == list(d.keys())
-        assert list(v) == list(d.values())
-        assert list(i) == list(d.items())
