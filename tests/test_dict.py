@@ -107,7 +107,7 @@ class TestIntervalDict:
     def test_iterators(self):
         d = P.IntervalDict([(P.closedopen(0, 1), 0), (P.closedopen(1, 3), 1), (P.singleton(3), 2)])
 
-        assert set(d.keys()) == set([P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)])
+        assert set(d.keys()) == {P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)}
         assert d.domain() == P.closed(0, 3)
         assert set(d.values()) == {0, 1, 2}
         assert set(d.items()) == {
