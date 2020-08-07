@@ -19,14 +19,12 @@
 ## 2.0.2 (2020-05-09)
 
 ### Fixed
-
  - Fix occasional `StopIteration` exception when checking for containment ([#28](https://github.com/AlexandreDecan/portion/issues/28)).
 
 
 ## 2.0.1 (2020-03-15)
 
 ### Fixed
-
  - Fix invalid representations of non-atomic intervals composed of a singleton ([#22](https://github.com/AlexandreDecan/portion/issues/22)).
 
 
