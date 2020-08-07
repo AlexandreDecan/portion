@@ -94,25 +94,28 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return a set-like object providing a view on contained items.
+        Return a view object on the contained items sorted by key
+        (see https://docs.python.org/3/library/stdtypes.html#dict-views).
 
-        :return: a set-like object.
+        :return: a view object.
         """
         return self._storage.items()
 
     def keys(self):
         """
-        Return a set-like object providing a view on existing keys.
+        Return a view object on the contained keys (sorted)
+        (see https://docs.python.org/3/library/stdtypes.html#dict-views).
 
-        :return: a set-like object.
+        :return: a view object.
         """
         return self._storage.keys()
 
     def values(self):
         """
-        Return a set-like object providing a view on contained values.
+        Return a view object on the contained values sorted by key
+        (see https://docs.python.org/3/library/stdtypes.html#dict-views).
 
-        :return: a set-like object.
+        :return: a view object.
         """
         return self._storage.values()
 
