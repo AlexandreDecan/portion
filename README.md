@@ -21,7 +21,7 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
  - Heavily tested with high code coverage.
 
 **Latest release:**
- - `portion`: 2.0.2 on 2020-05-09 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.0.2/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.1.0/CHANGELOG.md)).
+ - `portion`: 2.1.0 on 2020-08-09 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.1.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.1.0/CHANGELOG.md)).
  - `python-intervals`: 1.10.0 on 2019-09-26 ([documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog)).
 
  Note that `python-intervals` will no longer receive updates since it has been replaced by `portion`.
