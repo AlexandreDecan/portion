@@ -55,6 +55,8 @@ and can be installed with `pip install git+https://github.com/AlexandreDecan/por
 
 The test environment can be installed with `pip install portion[test]` and relies on [pytest](https://docs.pytest.org/en/latest/).
 
+`portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
+
 
 ## Documentation & usage
 
