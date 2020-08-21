@@ -4,7 +4,7 @@
 ## 2.1.1 (2020-08-21)
 
 ### Fixed
- - A regression for `IntervalDict` introduced in 2.1.0 ([#36](https://github.com/AlexandreDecan/portion/issues/36)).
+ - Fix a regression introduced in 2.1.0 for `IntervalDict` ([#36](https://github.com/AlexandreDecan/portion/issues/36)).
 
 
 
