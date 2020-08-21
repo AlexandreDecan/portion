@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.1.1 (2020-08-21)
+
+### Fixed
+ - A regression for `IntervalDict` introduced in 2.1.0 ([#36](https://github.com/AlexandreDecan/portion/issues/36)).
+
+
+
 ## 2.1.0 (2020-08-09)
 
 ### Added

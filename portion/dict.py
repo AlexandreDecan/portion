@@ -197,7 +197,6 @@ class IntervalDict(MutableMapping):
             data = mapping_or_iterable
 
         for i, v in data:
-            i = singleton(i) if not isinstance(i, Interval) else i
             self[i] = v
 
     def combine(self, other, how):
@@ -261,22 +260,32 @@ class IntervalDict(MutableMapping):
         if interval.empty:
             return
 
+        removed_keys = []
+        added_items = []
+
         found = False
         for i, v in self._storage.items():
             if value == v:
                 found = True
                 # Extend existing key
-                self._storage.pop(i)
-                self._storage[i | interval] = v
+                removed_keys.append(i)
+                added_items.append((i | interval, v))
             elif i.overlaps(interval):
                 # Reduce existing key
                 remaining = i - interval
-                self._storage.pop(i)
+                removed_keys.append(i)
                 if not remaining.empty:
-                    self._storage[remaining] = v
+                    added_items.append((remaining, v))
 
         if not found:
-            self._storage[interval] = value
+            added_items.append((interval, value))
+
+        # Update storage accordingly
+        for key in removed_keys:
+            self._storage.pop(key)
+
+        for key, value in added_items:
+            self._storage[key] = value
 
     def __delitem__(self, key):
         interval = key if isinstance(key, Interval) else singleton(key)
@@ -284,17 +293,27 @@ class IntervalDict(MutableMapping):
         if interval.empty:
             return
 
+        removed_keys = []
+        added_items = []
+
         found = False
         for i, v in self._storage.items():
             if i.overlaps(interval):
                 found = True
                 remaining = i - interval
-                self._storage.pop(i)
+                removed_keys.append(i)
                 if not remaining.empty:
-                    self._storage[remaining] = v
+                    added_items.append((remaining, v))
 
         if not found and not isinstance(key, Interval):
             raise KeyError(key)
+
+        # Update storage accordingly
+        for key in removed_keys:
+            self._storage.pop(key)
+
+        for key, value in added_items:
+            self._storage[key] = value
 
     def __iter__(self):
         return iter(self._storage)
