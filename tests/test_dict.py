@@ -188,6 +188,27 @@ class TestIntervalDict:
         assert P.closed(1, 2) in d
         assert P.closed(1, 4) not in d
 
+    def test_or_ior(self):
+        # https://github.com/AlexandreDecan/portion/issues/37
+        d1 = P.IntervalDict({P.closed(0, 1): 1, P.closed(3, 4): 2})
+        d2 = P.IntervalDict({P.closed(0.5, 2): 3})
+
+        assert d1 | d2 == P.IntervalDict({
+            P.closedopen(0, 0.5): 1,
+            P.closed(0.5, 2): 3,
+            P.closed(3, 4): 2
+        })
+        assert d1 == P.IntervalDict({P.closed(0, 1): 1, P.closed(3, 4): 2})
+        assert d2 == P.IntervalDict({P.closed(0.5, 2): 3})
+
+        d1 |= d2
+        assert d1 == P.IntervalDict({
+            P.closedopen(0, 0.5): 1,
+            P.closed(0.5, 2): 3,
+            P.closed(3, 4): 2
+        })
+        assert d2 == P.IntervalDict({P.closed(0.5, 2): 3})
+
     def test_repr(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         assert repr(d) == '{' + repr(P.closed(0, 3)) + ': 0}'
