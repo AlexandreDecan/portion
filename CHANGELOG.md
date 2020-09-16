@@ -1,6 +1,17 @@
 # Changelog
 
 
+## 2.1.2 (2020-09-16)
+
+### Added
+ - `IntervalDict` supports `|` and `|=`, the same way `dict` will do starting from Python 3.9 ([#37](https://github.com/AlexandreDecan/portion/issues/37)).
+
+### Fixed
+ - Fix invalid simplification of 3+ intervals when a closed interval shares the lower bound of an open one ([#38](https://github.com/AlexandreDecan/portion/issues/38)).
+ - Fix the order in which items are returned from an `IntervalDict` when a closed interval shares the lower bound of an open one ([#39](https://github.com/AlexandreDecan/portion/issues/39)).
+
+
+
 ## 2.1.1 (2020-08-21)
 
 ### Fixed
