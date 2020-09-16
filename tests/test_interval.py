@@ -642,6 +642,13 @@ class TestIntervalUnion:
         assert P.openclosed(1, 2) | P.closed(0, 1) == P.closed(0, 2)
         assert P.closed(0, 1) | P.openclosed(1, 2) == P.closed(0, 2)
 
+    def test_issue_38(self):
+        # https://github.com/AlexandreDecan/portion/issues/38
+        assert P.open(1, 2) | P.open(2, 3) | P.singleton(2) == P.open(1, 3)
+        assert P.open(2, 3) | P.open(1, 2) | P.singleton(2) == P.open(1, 3)
+        assert P.singleton(2) | P.open(2, 3) | P.open(1, 2) == P.open(1, 3)
+        assert P.singleton(2) | P.open(1, 2) | P.open(2, 3) == P.open(1, 3)
+
     def test_proxy_method(self):
         i1, i2 = P.closed(0, 1), P.closed(2, 3)
         assert i1 | i2 == i1.union(i2)
