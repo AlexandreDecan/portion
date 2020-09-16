@@ -124,7 +124,7 @@ class TestIntervalDict:
         assert P.IntervalDict().domain() == P.empty()
 
     def test_views(self):
-        d = P.IntervalDict({P.closed(0, 2):3, P.closed(3, 4): 2})
+        d = P.IntervalDict({P.closed(0, 2): 3, P.closed(3, 4): 2})
 
         k, v, i = d.keys(), d.values(), d.items()
         assert len(k) == len(v) == len(i) == len(d)
@@ -136,6 +136,11 @@ class TestIntervalDict:
         assert list(k) == list(d.keys())
         assert list(v) == list(d.values())
         assert list(i) == list(d.items())
+
+    def test_issue_39(self):
+        # https://github.com/AlexandreDecan/portion/issues/39
+        d = P.IntervalDict({P.open(2, 3): 1, P.singleton(2): 2})
+        assert list(d) == list([P.singleton(2), P.open(2, 3)])
 
     def test_combine_empty(self):
         add = lambda x, y: x + y
