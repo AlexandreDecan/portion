@@ -117,8 +117,8 @@ class Interval:
             # So we have at least one (empty) interval
             self._intervals.append(Atomic(Bound.OPEN, inf, -inf, Bound.OPEN))
         else:
-            # Sort intervals by lower bound
-            self._intervals.sort(key=lambda i: i.lower)
+            # Sort intervals by lower bound, closed first.
+            self._intervals.sort(key=lambda i: (i.lower, i.left is Bound.OPEN))
 
             i = 0
             # Try to merge consecutive intervals

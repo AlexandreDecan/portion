@@ -7,7 +7,7 @@ from sortedcontainers import SortedDict
 
 
 def _sort(i):
-    return (i[0].lower, i[0].left is Bound.CLOSED, i[0].upper, i[0].right is Bound.OPEN)
+    return (i[0].lower, i[0].left is Bound.OPEN, i[0].upper, i[0].right is Bound.OPEN)
 
 
 class IntervalDict(MutableMapping):

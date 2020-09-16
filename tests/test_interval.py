@@ -646,6 +646,10 @@ class TestIntervalUnion:
         # https://github.com/AlexandreDecan/portion/issues/38
         assert P.open(1, 2) | P.open(2, 3) | P.singleton(2) == P.open(1, 3)
         assert P.open(2, 3) | P.open(1, 2) | P.singleton(2) == P.open(1, 3)
+
+        assert P.open(1, 2) | P.singleton(2) | P.open(2, 3) == P.open(1, 3)
+        assert P.open(2, 3) | P.singleton(2) | P.open(1, 2) == P.open(1, 3)
+
         assert P.singleton(2) | P.open(2, 3) | P.open(1, 2) == P.open(1, 3)
         assert P.singleton(2) | P.open(1, 2) | P.open(2, 3) == P.open(1, 3)
 
