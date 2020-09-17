@@ -322,6 +322,7 @@ False
 
    ```
 
+Finally, intervals are hashable as long as their bounds are hashable (and we have defined a hash value for `P.inf` and `-P.inf`).
 
 
 [&uparrow; back to top](#table-of-contents)
@@ -337,7 +338,7 @@ False
 
 ```
 
-Moreover, intervals are comparable using e.g. `>`, `>=`, `<` or `<=`.
+Moreover, intervals are comparable using `>`, `>=`, `<` or `<=`.
 These comparison operators have a different behaviour than the usual ones.
 For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
 on the right of the upper bound of `b`.
@@ -397,7 +398,6 @@ True
 
 ```
 
-Finally, intervals are hashable as long as their bounds are hashable (and we have defined a hash value for `P.inf` and `-P.inf`).
 
 
 
@@ -417,11 +417,17 @@ current one. This method accepts four optional parameters `left`, `lower`, `uppe
 ```
 
 Functions can be passed instead of values. If a function is passed, it is called with the current corresponding
-value except if the corresponding bound is an infinity and parameter `ignore_inf` if set to `False`.
+value.
 
 ```python
 >>> P.closed(0, 2).replace(upper=lambda x: 2 * x)
 [0,4]
+
+```
+
+The provided function won't be called on infinities, unless `ignore_inf` is set to `False`.
+
+```python
 >>> i = P.closedopen(0, P.inf)
 >>> i.replace(upper=lambda x: 10)  # No change, infinity is ignored
 [0,+inf)
@@ -442,9 +448,9 @@ its enclosure satisfies the new bounds.
 
 ```
 
-To apply an arbitrary transformation on an interval, intervals expose an `apply` method.
+To apply arbitrary transformations on the underlying atomic intervals, intervals expose an `apply` method that acts like `map`.
 This method accepts a function that will be applied on each of the underlying atomic intervals to perform the desired transformation.
-The function is expected to return either an `Interval`, or a 4-uple `(left, lower, upper, right)`.
+The provided function is expected to return either an `Interval`, or a 4-uple `(left, lower, upper, right)`.
 
 ```python
 >>> i = P.closed(2, 3) | P.open(4, 5)
@@ -458,8 +464,8 @@ The function is expected to return either an `Interval`, or a 4-uple `(left, low
 ```
 
 The `apply` method is very powerful when used in combination with `replace`.
-Because the latter allows functions to be passed as parameters and can ignore infinities, it can be
-conveniently used to transform intervals in presence of infinities.
+Because the latter allows functions to be passed as parameters and ignores infinities by default, it can be
+conveniently used to transform (disjunction of) intervals in presence of infinities.
 
 ```python
 >>> i = P.openclosed(-P.inf, 0) | P.closed(3, 4) | P.closedopen(8, P.inf)
@@ -485,8 +491,7 @@ conveniently used to transform intervals in presence of infinities.
 
 The `iterate` function takes an interval, and returns a generator to iterate over
 the values of an interval. Obviously, as intervals are continuous, it is required to specify the
- `step` between consecutive values. The iteration then starts from the lower bound and ends on the upper one,
-given they are not excluded by the interval:
+ `step` between consecutive values. The iteration then starts from the lower bound and ends on the upper one. Only values contained by the interval are returned this way.
 
 ```python
 >>> list(P.iterate(P.closed(0, 3), step=1))
@@ -609,8 +614,8 @@ KeyError: 5
 
 ```
 
-When an interval is used as a key, a new `IntervalDict` containing the values
-for that interval is returned:
+When the key is an interval, a new `IntervalDict` containing the values
+for the specified key is returned:
 
 ```python
 >>> d[~P.empty()]  # Get all values, similar to d.copy()
