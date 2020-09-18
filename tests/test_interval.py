@@ -531,6 +531,12 @@ class TestIntervalContainment:
         assert (1 in i1) == i1.contains(1)
         assert (i1 in i2) == i2.contains(i1)
 
+    def test_issue_41(self):
+        # https://github.com/AlexandreDecan/portion/issues/41
+        assert P.empty() in P.closed(0, 1)
+        assert P.empty() in P.closed(0, 1) | P.closed(2, 3)
+
+
 
 class TestIntervalIntersection:
     def test_with_itself(self):
