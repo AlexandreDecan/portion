@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.3 (2020-09-18)
+
+### Fixed
+ - Empty intervals are contained in all intervals ([#41](https://github.com/AlexandreDecan/portion/issues/41)).
+
+
 
 ## 2.1.2 (2020-09-16)
 

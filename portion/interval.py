@@ -459,7 +459,9 @@ class Interval:
 
     def __contains__(self, item):
         if isinstance(item, Interval):
-            if self.atomic:
+            if item.empty:
+                return True
+            elif self.atomic:
                 left = item.lower > self.lower or (
                     item.lower == self.lower and
                     (item.left == self.left or self.left == Bound.CLOSED)
