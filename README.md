@@ -299,9 +299,11 @@ False
 
    ```
 
- - `i.adjacent(other)` tests if the two intervals are adjacent.
- Two intervals are adjacent if their intersection is empty, and their union is an atomic interval (or,
- in other words, if one interval fills the *gaps* of the other).
+ - `i.adjacent(other)` tests if the two intervals are adjacent, i.e., if they do not overlap and their union form a single atomic interval.
+ While this definition corresponds to the usual notion of adjacency for atomic
+ intervals, it has stronger requirements for non-atomic ones since it requires
+ all underlying atomic intervals to be adjacent (i.e. that one
+ interval fills the gaps between the atomic intervals of the other one).
    ```python
    >>> P.closed(0, 1).adjacent(P.openclosed(1, 2))
    True
@@ -309,7 +311,9 @@ False
    False
    >>> (P.closed(0, 1) | P.closed(2, 3)).adjacent(P.open(1, 2) | P.open(3, 4))
    True
-   >>> P.closed(0, 1).adjacent(P.open(1, 2) | P.open(10, 11))
+   >>> (P.closed(0, 1) | P.closed(2, 3)).adjacent(P.open(3, 4))
+   False
+   >>> P.closed(0, 1).adjacent(P.open(1, 2) | P.open(3, 4))
    False
 
    ```

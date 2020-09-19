@@ -261,6 +261,14 @@ class TestIntervalAdjacent():
         assert not P.openclosed(0, 2).adjacent(P.closedopen(0, 2))
         assert not P.closedopen(0, 2).adjacent(P.openclosed(0, 2))
 
+    def test_empty(self):
+        assert P.empty().adjacent(P.closed(0, 2))
+        assert P.empty().adjacent(P.empty())
+        assert P.closed(0, 2).adjacent(P.empty())
+
+        assert not P.empty().adjacent(P.closed(0, 1) | P.closed(2, 3))
+        assert not (P.closed(0, 1) | P.closed(2, 3)).adjacent(P.empty())
+
     def test_nonatomic_interval(self):
         assert (P.closed(0, 1) | P.closed(2, 3)).adjacent(P.open(1, 2))
         assert P.open(1, 2).adjacent(P.closed(0, 1) | P.closed(2, 3))

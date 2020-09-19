@@ -313,11 +313,15 @@ class Interval:
 
     def adjacent(self, other):
         """
-        Test if given interval is adjacent.
+        Test if two intervals are adjacent.
 
-        An interval is adjacent if there is no intersection, and their union is an atomic interval.
-        For atomic intervals, this corresponds to the usual definition of adjacency but for
-        non-atomic intervals, it has stronger requirements.
+        Two intervals are adjacent if they do not overlap and their union form a
+        single atomic interval.
+
+        While this definition corresponds to the usual notion of adjacency for atomic
+        intervals, it has stronger requirements for non-atomic ones since it requires
+        all underlying atomic intervals to be adjacent (i.e. that one
+        interval fills the gaps between the atomic intervals of the other one).
 
         :param other: an interval.
         :return: True if intervals are adjacent, False otherwise.
@@ -326,7 +330,7 @@ class Interval:
 
     def overlaps(self, other):
         """
-        Test if intervals have any overlapping value.
+        Test if two intervals overlap (i.e. if their intersection is non-empty).
 
         :param other: an interval.
         :return: True if intervals overlap, False otherwise.
