@@ -316,6 +316,8 @@ class Interval:
         Test if given interval is adjacent.
 
         An interval is adjacent if there is no intersection, and their union is an atomic interval.
+        For atomic intervals, this corresponds to the usual definition of adjacency but for
+        non-atomic intervals, it has stronger requirements.
 
         :param other: an interval.
         :return: True if intervals are adjacent, False otherwise.

@@ -300,7 +300,8 @@ False
    ```
 
  - `i.adjacent(other)` tests if the two intervals are adjacent.
- Two intervals are adjacent if their intersection is empty, and their union is an atomic interval.
+ Two intervals are adjacent if their intersection is empty, and their union is an atomic interval (or,
+ in other words, if one interval fills the *gaps* of the other).
    ```python
    >>> P.closed(0, 1).adjacent(P.openclosed(1, 2))
    True
