@@ -663,8 +663,7 @@ value is defined:
 ```
 
 The active domain of an `IntervalDict` can be retrieved with its `.domain` method.
-This method always returns a single `Interval` instance, where `.keys` returns
-a sorted view of disjoint intervals, one for each stored value.
+This method always returns a single `Interval` instance, where `.keys` returns a sorted view of disjoint intervals.
 
 ```python
 >>> d.domain()
@@ -677,6 +676,18 @@ a sorted view of disjoint intervals, one for each stored value.
 [([0,2), 'banana'), ([2,4], 'orange')]
 
 ```
+
+The `.keys`, `.values` and `.items` methods return exactly one element for each stored value (i.e., if two intervals share a value, they are merged into a disjunction), as illustrated next.
+See [#44](https://github.com/AlexandreDecan/portion/issues/44#issuecomment-710199687) to know how to obtained a sorted list of atomic intervals instead.
+
+```python
+>>> d = P.IntervalDict()
+>>> d[P.closed(0, 1)] = d[P.closed(2, 3)] = 'peach'
+>>> list(d.items())
+[([0,1] | [2,3], 'peach')]
+
+```
+
 
 Two `IntervalDict` instances can be combined together using the `.combine` method.
 This method returns a new `IntervalDict` whose keys and values are taken from the two
