@@ -1,5 +1,13 @@
 # Changelog
 
+
+## 2.1.4 (2020-11-26)
+
+### Changed
+ - Much faster `get`, `copy` and `|` operations for `IntervalDict`.
+
+
+
 ## 2.1.3 (2020-09-18)
 
 ### Fixed

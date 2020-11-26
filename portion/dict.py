@@ -46,6 +46,23 @@ class IntervalDict(MutableMapping):
         if mapping_or_iterable is not None:
             self.update(mapping_or_iterable)
 
+    @classmethod
+    def _from_items(cls, items):
+        """
+        Fast creation of an IntervalDict with the provided items.
+
+        The items have to satisfy the two following properties: (1) all keys
+        must be disjoint intervals and (2) all values must be distinct.
+
+        :param items: list of (key, value) pairs.
+        :return: an IntervalDict
+        """
+        d = cls()
+        for key, value in items:
+            d._storage[key] = value
+
+        return d
+
     def clear(self):
         """
         Remove all items from the IntervalDict.
@@ -58,7 +75,7 @@ class IntervalDict(MutableMapping):
 
         :return: a shallow copy.
         """
-        return IntervalDict(self)
+        return IntervalDict._from_items(self.items())
 
     def get(self, key, default=None):
         """
@@ -248,7 +265,7 @@ class IntervalDict(MutableMapping):
                 intersection = key & i
                 if not intersection.empty:
                     items.append((intersection, v))
-            return IntervalDict(items)
+            return IntervalDict._from_items(items)
         else:
             for i, v in self._storage.items():
                 if key in i:
@@ -317,7 +334,7 @@ class IntervalDict(MutableMapping):
             self._storage[key] = value
 
     def __or__(self, other):
-        d = IntervalDict(self)
+        d = self.copy()
         d.update(other)
         return d
 
