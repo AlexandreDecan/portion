@@ -44,7 +44,7 @@ setup(
     python_requires='~=3.5',
 
     install_requires=[
-        'sortedcontainers ~= 2.2.2',
+        'sortedcontainers >=2.2.0, <3.0.0',
     ],
     extras_require={
         'test': ['pytest ~= 5.0.1'],
