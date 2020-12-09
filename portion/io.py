@@ -170,3 +170,73 @@ def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
             item.right.value
         ))
     return data
+
+def dict_to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
+    """
+    Export given DictInteval to a list of 2-uples ((left, lower,upper, right), item)
+
+    :param interval: an DictInteval.
+    :param conv: function that convert bounds to "lower" and "upper", default to identity.
+    :param conv_data: function that convert value, default to identity.
+    :param pinf: value used to encode positive infinity.
+    :param ninf: value used to encode negative infinity.
+    :return: a list of 4-uples (left, lower, upper, right)
+    """
+    conv = (lambda v: v) if conv is None else conv
+    conv_data = (lambda v: v) if conv_data is None else conv_data
+
+    data = []
+
+    def _convert(bound):
+        if bound == portion.inf:
+            return pinf
+        elif bound == -portion.inf:
+            return ninf
+        else:
+            return conv(bound)
+
+    for key, value in interval.items():
+        data.append((
+          (
+              key.left.value,
+              _convert(key.lower),
+              _convert(key.upper),
+              key.right.value,
+          ), conv_data(value))
+        )
+    return data
+
+
+def dict_from_data(data, conv=None, conv_data=None, *, pinf=float('inf'), ninf=float('-inf')):
+    """
+    Import an DictInterval from a piece of data.
+
+    :param data: a list of 2-uples ( (left, lower, upper, right), item).
+    :param conv: function that converts "lower" and "upper" to bounds, default to identity.
+    :param conv: function that converts item to string, default to identity.
+    :param pinf: value used to represent positive infinity.
+    :param ninf: value used to represent negative infinity.
+    :return: an Interval instance.
+    """
+    intervals = []
+    conv = (lambda v: v) if conv is None else conv
+    conv_data = (lambda v: v) if conv_data is None else conv_data
+
+    def _convert(bound):
+        if bound == pinf:
+            return portion.inf
+        elif bound == ninf:
+            return -portion.inf
+        else:
+            return conv(bound)
+
+    ret = portion.IntervalDict()
+    for (left, lower, upper, right), value in data:
+        interval = portion.Interval.from_atomic(
+            portion.Bound(left),
+            _convert(lower),
+            _convert(upper),
+            portion.Bound(right),
+        )
+        ret[interval] = conv_data(value)
+    return ret
