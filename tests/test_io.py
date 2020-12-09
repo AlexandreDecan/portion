@@ -178,6 +178,67 @@ class TestFromData:
         d = [(P.OPEN, 'lowest', '4', P.CLOSED), (P.CLOSED, '6', 'highest', P.OPEN)]
         assert P.from_data(d, conv=int, pinf='highest', ninf='lowest') == P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf)
 
+class TestDictToData:
+    def test_bounds(self):
+        assert P.dict_to_data(P.IntervalDict({P.closed(0, 1):'abcd'})) == {((True, 0, 1, True),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.openclosed(0, 1):'abcd'})) == {((False, 0, 1, True),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.closedopen(0, 1):'abcd'})) == {((True, 0, 1, False),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.open(0, 1):'abcd'})) == {((False, 0, 1, False),): 'abcd'}
+
+    def test_values(self):
+        assert P.dict_to_data(P.IntervalDict({P.closed('a', 'b'):'abcd'})) == {((True, 'a', 'b', True),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.closed(tuple([0]), tuple([1])):'abcd'})) == {((True, (0,), (1,), True),): 'abcd'}
+
+    def test_singleton(self):
+        assert P.dict_to_data(P.IntervalDict({P.singleton(0):'abcd'})) == {((True, 0, 0, True),): 'abcd'}
+
+    def test_open_intervals(self):
+        assert P.dict_to_data(P.IntervalDict({P.open(-P.inf, P.inf):'abcd'})) == {((False, float('-inf'), float('inf'), False),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.openclosed(-P.inf, 0):'abcd'})) == {((False, float('-inf'), 0, True),): 'abcd'}
+        assert P.dict_to_data(P.IntervalDict({P.closedopen(0, P.inf):'abcd'})) == {((True, 0, float('inf'), False),): 'abcd'}
+
+    def test_empty_interval(self):
+        assert P.dict_to_data(P.IntervalDict({P.empty():'abcd'})) == {}
+
+    def test_unions(self):
+        i = P.IntervalDict({P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf):'abcd'})
+        assert P.dict_to_data(i) == {((False, float('-inf'), 4, True), (True, 6, float('inf'), False)): 'abcd'}
+
+    def test_parameters(self):
+        i = P.IntervalDict({P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf):'abcd'})
+        assert P.dict_to_data(i, conv=str, pinf='highest', ninf='lowest') == {((False, 'lowest', '4', True), (True, '6', 'highest', False)): 'abcd'}
+
+
+class TestDictFromData:
+    def test_bounds(self):
+        assert P.dict_from_data({((P.CLOSED, 0, 1, P.CLOSED),): 'abcd'}) == P.IntervalDict({P.closed(0, 1):'abcd'})
+        assert P.dict_from_data({((P.OPEN, 0, 1, P.CLOSED),): 'abcd'}) == P.IntervalDict({P.openclosed(0, 1):'abcd'})
+        assert P.dict_from_data({((P.CLOSED, 0, 1, P.OPEN),): 'abcd'}) == P.IntervalDict({P.closedopen(0, 1):'abcd'})
+        assert P.dict_from_data({((P.OPEN, 0, 1, P.OPEN),): 'abcd'}) == P.IntervalDict({P.open(0, 1):'abcd'})
+
+    def test_values(self):
+        assert P.dict_from_data({((P.CLOSED, 'a', 'b', P.CLOSED),): 'abcd'}) == P.IntervalDict({P.closed('a', 'b'):'abcd'})
+        assert P.dict_from_data({((P.CLOSED, (0,), (1,), P.CLOSED),): 'abcd'}) == P.IntervalDict({P.closed(tuple([0]), tuple([1])):'abcd'})
+
+    def test_singleton(self):
+        assert P.dict_from_data({((P.CLOSED, 0, 0, P.CLOSED),): 'abcd'}) == P.IntervalDict({P.singleton(0):'abcd'})
+
+    def test_open_intervals(self):
+        assert P.dict_from_data({((P.OPEN, float('-inf'), float('inf'), P.OPEN),): 'abcd'}) == P.IntervalDict({P.open(-P.inf, P.inf):'abcd'})
+        assert P.dict_from_data({((P.OPEN, float('-inf'), 0, P.CLOSED),): 'abcd'}) == P.IntervalDict({P.openclosed(-P.inf, 0):'abcd'})
+        assert P.dict_from_data({((P.CLOSED, 0, float('inf'), P.OPEN),): 'abcd'}) == P.IntervalDict({P.closedopen(0, P.inf):'abcd'})
+
+    def test_empty_interval(self):
+        assert P.dict_from_data({((P.OPEN, float('inf'), float('-inf'), P.OPEN),): 'abcd'}) == P.IntervalDict({P.empty():'abcd'})
+
+    def test_unions(self):
+        d = {((P.OPEN, float('-inf'), 4, P.CLOSED), (P.CLOSED, 6, float('inf'), P.OPEN)): 'abcd'}
+        assert P.dict_from_data(d) == P.IntervalDict({P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf):'abcd'})
+
+    def test_parameters(self):
+        d = {((P.OPEN, 'lowest', '4', P.CLOSED), (P.CLOSED, '6', 'highest', P.OPEN)): 'abcd'}
+        assert P.dict_from_data(d, conv=int, pinf='highest', ninf='lowest') == P.IntervalDict({P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf):'abcd'})
+
 
 class TestDataIdentity:
     def test_identity(self):
