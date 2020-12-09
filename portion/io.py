@@ -2,6 +2,7 @@ import re
 
 from .const import Bound, inf
 from .interval import Interval
+from .dict import IntervalDict
 
 
 def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
@@ -171,7 +172,7 @@ def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
         ))
     return data
 
-def dict_to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
+def dict_to_data(interval, conv=None, conv_data=None, *, pinf=float('inf'), ninf=float('-inf')):
     """
     Export given DictInteval to a list of 2-uples ((left, lower,upper, right), item)
 
@@ -188,9 +189,9 @@ def dict_to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
     data = []
 
     def _convert(bound):
-        if bound == portion.inf:
+        if bound == inf:
             return pinf
-        elif bound == -portion.inf:
+        elif bound == -inf:
             return ninf
         else:
             return conv(bound)
@@ -224,19 +225,19 @@ def dict_from_data(data, conv=None, conv_data=None, *, pinf=float('inf'), ninf=f
 
     def _convert(bound):
         if bound == pinf:
-            return portion.inf
+            return inf
         elif bound == ninf:
-            return -portion.inf
+            return -inf
         else:
             return conv(bound)
 
-    ret = portion.IntervalDict()
+    ret = IntervalDict()
     for (left, lower, upper, right), value in data:
-        interval = portion.Interval.from_atomic(
-            portion.Bound(left),
+        interval = Interval.from_atomic(
+            Bound(left),
             _convert(lower),
             _convert(upper),
-            portion.Bound(right),
+            Bound(right),
         )
         ret[interval] = conv_data(value)
     return ret

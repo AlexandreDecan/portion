@@ -1,7 +1,7 @@
 from .const import Bound, inf
 from .interval import Interval, open, closed, openclosed, closedopen, empty, singleton
 from .func import iterate
-from .io import from_string, to_string, from_data, to_data
+from .io import from_string, to_string, from_data, to_data, dict_to_data, dict_from_data
 from .dict import IntervalDict
 
 
@@ -10,7 +10,7 @@ __all__ = [
     'Interval',
     'open', 'closed', 'openclosed', 'closedopen', 'singleton', 'empty',
     'iterate',
-    'from_string', 'to_string', 'from_data', 'to_data',
+    'from_string', 'to_string', 'from_data', 'to_data', 'dict_to_data', 'dict_from_data',
     'IntervalDict',
 ]
 
