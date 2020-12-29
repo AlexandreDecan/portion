@@ -24,4 +24,4 @@ deploy:
   on:
     branch: master
     tags: true
-    python: 3.7
+    python: 3.9
