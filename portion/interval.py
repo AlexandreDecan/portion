@@ -582,15 +582,15 @@ class Interval:
         return hash(tuple([self.lower, self.upper]))
 
     def __repr__(self):
-        intervals = []
+        if self.empty:
+            return '()'
 
-        for interval in self:
-            if interval.empty:
-                intervals.append('()')
-            elif interval.lower == interval.upper:
-                intervals.append('[{}]'.format(repr(interval.lower)))
+        string = []
+        for interval in self._intervals:
+            if interval.lower == interval.upper:
+                string.append('[{}]'.format(repr(interval.lower)))
             else:
-                intervals.append(
+                string.append(
                     '{}{},{}{}'.format(
                         '[' if interval.left == Bound.CLOSED else '(',
                         repr(interval.lower),
@@ -598,4 +598,4 @@ class Interval:
                         ']' if interval.right == Bound.CLOSED else ')',
                     )
                 )
-        return ' | '.join(intervals)
+        return ' | '.join(string)
