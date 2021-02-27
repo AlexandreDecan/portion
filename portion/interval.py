@@ -599,3 +599,7 @@ class Interval:
                     )
                 )
         return ' | '.join(string)
+
+    def __next__(self):
+        # Presence of attr __next__ ensures better printing in Pandas.DataFrame
+        pass
