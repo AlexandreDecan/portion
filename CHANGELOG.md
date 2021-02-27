@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.1.5-pre1 (not yet released)
+
+### Fixed
+ - Getting items from an `Interval` using a slice does no longer return a `list` but an `Interval` instance.
+
+
+
 ## 2.1.4 (2020-11-26)
 
 ### Changed

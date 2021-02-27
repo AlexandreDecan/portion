@@ -768,10 +768,10 @@ class TestIntervalIteration:
     def test_slices(self):
         items = [P.closed(5, 6), P.closed(7, 9), P.singleton(10)]
         interval = P.Interval(*items)
-        assert interval[:] == items
-        assert interval[:2] == items[:2]
-        assert interval[::-1] == items[::-1]
-        assert interval[::2] == items[::2]
+        assert interval[:] == P.Interval(*items)
+        assert interval[:2] == P.Interval(*items[:2])
+        assert interval[::-1] == P.Interval(*items[::-1])
+        assert interval[::2] == P.Interval(*items[::2])
 
     def test_missing_index(self):
         i1 = P.closed(10, 10) | P.closed(5, 6) | P.closed(7, 8) | P.closed(8, 9)

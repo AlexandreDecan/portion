@@ -131,13 +131,15 @@ Intervals can be iterated to access the underlying atomic intervals, sorted by t
 
 ```
 
-Atomic intervals can also be retrieved by position:
+Nested intervals can also be retrieved with a position or a slice:
 
 ```python
 >>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[0]
 [0,1]
 >>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[-2]
 (10,11)
+>>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[:2]
+[0,1] | (10,11)
 
 ```
 

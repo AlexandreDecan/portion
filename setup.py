@@ -7,7 +7,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 
 setup(
     name='portion',
-    version='2.1.4',
+    version='2.1.5-pre1',
     license='LGPLv3',
 
     author='Alexandre Decan',

@@ -405,7 +405,9 @@ class Interval:
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return [Interval.from_atomic(*i) for i in self._intervals[item]]
+            return Interval(
+                *[Interval.from_atomic(*i) for i in self._intervals[item]]
+            )
         else:
             return Interval.from_atomic(*self._intervals[item])
 
