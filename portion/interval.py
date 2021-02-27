@@ -401,7 +401,7 @@ class Interval:
         return len(self._intervals)
 
     def __iter__(self):
-        return iter([Interval.from_atomic(*i) for i in self._intervals])
+        yield from (Interval.from_atomic(*i) for i in self._intervals)
 
     def __getitem__(self, item):
         if isinstance(item, slice):
@@ -599,3 +599,4 @@ class Interval:
                     )
                 )
         return ' | '.join(string)
+
