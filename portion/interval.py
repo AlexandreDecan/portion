@@ -397,6 +397,18 @@ class Interval:
         """
         return self - other
 
+    def __getattr__(self, name):
+        if name == '__next__':
+            # Hack for a better representation of intervals within pandas
+            # See https://github.com/AlexandreDecan/portion/pull/54
+            try:
+                import inspect
+                if inspect.stack()[1].function == 'pprint_thing':
+                    return
+            except Exception:
+                pass
+        raise AttributeError
+
     def __len__(self):
         return len(self._intervals)
 

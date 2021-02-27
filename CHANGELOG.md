@@ -5,6 +5,7 @@
 
 ### Fixed
  - Getting items from an `Interval` using a slice does no longer return a `list` but an `Interval` instance.
+ - Intervals are properly pretty-printed by `pandas` ([#54](https://github.com/AlexandreDecan/portion/pull/54)).
 
 
 
