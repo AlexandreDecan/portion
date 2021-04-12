@@ -545,7 +545,6 @@ class TestIntervalContainment:
         assert P.empty() in P.closed(0, 1) | P.closed(2, 3)
 
 
-
 class TestIntervalIntersection:
     def test_with_itself(self):
         assert P.closed(0, 1) & P.closed(0, 1) == P.closed(0, 1)

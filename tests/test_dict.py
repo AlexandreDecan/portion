@@ -128,7 +128,7 @@ class TestIntervalDict:
 
         k, v, i = d.keys(), d.values(), d.items()
         assert len(k) == len(v) == len(i) == len(d)
-        assert list(k) == [P.closed(0, 2), P.closed(3,4)]
+        assert list(k) == [P.closed(0, 2), P.closed(3, 4)]
         assert list(v) == [3, 2]
         assert list(i) == [(P.closed(0, 2), 3), (P.closed(3, 4), 2)]
 
@@ -143,7 +143,7 @@ class TestIntervalDict:
         assert list(d) == list([P.singleton(2), P.open(2, 3)])
 
     def test_combine_empty(self):
-        add = lambda x, y: x + y
+        def add(x, y): return x + y
         assert P.IntervalDict().combine(P.IntervalDict(), add) == P.IntervalDict()
 
         d = P.IntervalDict([(P.closed(0, 3), 0)])
@@ -151,7 +151,7 @@ class TestIntervalDict:
         assert d.combine(P.IntervalDict(), add) == d
 
     def test_combine_nonempty(self):
-        add = lambda x, y: x + y
+        def add(x, y): return x + y
         d1 = P.IntervalDict([(P.closed(1, 3) | P.closed(5, 7), 1)])
         d2 = P.IntervalDict([(P.closed(2, 4) | P.closed(6, 8), 2)])
         assert d1.combine(d2, add) == d2.combine(d1, add)

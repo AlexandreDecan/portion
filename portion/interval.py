@@ -613,4 +613,3 @@ class Interval:
                     )
                 )
         return ' | '.join(string)
-

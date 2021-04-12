@@ -22,8 +22,8 @@ class TestBounds:
         assert Bound(True) == Bound.CLOSED
         assert Bound(False) == Bound.OPEN
 
-        assert Bound.CLOSED.value == True
-        assert Bound.OPEN.value == False
+        assert Bound.CLOSED.value is True
+        assert Bound.OPEN.value is False
 
 
 class TestInfinities:
