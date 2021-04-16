@@ -2,25 +2,25 @@ language: python
 sudo: required
 dist: bionic
 python:
-- 3.5
 - 3.6
 - 3.7
 - 3.8
 - 3.9
 - pypy3
+before_install:
+- pip install poetry
 install:
-- pip install pip -U
-- pip install -e .[test,travis]
+- poetry install --extras "ci"
 script:
-- coverage run --source portion -m pytest
+- poetry run coverage run --source portion -m pytest
 after_success:
-- coveralls
+- poetry run coveralls
+before_deploy:
+- poetry build
+- poetry config pypi-token.pypi $PYPI_TOKEN
 deploy:
-  provider: pypi
-  distributions: sdist bdist_wheel
-  user: AlexandreDecan
-  password:
-    secure: ZEZTWgOAbgFAZ644FSekY+CZi1qPbdDLDxjMi6JQ7JkteB/8q74qyWBJFsBzVF3eBmq0QZZm186ryndu1K42iKG2XDlKcI29RQ9f2HpxPSvZvX9LfdAv13nb/JelDAWnrSTwYWMxyxsqWK0+wVJoyLN5E5ct8wLYSMrf3WcU8V3TqP9LCATy/zuXkM7XBjIinDA4mwdFTmXJCwc6N5auwXv/FVpvoZdCnzPuJVLMa+gcOvgXNZRwvQpB8djv7DXUU/e0Ybie5MpjkEsxnvTphjDS8eOSqhxjBHW/BB4halbEGidxsyyjb7Jm0u6CNxRtEazEyCDCHsN+HcCvlKTZ6AWm93T1GcVgX4S6xVYAKXrjJYmeVxagQq31zWupOQTAsKTXxA3O18JLcXtoPIRFPU9epH5eYfz5j0KVZUAAVLoNbf6nrEUYgNbCOF5KPD/Ysv6V88hZnQlNDcuYG7ZFACr1Ts53IKjeP3zoOFwV4HNX91OqHE9ku1X3DSG027SEfsm5dE2MGjja29ap5bZAtnjbaa0n0Y4abrn/+yNiELjaBHSXKaRqVSKpqLu1uRfD9Op/h4VTLNSgob54B6ZoTzeEz4N4I983fTgpUT8mJhaQaKYhufj03OJHucv1Gn6O7W/fdCHf496rpDixQHzpHYAHDGhkQI1ISsZm8deEnAU=
+  provider: script
+  script: poetry publish
   on:
     branch: master
     tags: true

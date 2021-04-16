@@ -4,9 +4,20 @@ from .const import Bound, inf
 from .interval import Interval
 
 
-def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
-                left_open=r'\(', left_closed=r'\[', right_open=r'\)', right_closed=r'\]',
-                pinf=r'\+inf', ninf=r'-inf'):
+def from_string(
+    string,
+    conv,
+    *,
+    bound=r".+?",
+    disj=r" ?\| ?",
+    sep=r", ?",
+    left_open=r"\(",
+    left_closed=r"\[",
+    right_open=r"\)",
+    right_closed=r"\]",
+    pinf=r"\+inf",
+    ninf=r"-inf"
+):
     """
     Parse given string and create an Interval instance.
     A converter function has to be provided to convert a bound (as string) to a value.
@@ -17,19 +28,23 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
     :param disj: pattern that matches the disjunctive operator (default matches '|').
     :param sep: pattern that matches a bounds separator (default matches ',').
     :param left_open: pattern that matches a left open boundary (default matches '(').
-    :param left_closed: pattern that matches a left closed boundary (default matches '[').
+    :param left_closed: pattern that matches a left closed boundary (default
+        matches '[').
     :param right_open: pattern that matches a right open boundary (default matches ')').
-    :param right_closed: pattern that matches a right closed boundary (default matches ']').
+    :param right_closed: pattern that matches a right closed boundary (default
+        matches ']').
     :param pinf: pattern that matches a positive infinity (default matches '+inf').
     :param ninf: pattern that matches a negative infinity (default matches '-inf').
     :return: an Interval instance.
     """
 
-    re_left_boundary = r'(?P<left>{}|{})'.format(left_open, left_closed)
-    re_right_boundary = r'(?P<right>{}|{})'.format(right_open, right_closed)
-    re_bounds = r'(?P<lower>{bound})({sep}(?P<upper>{bound}))?'.format(bound=bound, sep=sep)
-    re_interval = r'{}(|{}){}'.format(re_left_boundary, re_bounds, re_right_boundary)
-    re_intervals = r'{}(?P<disj>{})?'.format(re_interval, disj)
+    re_left_boundary = r"(?P<left>{}|{})".format(left_open, left_closed)
+    re_right_boundary = r"(?P<right>{}|{})".format(right_open, right_closed)
+    re_bounds = r"(?P<lower>{bound})({sep}(?P<upper>{bound}))?".format(
+        bound=bound, sep=sep
+    )
+    re_interval = r"{}(|{}){}".format(re_left_boundary, re_bounds, re_right_boundary)
+    re_intervals = r"{}(?P<disj>{})?".format(re_interval, disj)
 
     intervals = []
     has_more = True
@@ -49,22 +64,41 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
         else:
             group = match.groupdict()
 
-            left = Bound.CLOSED if re.match(left_closed + '$', group['left']) else Bound.OPEN
-            right = Bound.CLOSED if re.match(right_closed + '$', group['right']) else Bound.OPEN
+            left = (
+                Bound.CLOSED
+                if re.match(left_closed + "$", group["left"])
+                else Bound.OPEN
+            )
+            right = (
+                Bound.CLOSED
+                if re.match(right_closed + "$", group["right"])
+                else Bound.OPEN
+            )
 
-            lower = group.get('lower', None)
-            upper = group.get('upper', None)
+            lower = group.get("lower", None)
+            upper = group.get("upper", None)
             lower = _convert(lower) if lower is not None else inf
             upper = _convert(upper) if upper is not None else lower
 
             intervals.append(Interval.from_atomic(left, lower, upper, right))
-            string = string[match.end():]
+            string = string[match.end() :]
 
     return Interval(*intervals)
 
 
-def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
-              left_closed='[', right_open=')', right_closed=']', pinf='+inf', ninf='-inf'):
+def to_string(
+    interval,
+    conv=repr,
+    *,
+    disj=" | ",
+    sep=",",
+    left_open="(",
+    left_closed="[",
+    right_open=")",
+    right_closed="]",
+    pinf="+inf",
+    ninf="-inf"
+):
     """
     Export given interval to string.
 
@@ -81,7 +115,7 @@ def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
     :return: a string representation for given interval.
     """
     if interval.empty:
-        return '{}{}'.format(left_open, right_open)
+        return "{}{}".format(left_open, right_open)
 
     def _convert(bound):
         if bound == inf:
@@ -100,14 +134,16 @@ def to_string(interval, conv=repr, *, disj=' | ', sep=',', left_open='(',
         upper = _convert(item.upper)
 
         if item.lower == item.upper:
-            exported_intervals.append('{}{}{}'.format(left, lower, right))
+            exported_intervals.append("{}{}{}".format(left, lower, right))
         else:
-            exported_intervals.append('{}{}{}{}{}'.format(left, lower, sep, upper, right))
+            exported_intervals.append(
+                "{}{}{}{}{}".format(left, lower, sep, upper, right)
+            )
 
     return disj.join(exported_intervals)
 
 
-def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
+def from_data(data, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
     """
     Import an interval from a piece of data.
 
@@ -130,16 +166,18 @@ def from_data(data, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
 
     for item in data:
         left, lower, upper, right = item
-        intervals.append(Interval.from_atomic(
-            Bound(left),
-            _convert(lower),
-            _convert(upper),
-            Bound(right),
-        ))
+        intervals.append(
+            Interval.from_atomic(
+                Bound(left),
+                _convert(lower),
+                _convert(upper),
+                Bound(right),
+            )
+        )
     return Interval(*intervals)
 
 
-def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
+def to_data(interval, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
     """
     Export given interval to a list of 4-uples (left, lower,
     upper, right).
@@ -163,10 +201,12 @@ def to_data(interval, conv=None, *, pinf=float('inf'), ninf=float('-inf')):
             return conv(bound)
 
     for item in interval:
-        data.append((
-            item.left.value,
-            _convert(item.lower),
-            _convert(item.upper),
-            item.right.value
-        ))
+        data.append(
+            (
+                item.left.value,
+                _convert(item.lower),
+                _convert(item.upper),
+                item.right.value,
+            )
+        )
     return data

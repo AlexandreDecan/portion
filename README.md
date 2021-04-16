@@ -7,7 +7,7 @@
 [![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
-The `portion` library (formerly distributed as `python-intervals`) provides data structure and operations for intervals in Python 3.5+.
+The `portion` library (formerly distributed as `python-intervals`) provides data structure and operations for intervals in Python 3.6+.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or (semi-)infinite intervals.
@@ -19,12 +19,6 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
  - Dict-like structure to map intervals to data.
  - Import and export intervals to strings and to Python built-in data types.
  - Heavily tested with high code coverage.
-
-**Latest release:**
- - `portion`: 2.1.5 on 2021-02-28 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.1.5/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.1.5/CHANGELOG.md)).
- - `python-intervals`: 1.10.0 on 2019-09-26 ([documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog)).
-
- Note that `python-intervals` will no longer receive updates since it has been replaced by `portion`.
 
 
 ## Table of contents
@@ -47,13 +41,13 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
 
 ## Installation
 
-You can use `pip` to install it, as usual: `pip install portion`.
+You can use `pip` (>=10) to install it, as usual: `pip install portion`.
 
 This will install the latest available version from [PyPI](https://pypi.org/project/portion).
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion)
 and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 
-The test environment can be installed with `pip install portion[test]` and relies on [pytest](https://docs.pytest.org/en/latest/).
+The test environment can be installed with `poetry install` and relies on [pytest](https://docs.pytest.org/en/latest/).
 
 `portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
 
@@ -857,6 +851,8 @@ See [CHANGELOG.md](https://github.com/AlexandreDecan/portion/blob/master/CHANGEL
 
 Contributions are very welcome!
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
+
+Code formatting should follow [Black code style](https://black.readthedocs.io/en/stable/the_black_code_style.html).
 
 
 

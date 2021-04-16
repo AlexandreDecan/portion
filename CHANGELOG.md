@@ -1,6 +1,14 @@
 # Changelog
 
 
+## 2.1.6 (not yet released)
+
+### Changed
+ - Use `pyproject.toml` in combination with `poetry` instead of `setup.py` and `setuptools`.
+ - Drop official support for Python 3.5.
+ - Use `black` as official code formatting.
+
+
 ## 2.1.5 (2021-02-28)
 
 ### Fixed
