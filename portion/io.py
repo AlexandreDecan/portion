@@ -26,7 +26,8 @@ def from_string(
     :param string: string to parse.
     :param conv: function that converts a bound (as string) to an object.
     :param bound: pattern that matches a value.
-    :param disj: pattern that matches the disjunctive operator (default matches '|').
+    :param disj: pattern that matches the disjunctive operator (default matches
+        '|' and ' | ').
     :param sep: pattern that matches a bounds separator (default matches ',').
     :param left_open: pattern that matches a left open boundary (default matches '(').
     :param left_closed: pattern that matches a left closed boundary (default
@@ -45,10 +46,10 @@ def from_string(
         bound=bound, sep=sep
     )
     re_interval = r"{}(|{}){}".format(re_left_boundary, re_bounds, re_right_boundary)
-    re_intervals = r"{}(?P<disj>{})?".format(re_interval, disj)
 
     intervals = []
     has_more = True
+    source = string
 
     def _convert(bound):
         if re.match(pinf, bound):
@@ -58,40 +59,37 @@ def from_string(
         else:
             return conv(bound)
 
-    source = string
-
     while has_more:
-        match = re.match(re_intervals, string)
+        match = re.match(re_interval, string)
         if match is None:
-            if len(string) > 0:
-                raise ValueError(
-                    '"{}" in "{}" cannot be parsed to an interval.'.format(
-                        string, source
-                    )
-                )
+            raise ValueError('"{}" cannot be parsed to an interval.'.format(source))
 
-            has_more = False
+        # Parse atomic interval
+        group = match.groupdict()
+
+        left = (
+            Bound.CLOSED if re.match(left_closed + "$", group["left"]) else Bound.OPEN
+        )
+        right = (
+            Bound.CLOSED if re.match(right_closed + "$", group["right"]) else Bound.OPEN
+        )
+        lower = group.get("lower", None)
+        upper = group.get("upper", None)
+        lower = _convert(lower) if lower is not None else inf
+        upper = _convert(upper) if upper is not None else lower
+
+        intervals.append(Interval.from_atomic(left, lower, upper, right))
+        string = string[match.end() :]
+
+        # Are there more atomic intervals?
+        if len(string) > 0:
+            match = re.match(disj, string)
+            if match is None:
+                raise ValueError('"{}" cannot be parsed to an interval.'.format(source))
+            else:
+                string = string[match.end() :]
         else:
-            group = match.groupdict()
-
-            left = (
-                Bound.CLOSED
-                if re.match(left_closed + "$", group["left"])
-                else Bound.OPEN
-            )
-            right = (
-                Bound.CLOSED
-                if re.match(right_closed + "$", group["right"])
-                else Bound.OPEN
-            )
-
-            lower = group.get("lower", None)
-            upper = group.get("upper", None)
-            lower = _convert(lower) if lower is not None else inf
-            upper = _convert(upper) if upper is not None else lower
-
-            intervals.append(Interval.from_atomic(left, lower, upper, right))
-            string = string[match.end() :]
+            has_more = False
 
     return Interval(*intervals)
 
