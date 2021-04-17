@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2.1.6 (not yet released)
+## 2.1.6 (2021-04-17)
 
 ### Fixed
  - `from_string`raises a `ValueError` if given string cannot be parsed to an interval ([#57](https://github.com/AlexandreDecan/portion/issues/57)).
