@@ -3,6 +3,9 @@
 
 ## 2.1.6 (not yet released)
 
+### Fixed
+ - `from_string`raises a `ValueError` if given string cannot be parsed to an interval ([#57](https://github.com/AlexandreDecan/portion/issues/57)).
+
 ### Changed
  - Use `pyproject.toml` in combination with `poetry` instead of `setup.py` and `setuptools`.
  - Drop official support for Python 3.5.
