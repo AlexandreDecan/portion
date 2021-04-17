@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "portion"
+version = "2.1.6"
+description = "Python data structure and operations for intervals"
+authors = ["Alexandre Decan <alexandre.decan@lexpage.net>"]
+license = "LGPLv3"
+readme = "README.md"
+homepage = "https://github.com/AlexandreDecan/portion"
+repository = "https://github.com/AlexandreDecan/portion"
+documentation = "https://github.com/AlexandreDecan/portion"
+keywords = ["interval", "operation", "range", "math", "structure"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+include = ["CHANGELOG.md", "LICENSE.txt", "tests/"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+sortedcontainers = "^2.2.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.0.1"
+flake8 = "^3.9.1"
+black = "^20.8b1"
+
+[tool.poetry.extras]
+ci = ["coverage^=5.0.3", "coveralls^=1.11.1"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
