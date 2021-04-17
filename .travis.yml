@@ -9,8 +9,10 @@ python:
 - pypy3
 before_install:
 - pip install poetry
+- poetry run pip install coverage coveralls
 install:
-- poetry install --extras "ci"
+- poetry install
+- poetry update
 script:
 - poetry run coverage run --source portion -m pytest
 after_success:
