@@ -106,6 +106,24 @@ class TestFromString:
 
         assert P.from_string('<"0"-"1"> or <"2"-"3">', **params) == P.closed(0, 1) | P.closed(2, 3)
 
+    @pytest.mark.parametrize('case', [
+        ' ',
+        '1',
+        '[1',
+        '(1', '1)',
+        '1]',
+        ')1,2]',
+        '|',
+        '[0,1] | 1',
+        '1 | [0,1]',
+        '[0,1] | 1 | [2,3]',
+        '[0,1] || [2,3]',
+    ])
+    def test_invalid_strings(self, case):
+        # Related to https://github.com/AlexandreDecan/portion/issues/57
+        with pytest.raises(ValueError):
+            P.from_string(case, int)
+
 
 class TestStringIdentity:
     def test_identity(self):

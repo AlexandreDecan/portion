@@ -10,6 +10,7 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
     """
     Parse given string and create an Interval instance.
     A converter function has to be provided to convert a bound (as string) to a value.
+    This function raises a ValueError if given string cannot be parsed to an interval.
 
     :param string: string to parse.
     :param conv: function that converts a bound (as string) to an object.
@@ -42,9 +43,16 @@ def from_string(string, conv, *, bound=r'.+?', disj=r' ?\| ?', sep=r', ?',
         else:
             return conv(bound)
 
+    source = string
+
     while has_more:
         match = re.match(re_intervals, string)
         if match is None:
+            if len(string) > 0:
+                raise ValueError(
+                    '"{}" in "{}" cannot be parsed to an interval.'.format(string, source)
+                )
+
             has_more = False
         else:
             group = match.groupdict()
