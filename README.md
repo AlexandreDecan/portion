@@ -47,8 +47,6 @@ This will install the latest available version from [PyPI](https://pypi.org/proj
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion)
 and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 
-The test environment can be installed with `poetry install` and relies on [pytest](https://docs.pytest.org/en/latest/).
-
 `portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
 
 
@@ -852,6 +850,7 @@ See [CHANGELOG.md](https://github.com/AlexandreDecan/portion/blob/master/CHANGEL
 Contributions are very welcome!
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
 
+The test suite requires [pytest](https://docs.pytest.org/en/latest/).
 Code formatting should follow [Black code style](https://black.readthedocs.io/en/stable/the_black_code_style.html).
 
 
