@@ -65,7 +65,9 @@ def from_string(
         if match is None:
             if len(string) > 0:
                 raise ValueError(
-                    '"{}" in "{}" cannot be parsed to an interval.'.format(string, source)
+                    '"{}" in "{}" cannot be parsed to an interval.'.format(
+                        string, source
+                    )
                 )
 
             has_more = False
