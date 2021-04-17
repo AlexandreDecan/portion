@@ -2,7 +2,6 @@ language: python
 sudo: required
 dist: focal
 python:
-- 3.5
 - 3.6
 - 3.7
 - 3.8
@@ -11,7 +10,6 @@ python:
 - pypy3
 matrix:
   allow_failures:
-  - python: 3.5
   - python: 3.10-dev
   - python: pypy3
 before_install:
