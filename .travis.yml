@@ -1,18 +1,23 @@
 language: python
 sudo: required
-dist: bionic
+dist: focal
 python:
 - 3.6
 - 3.7
 - 3.8
 - 3.9
+- 3.10-dev
 - pypy3
+matrix:
+  allow_failures:
+    - python: 3.10-dev
+    - python: pypy3
 before_install:
 - pip install poetry
 - poetry run pip install coverage coveralls
 install:
+- poetry update --lock
 - poetry install
-- poetry update
 script:
 - poetry run coverage run --source portion -m pytest
 after_success:
