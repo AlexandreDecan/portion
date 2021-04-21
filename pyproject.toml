@@ -25,7 +25,7 @@ sortedcontainers = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.0.1"
-black = {version = "^20.8b1", markers = "implementation_name!='pypy'"}
+black = {version = "^20.8b1", markers = "implementation_name != 'pypy'"}
 pre-commit = {version = "^2.12.1", python = "^3.6.1"}
 
 [tool.black]

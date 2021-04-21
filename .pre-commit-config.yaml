@@ -15,6 +15,7 @@ repos:
         pass_filenames: false
       - id: black
         name: check code style
-        entry: poetry run black --check
+        entry: poetry run black --check portion
         language: python
-        files: "portion/.*\\.py"
+        pass_filenames: false
+        always_run: true
