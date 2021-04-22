@@ -32,6 +32,7 @@ def iterate(interval, step, *, base=None, reverse=False):
     :return: a lazy iterator.
     """
     if base is None:
+
         def base(x):
             return x
 
