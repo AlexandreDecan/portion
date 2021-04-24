@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.2.0 (not yet released)
+
+### Changed
+ - Use `poetry` instead of `setuptools` to build `portion`.
+
+
+
 ## 2.1.6 (2021-04-17)
 
 ### Fixed

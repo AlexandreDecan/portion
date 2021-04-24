@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "portion"
-version = "2.1.6"
+version = "2.2.0-dev"
 description = "Python data structure and operations for intervals"
 authors = ["Alexandre Decan <alexandre.decan@lexpage.net>"]
 license = "LGPLv3"
