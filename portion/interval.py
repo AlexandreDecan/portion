@@ -1,3 +1,5 @@
+import warnings
+
 from collections import namedtuple
 from .const import Bound, inf
 
@@ -14,15 +16,11 @@ def mergeable(a, b):
     :param b: an atomic interval.
     :return: True if mergeable, False otherwise.
     """
-    if a.lower < b.lower or (a.lower == b.lower and a.left == Bound.CLOSED):
-        first, second = a, b
-    else:
-        first, second = b, a
-
-    if first.upper == second.lower:
-        return first.right == Bound.CLOSED or second.left == Bound.CLOSED
-
-    return first.upper > second.lower
+    warnings.warn(
+        "This function is deprecated, use Interval._mergeable instead.",
+        DeprecationWarning,
+    )
+    return Interval._mergeable(a, b)
 
 
 def open(lower, upper):
@@ -128,7 +126,7 @@ class Interval:
                 current = self._intervals[i]
                 successor = self._intervals[i + 1]
 
-                if mergeable(current, successor):
+                if self.__class__._mergeable(current, successor):
                     if current.lower == successor.lower:
                         lower = current.lower
                         left = (
@@ -161,6 +159,26 @@ class Interval:
                     self._intervals.insert(i, union)
                 else:
                     i = i + 1
+
+    @classmethod
+    def _mergeable(cls, a, b):
+        """
+        Tester whether two atomic intervals can be merged (i.e. they overlap or
+        are adjacent).
+
+        :param a: an atomic interval.
+        :param b: an atomic interval.
+        :return: True if mergeable, False otherwise.
+        """
+        if a.lower < b.lower or (a.lower == b.lower and a.left == Bound.CLOSED):
+            first, second = a, b
+        else:
+            first, second = b, a
+
+        if first.upper == second.lower:
+            return first.right == Bound.CLOSED or second.left == Bound.CLOSED
+
+        return first.upper > second.lower
 
     @property
     def left(self):
