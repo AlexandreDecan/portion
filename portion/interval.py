@@ -255,7 +255,7 @@ class Interval:
 
         :return: an Interval instance.
         """
-        return Interval.from_atomic(self.left, self.lower, self.upper, self.right)
+        return self.__class__.from_atomic(self.left, self.lower, self.upper, self.right)
 
     def replace(
         self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True
@@ -308,16 +308,16 @@ class Interval:
             right = enclosure.right if right is None else right
 
         if self.atomic:
-            return Interval.from_atomic(left, lower, upper, right)
+            return self.__class__.from_atomic(left, lower, upper, right)
 
-        n_interval = self & Interval.from_atomic(left, lower, upper, right)
+        n_interval = self & self.__class__.from_atomic(left, lower, upper, right)
 
         if n_interval.atomic:
             return n_interval.replace(left, lower, upper, right)
         else:
             lowest = n_interval[0].replace(left=left, lower=lower)
             highest = n_interval[-1].replace(upper=upper, right=right)
-            return Interval(lowest, *n_interval[1:-1], highest)
+            return self.__class__(lowest, *n_interval[1:-1], highest)
 
     def apply(self, func):
         """
@@ -341,13 +341,13 @@ class Interval:
             if isinstance(value, Interval):
                 intervals.append(value)
             elif isinstance(value, tuple):
-                intervals.append(Interval.from_atomic(*value))
+                intervals.append(self.__class__.from_atomic(*value))
             else:
                 raise TypeError(
                     "Unsupported return type {} for {}".format(type(value), value)
                 )
 
-        return Interval(*intervals)
+        return self.__class__(*intervals)
 
     def adjacent(self, other):
         """
@@ -452,13 +452,15 @@ class Interval:
         return len(self._intervals)
 
     def __iter__(self):
-        yield from (Interval.from_atomic(*i) for i in self._intervals)
+        yield from (self.__class__.from_atomic(*i) for i in self._intervals)
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return Interval(*[Interval.from_atomic(*i) for i in self._intervals[item]])
+            return self.__class__(
+                *[self.__class__.from_atomic(*i) for i in self._intervals[item]]
+            )
         else:
-            return Interval.from_atomic(*self._intervals[item])
+            return self.__class__.from_atomic(*self._intervals[item])
 
     def __and__(self, other):
         if not isinstance(other, Interval):
@@ -479,7 +481,7 @@ class Interval:
                 upper = min(self.upper, other.upper)
                 right = self.right if upper == self.upper else other.right
 
-            return Interval.from_atomic(left, lower, upper, right)
+            return self.__class__.from_atomic(left, lower, upper, right)
         else:
             intersections = []
 
@@ -506,11 +508,11 @@ class Interval:
                     else:
                         assert False
 
-            return Interval(*intersections)
+            return self.__class__(*intersections)
 
     def __or__(self, other):
         if isinstance(other, Interval):
-            return Interval(self, other)
+            return self.__class__(self, other)
         else:
             return NotImplemented
 
@@ -556,16 +558,16 @@ class Interval:
 
     def __invert__(self):
         complements = [
-            Interval.from_atomic(Bound.OPEN, -inf, self.lower, ~self.left),
-            Interval.from_atomic(~self.right, self.upper, inf, Bound.OPEN),
+            self.__class__.from_atomic(Bound.OPEN, -inf, self.lower, ~self.left),
+            self.__class__.from_atomic(~self.right, self.upper, inf, Bound.OPEN),
         ]
 
         for i, j in zip(self._intervals[:-1], self._intervals[1:]):
             complements.append(
-                Interval.from_atomic(~i.right, i.upper, j.lower, ~j.left)
+                self.__class__.from_atomic(~i.right, i.upper, j.lower, ~j.left)
             )
 
-        return Interval(*complements)
+        return self.__class__(*complements)
 
     def __sub__(self, other):
         if isinstance(other, Interval):
