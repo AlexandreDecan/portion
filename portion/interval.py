@@ -227,8 +227,8 @@ class Interval:
         """
         return len(self._intervals) == 1
 
-    @staticmethod
-    def from_atomic(left, lower, upper, right):
+    @classmethod
+    def from_atomic(cls, left, lower, upper, right):
         """
         Create an Interval instance containing a single atomic interval.
 
@@ -237,13 +237,13 @@ class Interval:
         :param upper: value of the upper bound.
         :param right: either CLOSED or OPEN.
         """
-        instance = Interval()
+        instance = cls()
         left = left if lower not in [inf, -inf] else Bound.OPEN
         right = right if upper not in [inf, -inf] else Bound.OPEN
 
         instance._intervals = [Atomic(left, lower, upper, right)]
         if instance.empty:
-            return Interval()
+            return cls()
 
         return instance
 
