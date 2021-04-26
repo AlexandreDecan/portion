@@ -17,7 +17,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
-include = ["CHANGELOG.md", "LICENSE.txt", "tests/"]
+include = ["README.md", "CHANGELOG.md", "LICENSE.txt", "tests/"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
