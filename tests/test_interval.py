@@ -139,6 +139,31 @@ class TestInterval:
         assert P.closed(0, 4) == (P.closed(0, 1) | P.closed(3, 4)).enclosure
         assert P.openclosed(0, 4) == (P.open(0, 1) | P.closed(3, 4)).enclosure
 
+    def test_measure(self):
+        assert P.empty().measure == 0
+        assert P.singleton(1).measure == 0
+        assert (P.singleton(-1) | (P.singleton(0) | P.singleton(1))).measure == 0
+
+        assert P.open(0, 1).measure == 1
+        assert P.openclosed(0, 1).measure == 1
+        assert P.closedopen(0, 1).measure == 1
+        assert P.closed(0, 1).measure == 1
+
+        assert (P.open(0, 1) | P.open(3, 5)).measure == 3
+
+        assert (P.open(0, P.inf)).measure == float('inf')
+        assert (P.open(-P.inf, 0)).measure == float('inf')
+        assert (P.open(-P.inf, P.inf)).measure == float('inf')
+       
+        with pytest.raises(TypeError):
+            P.open('a', 'b').measure
+       
+        with pytest.raises(TypeError):
+            P.open('a', P.inf).measure
+       
+        with pytest.raises(TypeError):
+            P.open(-P.inf, 'b').measure
+
 
 class TestIntervalReplace:
     def test_replace_bounds(self):

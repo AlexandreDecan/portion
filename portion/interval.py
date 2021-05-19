@@ -239,6 +239,23 @@ class Interval:
         """
         return Interval.from_atomic(self.left, self.lower, self.upper, self.right)
 
+    @property
+    def measure(self):
+        """
+        Return a measure (~ length) of the interval.
+
+        Only valid for intervals with numeric bounds.
+        """
+        if self.empty:
+            return 0
+        if self.upper != inf and type(self.upper) not in (int, float):
+            raise TypeError("Interval bounds must be numeric")
+        if self.lower != -inf and type(self.lower) not in (int, float):
+            raise TypeError("Interval bounds must be numeric")
+        if self.upper == inf or self.lower == -inf:
+            return float("inf")
+        return sum([i.upper - i.lower for i in self._intervals])
+
     def replace(
         self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True
     ):
