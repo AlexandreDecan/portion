@@ -13,23 +13,20 @@ jobs:
     - python: 3.10-dev
     - python: pypy3
 before_install:
-- pip install pip virtualenv -U
-- curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
-- poetry run pip install coverage coveralls
-- poetry update --lock
+- pip install pip -U
 install:
-- poetry install
+- pip install .[test,dev,ci]
 script:
-- poetry run black --check
-- poetry run coverage run --source portion -m pytest
+- black --check
+- coverage run --source portion -m pytest
 after_success:
-- poetry run coveralls
-before_deploy:
-- poetry build
-- poetry config pypi-token.pypi $PYPI_TOKEN
+- coveralls
 deploy:
-  provider: script
-  script: poetry publish
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: AlexandreDecan
+  password:
+    secure: ZEZTWgOAbgFAZ644FSekY+CZi1qPbdDLDxjMi6JQ7JkteB/8q74qyWBJFsBzVF3eBmq0QZZm186ryndu1K42iKG2XDlKcI29RQ9f2HpxPSvZvX9LfdAv13nb/JelDAWnrSTwYWMxyxsqWK0+wVJoyLN5E5ct8wLYSMrf3WcU8V3TqP9LCATy/zuXkM7XBjIinDA4mwdFTmXJCwc6N5auwXv/FVpvoZdCnzPuJVLMa+gcOvgXNZRwvQpB8djv7DXUU/e0Ybie5MpjkEsxnvTphjDS8eOSqhxjBHW/BB4halbEGidxsyyjb7Jm0u6CNxRtEazEyCDCHsN+HcCvlKTZ6AWm93T1GcVgX4S6xVYAKXrjJYmeVxagQq31zWupOQTAsKTXxA3O18JLcXtoPIRFPU9epH5eYfz5j0KVZUAAVLoNbf6nrEUYgNbCOF5KPD/Ysv6V88hZnQlNDcuYG7ZFACr1Ts53IKjeP3zoOFwV4HNX91OqHE9ku1X3DSG027SEfsm5dE2MGjja29ap5bZAtnjbaa0n0Y4abrn/+yNiELjaBHSXKaRqVSKpqLu1uRfD9Op/h4VTLNSgob54B6ZoTzeEz4N4I983fTgpUT8mJhaQaKYhufj03OJHucv1Gn6O7W/fdCHf496rpDixQHzpHYAHDGhkQI1ISsZm8deEnAU=
   on:
     branch: master
     tags: true

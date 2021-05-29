@@ -52,7 +52,7 @@ Pre-releases are available from the *master* branch on [GitHub](https://github.c
 and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 Note that `portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
 
-`portion` relies on `poetry` for its dependencies and its build process. You can install `portion` and its development environment using `poetry install` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites), [black](https://black.readthedocs.io/en/stable/) (for code formatting) and [pre-commit](https://pre-commit.com) (to automatically install `portion`'s dependencies, execute `pytest` and `black`, assuming you executed `pre-commit install` beforehand).
+You can install `portion` and its development environment using `pip install -e .[test,dev]` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites), [black](https://black.readthedocs.io/en/stable/) (for code formatting) and [pre-commit](https://pre-commit.com).
 
 
 ## Documentation & usage

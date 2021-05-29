@@ -3,13 +3,13 @@ repos:
     hooks:
       - id: black
         name: check code style
-        entry: poetry run black --check
+        entry: black --check
         language: python
         pass_filenames: true
         types: ["python"]
       - id: pytest
         name: run test suite
-        entry: poetry run pytest
+        entry: pytest
         language: python
         always_run: true
         pass_filenames: false

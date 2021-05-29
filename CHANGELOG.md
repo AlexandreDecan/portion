@@ -4,12 +4,11 @@
 ## 2.2.0 (not yet released)
 
 ### Changed
- - Use `poetry` instead of `setuptools` to build `portion`.
  - Some internal changes to ease subclassing `Interval`(see [#58](https://github.com/AlexandreDecan/issues/58)):
    * Use `self.__class__` instead of `Interval` to create new instances;
    * Deprecate and move `mergeable` function to `Interval._mergeable` class method;
    * `Interval.from_atomic` is now a class method instead of a static method.
-
+ - Support [PEP 517](https://www.python.org/dev/peps/pep-0517).
 
 ## 2.1.6 (2021-04-17)
 
