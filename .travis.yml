@@ -17,7 +17,7 @@ before_install:
 install:
 - pip install .[test,dev,ci]
 script:
-- black --check
+- black --check portion
 - coverage run --source portion -m pytest
 after_success:
 - coveralls
