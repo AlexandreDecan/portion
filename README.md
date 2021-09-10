@@ -1,6 +1,6 @@
 # portion - data structure and operations for intervals
 
-[![Travis](https://travis-ci.com/AlexandreDecan/portion.svg?branch=master)](https://travis-ci.com/AlexandreDecan/portion)
+[![Tests](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
 [![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
 [![PyPI](https://badgen.net/pypi/v/portion)](https://pypi.org/project/portion)

@@ -1,14 +1,18 @@
-name: Test project
+name: Tests
 
-on: [push]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -23,9 +27,11 @@ jobs:
         run: pip install .[test]
       - name: Check code style
         run: black --check portion
-      - name: Execute test suites
+      - name: Execute tests
         run: coverage run --source portion -m pytest
-      - name: Report coverage
+      - name: Upload coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install "coveralls ~= 1.11.1"
-          coveralls
+          pip install coveralls
+          coveralls --service=github
