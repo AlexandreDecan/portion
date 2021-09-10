@@ -1,0 +1,31 @@
+name: Test project
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install pip -U
+          pip install .
+      - name: Install test dependencies
+        run: pip install .[test]
+      - name: Check code style
+        run: black --check portion
+      - name: Execute test suites
+        run: coverage run --source portion -m pytest
+      - name: Report coverage
+        run: |
+          pip install "coveralls ~= 1.11.1"
+          coveralls

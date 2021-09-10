@@ -38,9 +38,7 @@ setup(
         "sortedcontainers ~= 2.2",
     ],
     extras_require={
-        "test": ["pytest ~= 5.0"],
-        "dev": ["black >= 20.8b", "pre-commit ~= 2.12"],
-        "ci": ["coverage ~= 5.0.3", "coveralls ~= 1.11.1"],
+        "test": ["pytest ~= 5.0", "coverage ~= 5.0.3", "black >= 20.8b"],
     },
     zip_safe=True,
 )
