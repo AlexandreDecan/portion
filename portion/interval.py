@@ -466,7 +466,11 @@ class Interval:
         if not isinstance(other, Interval):
             return NotImplemented
 
-        if self.atomic and other.atomic:
+        if (self.upper < other.lower) or (self.lower > other.upper):
+            # early out for non-overlapping intervals
+            intersections = []
+            return self.__class__(*intersections)
+        elif self.atomic and other.atomic:
             if self.lower == other.lower:
                 lower = self.lower
                 left = self.left if self.left == Bound.OPEN else other.left
