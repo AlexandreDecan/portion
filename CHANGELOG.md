@@ -11,7 +11,9 @@
    * Use `self.__class__` instead of `Interval` to create new instances;
    * Deprecate and move `mergeable` function to `Interval._mergeable` class method;
    * `Interval.from_atomic` is now a class method instead of a static method.
- - Speed up lookups in `IntervalDict` ([#65](https://github.com/AlexandreDecan/portion/issues/58), Jeff Trull).
+ - Speed up lookups in `IntervalDict` ([#65](https://github.com/AlexandreDecan/portion/issues/65), Jeff Trull).
+ - Speed up intersection for non-overlapping intervals ([#66](https://github.com/AlexandreDecan/portion/issues/66), Jeff Trull).
+
 
 
 ## 2.1.6 (2021-04-17)
