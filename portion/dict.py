@@ -269,7 +269,7 @@ class IntervalDict(MutableMapping):
 
                 intersection = key & i
                 if not intersection.empty:
-                    items.append((intersection, self._storage[i]))
+                    items.append((intersection, v))
             return IntervalDict._from_items(items)
         else:
             for i, v in self._storage.items():
