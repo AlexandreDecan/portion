@@ -374,6 +374,10 @@ class Interval:
         :return: True if intervals overlap, False otherwise.
         """
         if isinstance(other, Interval):
+            if self.upper < other.lower or self.lower > other.upper:
+                # Early out for clearly non-overlapping intervals
+                return False
+
             i_iter = iter(self)
             o_iter = iter(other)
             i_current = next(i_iter)
@@ -523,6 +527,9 @@ class Interval:
         if isinstance(item, Interval):
             if item.empty:
                 return True
+            elif self.upper < item.lower or self.lower > item.upper:
+                # Early out for non-overlapping intervals
+                return False
             elif self.atomic:
                 left = item.lower > self.lower or (
                     item.lower == self.lower
@@ -549,6 +556,9 @@ class Interval:
                         return False
                 return True
         else:
+            if self.upper < item or self.lower > item:
+                return False
+
             # Item is a value
             for i in self._intervals:
                 left = (item >= i.lower) if i.left == Bound.CLOSED else (item > i.lower)

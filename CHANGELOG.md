@@ -14,6 +14,7 @@
  - Speed up lookups in `IntervalDict` ([#65](https://github.com/AlexandreDecan/portion/issues/65), Jeff Trull).
  - Speed up removals in `IntervalDict`.
  - Speed up intersection for non-overlapping intervals ([#66](https://github.com/AlexandreDecan/portion/issues/66), Jeff Trull).
+ - Speed up `.overlaps` and `.contains` for non-overlapping intervals/items.
 
 
 
