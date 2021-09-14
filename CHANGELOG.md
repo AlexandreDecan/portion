@@ -12,6 +12,7 @@
    * Deprecate and move `mergeable` function to `Interval._mergeable` class method;
    * `Interval.from_atomic` is now a class method instead of a static method.
  - Speed up lookups in `IntervalDict` ([#65](https://github.com/AlexandreDecan/portion/issues/65), Jeff Trull).
+ - Speed up removals in `IntervalDict`.
  - Speed up intersection for non-overlapping intervals ([#66](https://github.com/AlexandreDecan/portion/issues/66), Jeff Trull).
 
 

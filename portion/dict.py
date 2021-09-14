@@ -260,11 +260,10 @@ class IntervalDict(MutableMapping):
 
     def __getitem__(self, key):
         if isinstance(key, Interval):
-            upper = key.upper
             items = []
             for i, v in self._storage.items():
                 # Early out
-                if upper < i.lower:
+                if key.upper < i.lower:
                     break
 
                 intersection = key & i
@@ -321,6 +320,10 @@ class IntervalDict(MutableMapping):
 
         found = False
         for i, v in self._storage.items():
+            # Early out
+            if interval.upper < i.lower:
+                break
+
             if i.overlaps(interval):
                 found = True
                 remaining = i - interval
