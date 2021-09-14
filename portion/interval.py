@@ -556,10 +556,10 @@ class Interval:
                         return False
                 return True
         else:
+            # Item is a value
             if self.upper < item or self.lower > item:
                 return False
 
-            # Item is a value
             for i in self._intervals:
                 left = (item >= i.lower) if i.left == Bound.CLOSED else (item > i.lower)
                 right = (

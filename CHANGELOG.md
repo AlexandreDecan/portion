@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2.2.0 (not yet released)
+## 2.2.0 (2021-09-14)
 
 ### Added
  - Support [PEP 517](https://www.python.org/dev/peps/pep-0517).
