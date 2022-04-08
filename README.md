@@ -677,16 +677,27 @@ This method always returns a single `Interval` instance, where `.keys` returns a
 ```
 
 The `.keys`, `.values` and `.items` methods return exactly one element for each stored value (i.e., if two intervals share a value, they are merged into a disjunction), as illustrated next.
-See [#44](https://github.com/AlexandreDecan/portion/issues/44#issuecomment-710199687) to know how to obtained a sorted list of atomic intervals instead.
 
 ```python
 >>> d = P.IntervalDict()
->>> d[P.closed(0, 1)] = d[P.closed(2, 3)] = 'peach'
->>> list(d.items())
-[([0,1] | [2,3], 'peach')]
+>>> d[P.open(0, 1)] = d[P.open(2, 3)] = 'peach'
+>>> d[P.open(1, 2)] = 'peach stone'
+>>> list(d.items())  # a list of 2 items
+[((0,1) | (2,3), 'peach'), ((1,2), 'peach stone')]
 
 ```
 
+If you have an IntervalDict, and you want to iterate over its atomic intervals in order, you can manually create a list of (atomic interval, value) pairs:
+
+```python
+>>> d = P.IntervalDict()
+>>> d[P.open(0, 1)] = d[P.open(2, 3)] = 'peach'
+>>> d[P.open(1, 2)] = 'peach stone'
+>>> in_order = sorted([(atomic, value) for key, value in d.items() for atomic in key])
+>>> in_order  # a list of 3 items
+[((0,1), 'peach'), ((1,2), 'peach stone'), ((2,3), 'peach')]
+
+```
 
 Two `IntervalDict` instances can be combined together using the `.combine` method.
 This method returns a new `IntervalDict` whose keys and values are taken from the two
