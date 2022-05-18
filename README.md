@@ -720,7 +720,7 @@ by querying the resulting `IntervalDict` as follows:
 Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
 `.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
 For convenience, one can export the content of an `IntervalDict` to a classical Python `dict` using
-the `as_dict` method.
+the `as_dict` method. This method accepts an optional `atomic` parameter (whose default is `False`). When set to `True`, the keys of the resulting `dict` instance are atomic intervals.
 
 
 [&uparrow; back to top](#table-of-contents)

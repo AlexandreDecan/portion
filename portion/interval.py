@@ -97,6 +97,7 @@ class Interval:
     """
 
     __slots__ = ("_intervals",)
+    __match_args__ = ('left', 'lower', 'upper', 'right')
 
     def __init__(self, *intervals):
         """

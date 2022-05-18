@@ -250,13 +250,21 @@ class IntervalDict(MutableMapping):
 
         return IntervalDict(new_items)
 
-    def as_dict(self):
+    def as_dict(self, atomic=False):
         """
         Return the content as a classical Python dict.
 
+        :param atomic: whether keys are atomic intervals.
         :return: a Python dict.
         """
-        return dict(self._storage)
+        if atomic:
+            d = dict()
+            for interval, v in self._storage.items():
+                for i in interval:
+                    d[i] = v
+            return d
+        else:
+            return dict(self._storage)
 
     def __getitem__(self, key):
         if isinstance(key, Interval):

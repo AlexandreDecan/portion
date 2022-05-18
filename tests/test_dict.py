@@ -313,3 +313,19 @@ class TestIntervalDict:
         assert d[1] == 'a'
         assert d[2] == 'b'
         assert len(d) == 2
+
+    def test_as_dict(self):
+        content = {
+            P.closed(1, 2) | P.closed(4, 5): 1,
+            P.open(7, 8) | P.closed(10, 12): 2,
+        }
+        d = P.IntervalDict(content)
+
+        assert d.as_dict() == content
+        assert d.as_dict(atomic=False) == content
+        assert d.as_dict(atomic=True) == {
+            P.closed(1, 2): 1,
+            P.closed(4, 5): 1,
+            P.open(7, 8): 2,
+            P.closed(10, 12): 2,
+        }
