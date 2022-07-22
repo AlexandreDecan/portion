@@ -1,12 +1,15 @@
 # Changelog
 
 
-## 2.3.0 (not yet released)
+## 2.3.0-dev (not yet released)
 
 ### Added
  - Support Python 3.10.
  - `IntervalDict.as_dict` has an optional `atomic=False` parameter that, if set to `True`, returns intervals that are atomic.
  - Experimental support for structural pattern matching (on `left`, `lower`, `upper` and `right`).
+
+### Fixed
+ - Set `list(P.empty()) == []`, i.e., the empty interval is a disjunction of no interval (see [#72](https://github.com/AlexandreDecan/portion/issues/72)).
 
 
 ## 2.2.0 (2021-09-14)

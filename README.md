@@ -7,7 +7,7 @@
 [![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
-The `portion` library (formerly distributed as `python-intervals`) provides data structure and operations for intervals in Python 3.6+.
+The `portion` library provides data structure and operations for intervals in Python 3.6+.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or (semi-)infinite intervals.
@@ -19,12 +19,6 @@ The `portion` library (formerly distributed as `python-intervals`) provides data
  - Dict-like structure to map intervals to data.
  - Import and export intervals to strings and to Python built-in data types.
  - Heavily tested with high code coverage.
-
-**Latest release:**
- - `portion`: 2.2.0 on 2021-09-14 ([documentation](https://github.com/AlexandreDecan/portion/blob/2.2.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/2.2.0/CHANGELOG.md)).
- - `python-intervals`: 1.10.0 on 2019-09-26 ([documentation](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md), [changes](https://github.com/AlexandreDecan/portion/blob/1.10.0/README.md#changelog)).
-
- Note that `python-intervals` will no longer receive updates since it has been replaced by `portion`.
 
 
 ## Table of contents
@@ -106,18 +100,6 @@ When infinities are used as a lower or upper bound, the corresponding boundary i
 
 ```
 
-Empty intervals always resolve to `(P.inf, -P.inf)`, regardless of the provided bounds:
-
-```python
->>> P.empty() == P.open(P.inf, -P.inf)
-True
->>> P.closed(4, 3) == P.open(P.inf, -P.inf)
-True
->>> P.openclosed('a', 'a') == P.open(P.inf, -P.inf)
-True
-
-```
-
 Intervals created with this library are `Interval` instances.
 An `Interval` instance is a disjunction of atomic intervals each representing a single interval (e.g. `[1,2]`).
 Intervals can be iterated to access the underlying atomic intervals, sorted by their lower and upper bounds.
@@ -179,8 +161,10 @@ An `Interval` defines the following properties:
 
    ```
 
- - `i.atomic` is `True` if and only if the interval is a disjunction of a single (possibly empty) interval.
+ - `i.atomic` is `True` if and only if the interval is empty or is a disjunction of a single interval.
    ```python
+   >>> P.empty().atomic
+   True
    >>> P.closed(0, 2).atomic
    True
    >>> (P.closed(0, 1) | P.closed(1, 2)).atomic
@@ -210,6 +194,16 @@ CLOSED, OPEN
 (CLOSED, 0, 1, OPEN)
 
 ```
+
+By convention, empty intervals resolve to `(P.inf, -P.inf)`:
+
+```python
+>>> i = P.empty()
+>>> i.left, i.lower, i.upper, i.right
+(OPEN, +inf, -inf, OPEN)
+
+```
+
 
 If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
 while `right` and `upper` refer to the upper bound of its enclosure:

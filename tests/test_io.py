@@ -155,7 +155,7 @@ class TestToData:
         assert P.to_data(P.closedopen(0, P.inf)) == [(True, 0, float('inf'), False)]
 
     def test_empty_interval(self):
-        assert P.to_data(P.empty()) == [(False, float('inf'), float('-inf'), False)]
+        assert P.to_data(P.empty()) == []
 
     def test_unions(self):
         i = P.openclosed(-P.inf, 4) | P.closedopen(6, P.inf)
@@ -187,6 +187,7 @@ class TestFromData:
 
     def test_empty_interval(self):
         assert P.from_data([(P.OPEN, float('inf'), float('-inf'), P.OPEN)]) == P.empty()
+        assert P.from_data([]) == P.empty()
 
     def test_unions(self):
         d = [(P.OPEN, float('-inf'), 4, P.CLOSED), (P.CLOSED, 6, float('inf'), P.OPEN)]

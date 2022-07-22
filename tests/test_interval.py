@@ -129,9 +129,14 @@ class TestInterval:
         with pytest.raises(TypeError):
             hash(x)
 
-        y = x | P.closed(3, 4)
         with pytest.raises(TypeError):
-            hash(y)
+            hash(x | P.closed(3, 4))
+
+        with pytest.raises(TypeError):
+            hash(P.closed(-1, 0) | x)
+
+        # Not guaranteed to work
+        assert hash(P.closed(-1, 0) | x | P.closed(3, 4)) is not None
 
     def test_enclosure(self):
         assert P.closed(0, 1) == P.closed(0, 1).enclosure
@@ -193,7 +198,7 @@ class TestIntervalApply:
         assert i.apply(lambda s: (s.left, s.lower, s.upper * 2, s.right)) == P.closed(0, 6)
 
     def test_apply_on_empty(self):
-        assert P.empty().apply(lambda s: (P.CLOSED, 1, 2, P.CLOSED)) == P.closed(1, 2)
+        assert P.empty().apply(lambda s: (P.CLOSED, 1, 2, P.CLOSED)) == P.empty()
 
     def test_apply_with_incorrect_types(self):
         i = P.closed(0, 1)
@@ -778,6 +783,7 @@ class TestIntervalIteration:
             i1[3]
 
     def test_empty(self):
-        assert len(P.empty()) == 1
-        assert list(P.empty()) == [P.empty()]
-        assert P.empty()[0] == P.empty()
+        assert len(P.empty()) == 0
+        assert list(P.empty()) == []
+        with pytest.raises(IndexError):
+            P.empty()[0]

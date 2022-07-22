@@ -83,7 +83,7 @@ def empty():
 
     :return: an interval.
     """
-    return Interval.from_atomic(Bound.OPEN, inf, -inf, Bound.OPEN)
+    return Interval()
 
 
 class Interval:
@@ -114,10 +114,7 @@ class Interval:
             else:
                 raise TypeError("Parameters must be Interval instances")
 
-        if len(self._intervals) == 0:
-            # So we have at least one (empty) interval
-            self._intervals.append(Atomic(Bound.OPEN, inf, -inf, Bound.OPEN))
-        else:
+        if len(self._intervals) > 0:
             # Sort intervals by lower bound, closed first.
             self._intervals.sort(key=lambda i: (i.lower, i.left is Bound.OPEN))
 
@@ -186,6 +183,8 @@ class Interval:
         """
         Lowest left boundary is either CLOSED or OPEN.
         """
+        if self.empty:
+            return Bound.OPEN
         return self._intervals[0].left
 
     @property
@@ -193,6 +192,8 @@ class Interval:
         """
         Lowest lower bound value.
         """
+        if self.empty:
+            return inf
         return self._intervals[0].lower
 
     @property
@@ -200,6 +201,8 @@ class Interval:
         """
         Highest upper bound value.
         """
+        if self.empty:
+            return -inf
         return self._intervals[-1].upper
 
     @property
@@ -207,6 +210,8 @@ class Interval:
         """
         Highest right boundary is either CLOSED or OPEN.
         """
+        if self.empty:
+            return Bound.OPEN
         return self._intervals[-1].right
 
     @property
@@ -214,19 +219,15 @@ class Interval:
         """
         True if interval is empty, False otherwise.
         """
-        return self.lower > self.upper or (
-            self.lower == self.upper
-            and (self.left == Bound.OPEN or self.right == Bound.OPEN)
-        )
+        return len(self._intervals) == 0
 
     @property
     def atomic(self):
         """
         True if this interval is atomic, False otherwise.
-        An interval is atomic if it is composed of a single (possibly empty)
-        atomic interval.
+        An interval is atomic if it is empty or composed of a single interval.
         """
-        return len(self._intervals) == 1
+        return len(self._intervals) <= 1
 
     @classmethod
     def from_atomic(cls, left, lower, upper, right):
@@ -238,14 +239,15 @@ class Interval:
         :param upper: value of the upper bound.
         :param right: either CLOSED or OPEN.
         """
-        instance = cls()
         left = left if lower not in [inf, -inf] else Bound.OPEN
         right = right if upper not in [inf, -inf] else Bound.OPEN
 
-        instance._intervals = [Atomic(left, lower, upper, right)]
-        if instance.empty:
-            return cls()
-
+        instance = cls()
+        # Check for non-emptiness
+        if lower < upper or (
+            lower == upper and left == Bound.CLOSED and right == Bound.CLOSED
+        ):
+            instance._intervals = [Atomic(left, lower, upper, right)]
         return instance
 
     @property
@@ -381,8 +383,8 @@ class Interval:
 
             i_iter = iter(self)
             o_iter = iter(other)
-            i_current = next(i_iter)
-            o_current = next(o_iter)
+            i_current = next(i_iter, None)
+            o_current = next(o_iter, None)
 
             while i_current is not None and o_current is not None:
                 if i_current < o_current:
@@ -495,8 +497,8 @@ class Interval:
 
             i_iter = iter(self)
             o_iter = iter(other)
-            i_current = next(i_iter)
-            o_current = next(o_iter)
+            i_current = next(i_iter, None)
+            o_current = next(o_iter, None)
 
             while i_current is not None and o_current is not None:
                 if i_current < o_current:
