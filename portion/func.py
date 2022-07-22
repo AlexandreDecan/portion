@@ -2,6 +2,7 @@ import operator
 from functools import partial
 
 from .const import inf
+from .interval import singleton
 
 
 def iterate(interval, step, *, base=None, reverse=False):
@@ -47,9 +48,9 @@ def iterate(interval, step, *, base=None, reverse=False):
     for i in interval if not reverse else reversed(interval):
         value = base(i.lower if not reverse else i.upper)
 
-        while exclude(value, i):
+        while exclude(singleton(value), i):
             value = step(value)
 
-        while include(value, i):
+        while include(singleton(value), i):
             yield value
             value = step(value)

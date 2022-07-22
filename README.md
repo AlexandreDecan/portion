@@ -107,10 +107,12 @@ Intervals can be iterated to access the underlying atomic intervals, sorted by t
 ```python
 >>> list(P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))
 [[0,1], (10,11), [20,21]]
+>>> list(P.empty())
+[]
 
 ```
 
-Nested intervals can also be retrieved with a position or a slice:
+Nested (sorted) intervals can also be retrieved with a position or a slice:
 
 ```python
 >>> (P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))[0]
@@ -338,8 +340,8 @@ False
 
 Moreover, intervals are comparable using `>`, `>=`, `<` or `<=`.
 These comparison operators have a different behaviour than the usual ones.
-For instance, `a < b` holds if `a` is entirely on the left of the lower bound of `b` and `a > b` holds if `a` is entirely
-on the right of the upper bound of `b`.
+For instance, `a < b` holds if all values in `a` are lower than the minimal value of `b` (i.e., `a` is
+entirely on the left of the lower bound of `b`).
 
 ```python
 >>> P.closed(0, 1) < P.closed(2, 3)
@@ -349,8 +351,8 @@ False
 
 ```
 
-Similarly, `a <= b` holds if `a` is entirely on the left of the upper bound of `b`, and `a >= b`
-holds if `a` is entirely on the right of the lower bound of `b`.
+Similarly, `a <= b` if all values in `a` are lower than the maximal value of `b` (i.e., `a` is
+entirely on the left of the upper bound of `b`).
 
 ```python
 >>> P.closed(0, 1) <= P.closed(2, 3)
@@ -362,40 +364,49 @@ False
 
 ```
 
-Intervals can also be compared with single values. If `i` is an interval and `x` a value, then
-`x < i` holds if `x` is on the left of the lower bound of `i` and `x <= i` holds if `x` is on the
-left of the upper bound of `i`.
+If an interval needs to be compared against a single value, convert the value to a singleton interval first:
 
 ```python
->>> 5 < P.closed(0, 10)
+>>> P.singleton(0) < P.closed(0, 10)
 False
->>> 5 <= P.closed(0, 10)
+>>> P.singleton(0) <= P.closed(0, 10)
 True
->>> P.closed(0, 10) < 5
-False
->>> P.closed(0, 10) <= 5
+>>> P.singleton(5) <= P.closed(0, 10)
+True
+>>> P.closed(0, 1) < P.singleton(2)
 True
 
 ```
-
-This behaviour is similar to the one that could be obtained by first converting `x` to a
-singleton interval (except for infinities since they resolve to empty intervals).
 
 Note that all these semantics differ from classical comparison operators.
-As a consequence, some intervals are never comparable in the classical sense, as illustrated hereafter:
+As a consequence, the empty interval is never `<`, `<=`, `>` nor `>=` than any other interval, and
+no interval is `<`, `>`, `<=` or `>=` when compared to the empty interval.
 
 ```python
->>> P.closed(0, 4) <= P.closed(1, 2) or P.closed(0, 4) >= P.closed(1, 2)
+>>> e = P.empty()
+>>> e < e or e > e or e <= e or e >= e
 False
->>> P.closed(0, 4) < P.closed(1, 2) or P.closed(0, 4) > P.closed(1, 2)
+>>> i = P.closed(0, 1)
+>>> e < i or e <= i or e > i or e >= i
 False
->>> P.empty() < P.empty()
-True
->>> P.empty() < P.closed(0, 1) and P.empty() > P.closed(0, 1)
+
+```
+
+Moreover, some non-empty intervals are also not comparable in the classical sense, as illustrated hereafter:
+
+```python
+>>> a, b = P.closed(0, 4), P.closed(1, 2)
+>>> a < b or a > b
+False
+>>> a <= b or a >= b
+False
+>>> b <= a and b >= a
 True
 
 ```
 
+As a general rule, if `a < b` holds, then `a <= b`, `b > a`, `b >= a`
+`not (a > b)`, `not (b > a)`, `not (a >= b)` and `not (b >= a)` hold.
 
 
 

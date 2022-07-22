@@ -342,103 +342,6 @@ class TestIntervalComparison:
         assert i1 <= i3 and i3 >= i1
         assert not i1 < i2 and not i2 > i1
 
-    def test_closed_atomic_with_values(self):
-        i = P.closed(0, 5)
-
-        assert -1 < i
-        assert -1 <= i
-        assert 6 > i
-        assert 6 >= i
-
-        assert not (2 < i)
-        assert 2 <= i
-        assert not (5 < i)
-        assert 5 <= i
-
-        assert not (3 > i)
-        assert 3 >= i
-        assert not (0 > i)
-        assert 0 >= i
-
-    def test_open_atomic_with_values(self):
-        i = P.open(0, 5)
-
-        assert -1 < i
-        assert -1 <= i
-        assert 6 > i
-        assert 6 >= i
-
-        assert not (2 < i)
-        assert 2 <= i
-        assert not (5 < i)
-        assert not (5 <= i)
-
-        assert not (3 > i)
-        assert 3 >= i
-        assert not (0 > i)
-        assert not (0 >= i)
-
-    def test_atomic_with_infinities(self):
-        i = P.closed(0, 5)
-        assert -P.inf < i
-        assert -P.inf <= i
-        assert not (-P.inf > i)
-        assert not (-P.inf >= i)
-
-        assert P.inf > i
-        assert P.inf >= i
-        assert not (P.inf < i)
-        assert not (P.inf <= i)
-
-        i = P.open(0, 5)
-        assert -P.inf < i
-        assert -P.inf <= i
-        assert not (-P.inf > i)
-        assert not (-P.inf >= i)
-
-        assert P.inf > i
-        assert P.inf >= i
-        assert not (P.inf < i)
-        assert not (P.inf <= i)
-
-    def test_with_values(self):
-        i = P.closedopen(0, 10)
-
-        assert -1 < i
-        assert -1 <= i
-        assert not (0 < i)
-        assert 0 <= i
-        assert not (5 < i)
-        assert 5 <= i
-        assert not (10 < i)
-        assert not (10 <= i)
-        assert not (12 < i)
-        assert not (12 <= i)
-
-        assert 12 > i
-        assert 12 >= i
-        assert 10 > i
-        assert 10 >= i
-        assert not (8 > i)
-        assert 8 >= i
-        assert not (0 > i)
-        assert 0 >= i
-        assert not (-1 > i)
-        assert not (-1 >= i)
-
-    def test_with_infinities(self):
-        i = P.closedopen(0, 10)
-
-        assert -P.inf < i
-        assert -P.inf <= i
-        assert not (-P.inf > i)
-        assert not (-P.inf >= i)
-
-        assert P.inf > i
-        assert P.inf >= i
-        assert not (P.inf < i)
-        assert not (P.inf <= i)
-
     def test_with_intervals(self):
         i1, i2, i3 = P.closed(0, 1), P.closed(1, 2), P.closed(2, 3)
 
@@ -463,15 +366,31 @@ class TestIntervalComparison:
         assert not i5 <= i4
 
     def test_with_empty(self):
-        assert P.empty() < P.empty()
-        assert P.empty() <= P.empty()
-        assert P.empty() > P.empty()
-        assert P.empty() >= P.empty()
+        assert not (P.empty() < P.empty())
+        assert not (P.empty() <= P.empty())
+        assert not (P.empty() > P.empty())
+        assert not (P.empty() >= P.empty())
 
-        assert P.empty() < P.closed(2, 3)
-        assert P.empty() <= P.closed(2, 3)
-        assert P.empty() > P.closed(2, 3)
-        assert P.empty() >= P.closed(2, 3)
+        assert not (P.empty() < P.closed(2, 3))
+        assert not (P.empty() <= P.closed(2, 3))
+        assert not (P.empty() > P.closed(2, 3))
+        assert not (P.empty() >= P.closed(2, 3))
+
+        assert not (P.closed(2, 3) < P.empty())
+        assert not (P.closed(2, 3) > P.empty())
+        assert not (P.closed(2, 3) <= P.empty())
+        assert not (P.closed(2, 3) >= P.empty())
+
+    def test_with_empty_and_infinities(self):
+        assert not (P.empty() < P.closedopen(0, P.inf))
+        assert not (P.empty() <= P.closedopen(0, P.inf))
+        assert not (P.empty() > P.closedopen(0, P.inf))
+        assert not (P.empty() >= P.closedopen(0, P.inf))
+
+        assert not (P.closedopen(0, P.inf) < P.empty())
+        assert not (P.closedopen(0, P.inf) > P.empty())
+        assert not (P.closedopen(0, P.inf) <= P.empty())
+        assert not (P.closedopen(0, P.inf) >= P.empty())
 
 
 class TestIntervalContainment:

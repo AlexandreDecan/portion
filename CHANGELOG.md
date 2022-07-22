@@ -9,7 +9,10 @@
  - Experimental support for structural pattern matching (on `left`, `lower`, `upper` and `right`).
 
 ### Fixed
- - Set `list(P.empty()) == []`, i.e., the empty interval is a disjunction of no interval (see [#72](https://github.com/AlexandreDecan/portion/issues/72)).
+ - (breaking) Set `list(P.empty()) == []`, i.e., the empty interval is a disjunction of no interval (see [#72](https://github.com/AlexandreDecan/portion/issues/72)).
+ - (breaking) For consistency, the empty interval is never `<`, `>`, `<=`, nor `>=` when compared to another interval.
+ - Comparing intervals and values is deprecated since it is ill-defined in many cases. Convert values to singletons first.
+
 
 
 ## 2.2.0 (2021-09-14)
@@ -31,12 +34,12 @@
 
 ## 2.1.6 (2021-04-17)
 
-### Fixed
- - `from_string`raises a `ValueError` if given string cannot be parsed to an interval ([#57](https://github.com/AlexandreDecan/portion/issues/57)).
-
 ### Changed
  - Drop official support for Python 3.5.
  - Use `black` as official code formatting.
+
+### Fixed
+ - `from_string`raises a `ValueError` if given string cannot be parsed to an interval ([#57](https://github.com/AlexandreDecan/portion/issues/57)).
 
 
 

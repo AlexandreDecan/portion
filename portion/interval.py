@@ -611,6 +611,9 @@ class Interval:
 
     def __lt__(self, other):
         if isinstance(other, Interval):
+            if self.empty or other.empty:
+                return False
+
             if self.right == Bound.OPEN:
                 return self.upper <= other.lower
             else:
@@ -618,25 +621,31 @@ class Interval:
                     self.upper == other.lower and other.left == Bound.OPEN
                 )
         else:
+            warnings.warn(
+                "Comparing intervals and values might lead to invalid result and is therefore deprecated. Convert value to singleton first.",
+                DeprecationWarning,
+            )
             return self.upper < other or (
                 self.right == Bound.OPEN and self.upper == other
             )
 
     def __gt__(self, other):
         if isinstance(other, Interval):
-            if self.left == Bound.OPEN:
-                return self.lower >= other.upper
-            else:
-                return self.lower > other.upper or (
-                    self.lower == other.upper and other.right == Bound.OPEN
-                )
+            return other < self
         else:
-            return self.lower > other or (
+            warnings.warn(
+                "Comparing intervals and values might lead to invalid result and is therefore deprecated. Convert value to singleton first.",
+                DeprecationWarning,
+            )
+            return self.lower < other or (
                 self.left == Bound.OPEN and self.lower == other
             )
 
     def __le__(self, other):
         if isinstance(other, Interval):
+            if self.empty or other.empty:
+                return False
+
             if self.right == Bound.OPEN:
                 return self.upper <= other.upper
             else:
@@ -644,12 +653,18 @@ class Interval:
                     self.upper == other.upper and other.right == Bound.CLOSED
                 )
         else:
+            warnings.warn(
+                "Comparing intervals and values might lead to invalid result and is therefore deprecated. Convert value to singleton first.",
+                DeprecationWarning,
+            )
             return self.lower < other or (
                 self.left == Bound.CLOSED and self.lower == other
             )
 
     def __ge__(self, other):
         if isinstance(other, Interval):
+            if self.empty or other.empty:
+                return False
             if self.left == Bound.OPEN:
                 return self.lower >= other.lower
             else:
@@ -657,6 +672,10 @@ class Interval:
                     self.lower == other.lower and other.left == Bound.CLOSED
                 )
         else:
+            warnings.warn(
+                "Comparing intervals and values might lead to invalid result and is therefore deprecated. Convert value to singleton first.",
+                DeprecationWarning,
+            )
             return self.upper > other or (
                 self.right == Bound.CLOSED and self.upper == other
             )
