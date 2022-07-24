@@ -11,7 +11,7 @@
 ### Fixed
  - (breaking) Set `list(P.empty()) == []`, i.e., the empty interval is a disjunction of no interval (see [#72](https://github.com/AlexandreDecan/portion/issues/72)).
  - (breaking) For consistency, the empty interval is never `<`, `>`, `<=`, nor `>=` when compared to another interval.
- - Comparing intervals and values is deprecated since it is ill-defined in many cases. Convert values to singletons first.
+ - Comparing an interval and a value is deprecated since it is ill-defined when the value is on the left of `<=` or `>=`. Convert values to singletons first.
 
 
 

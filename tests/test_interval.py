@@ -392,6 +392,36 @@ class TestIntervalComparison:
         assert not (P.closedopen(0, P.inf) <= P.empty())
         assert not (P.closedopen(0, P.inf) >= P.empty())
 
+    def test_with_values(self):
+        assert 0 < P.closed(1, 2)
+        assert not (0 < P.closed(-1, 1))
+        assert not (0 < P.closed(0, 1))
+        assert 0 < P.open(0, 1)
+        # assert 0 <= P.closed(1, 2)
+        # assert 0 <= P.open(0, 1)
+        # assert 0 <= P.closed(-1, 1)
+        # assert not (0 <= P.closed(-2, -1))
+        # assert not (0 <= P.open(-1, 0))
+
+        assert P.closed(1, 2) > 0
+        assert not (P.closed(-1, 1) > 0)
+        assert not (P.closed(0, 1) > 0)
+        assert P.open(0, 1) > 0
+        assert P.closed(1, 2) >= 0
+        assert P.open(0, 1) >= 0
+        assert not (P.closed(-1, 1) >= 0)
+        assert not (P.closed(-2, -1) >= 0)
+        assert not (P.open(-1, 0) >= 0)
+
+        assert not (0 < P.empty())
+        # assert not (0 <= P.empty())
+        assert not (0 > P.empty())
+        # assert not (0 >= P.empty())
+        assert not (P.empty() < 0)
+        assert not (P.empty() <= 0)
+        assert not (P.empty() > 0)
+        assert not (P.empty() >= 0)
+
 
 class TestIntervalContainment:
     def test_with_values(self):
