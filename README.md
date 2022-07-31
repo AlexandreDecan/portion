@@ -405,8 +405,8 @@ True
 
 ```
 
-As a general rule, if `a < b` holds, then `a <= b`, `b > a`, `b >= a`
-`not (a > b)`, `not (b < a)`, `not (a >= b)` and `not (b <= a)` hold.
+As a general rule, if `a < b` holds, then `a <= b`, `b > a`, `b >= a`, 
+`not (a > b)`, `not (b < a)`, `not (a >= b)`, and `not (b <= a)` hold.
 
 
 
