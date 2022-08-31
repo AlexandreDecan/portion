@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2.3.0-dev (not yet released)
+## 2.3.0 (2022-08-31)
 
 ### Added
  - Support Python 3.10.
