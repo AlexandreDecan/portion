@@ -280,6 +280,9 @@ class IntervalDict(MutableMapping):
             return IntervalDict._from_items(items)
         else:
             for i, v in self._storage.items():
+                # Early out
+                if key < i.lower:
+                    break
                 if key in i:
                     return v
             raise KeyError(key)

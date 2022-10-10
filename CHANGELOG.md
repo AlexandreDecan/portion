@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.3.1 (not yet released)
+
+### Changed
+ - Speed up lookups in `IntervalDict` for non-interval keys.
+
+
+
 ## 2.3.0 (2022-08-31)
 
 ### Added
