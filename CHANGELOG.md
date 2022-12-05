@@ -5,7 +5,7 @@
 
 ### Changed
  - Speed up lookups in `IntervalDict` for non-interval keys.
-
+ - Drop official support for Python 3.6.
 
 
 ## 2.3.0 (2022-08-31)
