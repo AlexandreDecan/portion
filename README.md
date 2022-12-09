@@ -7,7 +7,7 @@
 [![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
-The `portion` library provides data structure and operations for intervals in Python 3.6+.
+The `portion` library provides data structure and operations for intervals in Python 3.7+.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or (semi-)infinite intervals.
