@@ -9,7 +9,7 @@ with open(
 
 setup(
     name="portion",
-    version="2.3.1-pre1",
+    version="2.3.1",
     license="LGPLv3",
     author="Alexandre Decan",
     url="https://github.com/AlexandreDecan/portion",
@@ -34,7 +34,7 @@ setup(
     ],
     keywords="interval operation range math",
     packages=find_packages(include=["portion"]),
-    python_requires="~= 3.6",
+    python_requires="~= 3.7",
     install_requires=[
         "sortedcontainers ~= 2.2",
     ],

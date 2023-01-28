@@ -1,14 +1,15 @@
 # Changelog
 
 
-## 2.3.1 (not yet released)
+## 2.3.1 (2023-01-28)
 
 ### Changed
  - Speed up lookups in `IntervalDict` for non-interval keys.
+ - Speed up `iterate` by no longer creating singleton instances under the hood.
  - Drop official support for Python 3.6.
 
 ### Fixed
- - Infinite recursion in `iterate` with `Interval` subclasses (see [#75](https://github.com/AlexandreDecan/portion/issues/75)).
+ - Infinite recursion when a subclass of an `Interval` is compared using `>` with an `Interval` instance (see [#75](https://github.com/AlexandreDecan/portion/issues/75)).
 
 
 

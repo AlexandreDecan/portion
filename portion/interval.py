@@ -629,7 +629,13 @@ class Interval:
 
     def __gt__(self, other):
         if isinstance(other, Interval):
-            return other < self
+            if self.empty or other.empty:
+                return False
+
+            if self.left == Bound.OPEN or other.right == Bound.OPEN:
+                return self.lower >= other.upper
+            else:
+                return self.lower > other.upper
         else:
             warnings.warn(
                 "Comparing an interval and a value is deprecated. Convert value to singleton first.",
