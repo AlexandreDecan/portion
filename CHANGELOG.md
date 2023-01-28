@@ -7,6 +7,10 @@
  - Speed up lookups in `IntervalDict` for non-interval keys.
  - Drop official support for Python 3.6.
 
+### Fixed
+ - Infinite recursion in `iterate` with `Interval` subclasses (see [#75](https://github.com/AlexandreDecan/portion/issues/75)).
+
+
 
 ## 2.3.0 (2022-08-31)
 

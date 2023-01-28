@@ -1,8 +1,7 @@
 import operator
 from functools import partial
 
-from .const import inf
-from .interval import singleton
+from .const import Bound, inf
 
 
 def iterate(interval, step, *, base=None, reverse=False):
@@ -37,8 +36,22 @@ def iterate(interval, step, *, base=None, reverse=False):
         def base(x):
             return x
 
-    exclude = operator.lt if not reverse else operator.gt
-    include = operator.le if not reverse else operator.ge
+    if not reverse:
+
+        def exclude(v, i):
+            return v < i.lower or (i.left is Bound.OPEN and v <= i.lower)
+
+        def include(v, i):
+            return v < i.upper or (i.right is Bound.CLOSED and v <= i.upper)
+
+    else:
+
+        def exclude(v, i):
+            return v > i.upper or (i.right is Bound.OPEN and v >= i.upper)
+
+        def include(v, i):
+            return v > i.lower or (i.left is Bound.CLOSED and v >= i.lower)
+
     step = step if callable(step) else partial(operator.add, step)
 
     value = base(interval.lower if not reverse else interval.upper)
@@ -48,9 +61,9 @@ def iterate(interval, step, *, base=None, reverse=False):
     for i in interval if not reverse else reversed(interval):
         value = base(i.lower if not reverse else i.upper)
 
-        while exclude(singleton(value), i):
+        while exclude(value, i):
             value = step(value)
 
-        while include(singleton(value), i):
+        while include(value, i):
             yield value
             value = step(value)
