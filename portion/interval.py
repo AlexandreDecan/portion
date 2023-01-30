@@ -91,9 +91,8 @@ class Interval:
     This class represents an interval.
 
     An interval is an (automatically simplified) union of atomic intervals.
-    It can be created with Interval.from_atomic(), by passing intervals to
-    __init__, or by using one of the helpers provided in this module (open,
-    closed, openclosed, etc.)
+    It can be created with Interval.from_atomic(...) or by passing Interval
+    instances to __init__.
     """
 
     __slots__ = ("_intervals",)
@@ -132,6 +131,7 @@ class Interval:
                             if current.left == Bound.CLOSED
                             else successor.left
                         )
+
                     else:
                         lower = min(current.lower, successor.lower)
                         left = (
@@ -243,7 +243,7 @@ class Interval:
         right = right if upper not in [inf, -inf] else Bound.OPEN
 
         instance = cls()
-        # Check for non-emptiness
+        # Check for non-emptiness (otherwise keep instance._intervals = [])
         if lower < upper or (
             lower == upper and left == Bound.CLOSED and right == Bound.CLOSED
         ):

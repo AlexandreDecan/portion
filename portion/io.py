@@ -16,7 +16,8 @@ def from_string(
     right_open=r"\)",
     right_closed=r"\]",
     pinf=r"\+inf",
-    ninf=r"-inf"
+    ninf=r"-inf",
+    klass=Interval,
 ):
     """
     Parse given string and create an Interval instance.
@@ -37,7 +38,8 @@ def from_string(
         matches ']').
     :param pinf: pattern that matches a positive infinity (default matches '+inf').
     :param ninf: pattern that matches a negative infinity (default matches '-inf').
-    :return: an Interval instance.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
     """
 
     re_left_boundary = r"(?P<left>{}|{})".format(left_open, left_closed)
@@ -78,7 +80,7 @@ def from_string(
         lower = _convert(lower) if lower is not None else inf
         upper = _convert(upper) if upper is not None else lower
 
-        intervals.append(Interval.from_atomic(left, lower, upper, right))
+        intervals.append(klass.from_atomic(left, lower, upper, right))
         string = string[match.end() :]
 
         # Are there more atomic intervals?
@@ -91,7 +93,7 @@ def from_string(
         else:
             has_more = False
 
-    return Interval(*intervals)
+    return klass(*intervals)
 
 
 def to_string(
@@ -105,7 +107,7 @@ def to_string(
     right_open=")",
     right_closed="]",
     pinf="+inf",
-    ninf="-inf"
+    ninf="-inf",
 ):
     """
     Export given interval to string.
@@ -151,7 +153,9 @@ def to_string(
     return disj.join(exported_intervals)
 
 
-def from_data(data, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
+def from_data(
+    data, conv=None, *, pinf=float("inf"), ninf=float("-inf"), klass=Interval
+):
     """
     Import an interval from a piece of data.
 
@@ -159,7 +163,8 @@ def from_data(data, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
     :param conv: function that converts "lower" and "upper" to bounds, default to identity.
     :param pinf: value used to represent positive infinity.
     :param ninf: value used to represent negative infinity.
-    :return: an Interval instance.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
     """
     intervals = []
     conv = (lambda v: v) if conv is None else conv
@@ -175,14 +180,14 @@ def from_data(data, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
     for item in data:
         left, lower, upper, right = item
         intervals.append(
-            Interval.from_atomic(
+            klass.from_atomic(
                 Bound(left),
                 _convert(lower),
                 _convert(upper),
                 Bound(right),
             )
         )
-    return Interval(*intervals)
+    return klass(*intervals)
 
 
 def to_data(interval, conv=None, *, pinf=float("inf"), ninf=float("-inf")):

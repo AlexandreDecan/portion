@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.3.2 (not yet released)
+
+### Changed
+ - `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval).
+
+
+
 ## 2.3.1 (2023-01-28)
 
 ### Changed
