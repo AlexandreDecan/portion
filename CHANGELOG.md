@@ -4,7 +4,7 @@
 ## 2.3.2 (not yet released)
 
 ### Changed
- - `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval).
+ - `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval`).
  - Speed up `repr` and `to_string` for `Interval` instances (see [#76](https://github.com/AlexandreDecan/portion/issues/76), adm271828).
 
 
