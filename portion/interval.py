@@ -687,14 +687,13 @@ class Interval:
         string = []
         for interval in self._intervals:
             if interval.lower == interval.upper:
-                string.append("[{}]".format(repr(interval.lower)))
+                string.append("[" + repr(interval.lower) + "]")
             else:
                 string.append(
-                    "{}{},{}{}".format(
-                        "[" if interval.left == Bound.CLOSED else "(",
-                        repr(interval.lower),
-                        repr(interval.upper),
-                        "]" if interval.right == Bound.CLOSED else ")",
-                    )
+                    ("[" if interval.left == Bound.CLOSED else "(")
+                    + repr(interval.lower)
+                    + ","
+                    + repr(interval.upper)
+                    + ("]" if interval.right == Bound.CLOSED else ")")
                 )
         return " | ".join(string)

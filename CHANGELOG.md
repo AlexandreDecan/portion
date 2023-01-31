@@ -5,7 +5,7 @@
 
 ### Changed
  - `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval).
-
+ - Speed up `repr` and `to_string` for `Interval` instances (see [#76](https://github.com/AlexandreDecan/portion/issues/76), adm271828).
 
 
 ## 2.3.1 (2023-01-28)
@@ -23,7 +23,7 @@
 ## 2.3.0 (2022-08-31)
 
 ### Added
- - Support Python 3.10.
+ - Support for Python 3.10.
  - `IntervalDict.as_dict` has an optional `atomic=False` parameter that, if set to `True`, returns intervals that are atomic.
  - Experimental support for structural pattern matching (on `left`, `lower`, `upper` and `right`).
 

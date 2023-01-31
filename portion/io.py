@@ -125,7 +125,7 @@ def to_string(
     :return: a string representation for given interval.
     """
     if interval.empty:
-        return "{}{}".format(left_open, right_open)
+        return left_open + right_open
 
     def _convert(bound):
         if bound == inf:
@@ -144,11 +144,9 @@ def to_string(
         upper = _convert(item.upper)
 
         if item.lower == item.upper:
-            exported_intervals.append("{}{}{}".format(left, lower, right))
+            exported_intervals.append(left + lower + right)
         else:
-            exported_intervals.append(
-                "{}{}{}{}{}".format(left, lower, sep, upper, right)
-            )
+            exported_intervals.append(left + lower + sep + upper + right)
 
     return disj.join(exported_intervals)
 
