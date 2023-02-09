@@ -1,7 +1,7 @@
 import pytest
 
-from portion.const import inf, _PInf, _NInf, Bound
-from portion import CLOSED, OPEN
+from portion.const import _PInf, _NInf, Bound
+from portion import inf, CLOSED, OPEN
 
 
 class TestBounds:
