@@ -1,6 +1,6 @@
 from .const import Bound, inf
-from .interval import Interval, open, closed, openclosed, closedopen, empty, singleton
-from .func import iterate
+from .interval import Interval
+from .func import iterate, open, closed, openclosed, closedopen, empty, singleton
 from .io import from_string, to_string, from_data, to_data
 from .dict import IntervalDict
 

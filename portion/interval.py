@@ -23,69 +23,6 @@ def mergeable(a, b):
     return Interval._mergeable(a, b)
 
 
-def open(lower, upper):
-    """
-    Create an open interval with given bounds.
-
-    :param lower: value of the lower bound.
-    :param upper: value of the upper bound.
-    :return: an interval.
-    """
-    return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.OPEN)
-
-
-def closed(lower, upper):
-    """
-    Create a closed interval with given bounds.
-
-    :param lower: value of the lower bound.
-    :param upper: value of the upper bound.
-    :return: an interval.
-    """
-    return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.CLOSED)
-
-
-def openclosed(lower, upper):
-    """
-    Create a left-open interval with given bounds.
-
-    :param lower: value of the lower bound.
-    :param upper: value of the upper bound.
-    :return: an interval.
-    """
-    return Interval.from_atomic(Bound.OPEN, lower, upper, Bound.CLOSED)
-
-
-def closedopen(lower, upper):
-    """
-    Create a right-open interval with given bounds.
-
-    :param lower: value of the lower bound.
-    :param upper: value of the upper bound.
-    :return: an interval.
-    """
-    return Interval.from_atomic(Bound.CLOSED, lower, upper, Bound.OPEN)
-
-
-def singleton(value):
-    """
-    Create a singleton interval.
-
-    :param value: value of the lower and upper bounds.
-    :return: an interval.
-    """
-    return Interval.from_atomic(Bound.CLOSED, value, value, Bound.CLOSED)
-
-
-def empty():
-    """
-    Create an empty interval.
-
-    :return: an interval.
-    """
-    return Interval()
-
-
 class Interval:
     """
     This class represents an interval.

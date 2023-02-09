@@ -1,9 +1,7 @@
-from .const import Bound
-from .interval import Interval, singleton
-
-from collections.abc import MutableMapping, Mapping
-
 from sortedcontainers import SortedDict
+from collections.abc import MutableMapping, Mapping
+from .const import Bound
+from .interval import Interval
 
 
 def _sort(i):
@@ -29,6 +27,9 @@ class IntervalDict(MutableMapping):
     """
 
     __slots__ = ("_storage",)
+
+    # Class to use when creating Interval instances
+    _klass = Interval
 
     def __init__(self, mapping_or_iterable=None):
         """
@@ -75,7 +76,7 @@ class IntervalDict(MutableMapping):
 
         :return: a shallow copy.
         """
-        return IntervalDict._from_items(self.items())
+        return self.__class__._from_items(self.items())
 
     def get(self, key, default=None):
         """
@@ -108,7 +109,7 @@ class IntervalDict(MutableMapping):
         :param value: value to look for.
         :return: an Interval instance.
         """
-        return Interval(*(i for i, v in self._storage.items() if v == value))
+        return self._klass(*(i for i, v in self._storage.items() if v == value))
 
     def items(self):
         """
@@ -143,7 +144,7 @@ class IntervalDict(MutableMapping):
 
         :return: an Interval.
         """
-        return Interval(*self._storage.keys())
+        return self._klass(*self._storage.keys())
 
     def pop(self, key, default=None):
         """
@@ -248,7 +249,7 @@ class IntervalDict(MutableMapping):
                     v = how(v1, v2)
                     new_items.append((i, v))
 
-        return IntervalDict(new_items)
+        return self.__class__(new_items)
 
     def as_dict(self, atomic=False):
         """
@@ -277,7 +278,7 @@ class IntervalDict(MutableMapping):
                 intersection = key & i
                 if not intersection.empty:
                     items.append((intersection, v))
-            return IntervalDict._from_items(items)
+            return self.__class__._from_items(items)
         else:
             for i, v in self._storage.items():
                 # Early out
@@ -288,7 +289,10 @@ class IntervalDict(MutableMapping):
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        interval = key if isinstance(key, Interval) else singleton(key)
+        if isinstance(key, Interval):
+            interval = key
+        else:
+            interval = self._klass.from_atomic(Bound.CLOSED, key, key, Bound.CLOSED)
 
         if interval.empty:
             return
@@ -321,7 +325,10 @@ class IntervalDict(MutableMapping):
             self._storage[key] = value
 
     def __delitem__(self, key):
-        interval = key if isinstance(key, Interval) else singleton(key)
+        if isinstance(key, Interval):
+            interval = key
+        else:
+            interval = self._klass.from_atomic(Bound.CLOSED, key, key, Bound.CLOSED)
 
         if interval.empty:
             return

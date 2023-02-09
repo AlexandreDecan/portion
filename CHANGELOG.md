@@ -1,11 +1,17 @@
 # Changelog
 
 
-## 2.3.2 (not yet released)
+## 2.4.0 (not yet released)
+
+### Added
+- `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval`).
+ - Add a `klass` parameter for `open`, `closed`, `openclosed`, `closedopen`, `singleton` and `empty` (default is `Interval`).
+ - Add a `_klass` class attribute in `IntervalDict` used to create `Interval` instances (default is `Interval`).
 
 ### Changed
- - `from_string` and `from_data` accepts a `klass` parameter to specify which class should be used to create `Interval` instances (default is `Interval`).
  - Speed up `repr` and `to_string` for `Interval` instances (see [#76](https://github.com/AlexandreDecan/portion/issues/76), adm271828).
+ - `IntervalDict` uses `self.__class__` to preserve subclasses when creating new instances.
+
 
 
 ## 2.3.1 (2023-01-28)

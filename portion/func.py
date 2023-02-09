@@ -1,7 +1,77 @@
 import operator
-from functools import partial
 
+from functools import partial
+from .interval import Interval
 from .const import Bound, inf
+
+
+def open(lower, upper, *, klass=Interval):
+    """
+    Create an open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass.from_atomic(Bound.OPEN, lower, upper, Bound.OPEN)
+
+
+def closed(lower, upper, *, klass=Interval):
+    """
+    Create a closed interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass.from_atomic(Bound.CLOSED, lower, upper, Bound.CLOSED)
+
+
+def openclosed(lower, upper, *, klass=Interval):
+    """
+    Create a left-open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass.from_atomic(Bound.OPEN, lower, upper, Bound.CLOSED)
+
+
+def closedopen(lower, upper, *, klass=Interval):
+    """
+    Create a right-open interval with given bounds.
+
+    :param lower: value of the lower bound.
+    :param upper: value of the upper bound.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass.from_atomic(Bound.CLOSED, lower, upper, Bound.OPEN)
+
+
+def singleton(value, *, klass=Interval):
+    """
+    Create a singleton interval.
+
+    :param value: value of the lower and upper bounds.
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass.from_atomic(Bound.CLOSED, value, value, Bound.CLOSED)
+
+
+def empty(*, klass=Interval):
+    """
+    Create an empty interval.
+
+    :param klass: class to use for creating intervals (default to Interval).
+    :return: an interval.
+    """
+    return klass()
 
 
 def iterate(interval, step, *, base=None, reverse=False):
