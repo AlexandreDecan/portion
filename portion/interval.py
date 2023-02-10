@@ -634,3 +634,41 @@ class Interval:
                     + ("]" if interval.right == Bound.CLOSED else ")")
                 )
         return " | ".join(string)
+
+
+class AbstractDiscreteInterval(Interval):
+    """
+    An abstract class for discrete interval.
+
+    This class is not expected to be used as-is, and should be subclassed
+    first. The only attribute/method that should be overriden is the `incr`
+    class variable. This variable defines the step between two consecutive
+    values of the discrete domain. It accepts either a value (e.g., 1 for
+    discrete intervals of integers) or a callable that, given a value, returns
+    the next value (e.g., lambda c: chr(ord(c) + 1) for discrete intervals of
+    characters).
+
+    This class is still experimental and backward incompatible changes may
+    occur even in minor or patch updates of portion.
+    """
+
+    incr = None
+
+    @classmethod
+    def _mergeable(cls, a, b):
+        incr = cls.incr
+
+        if a.upper <= b.upper:
+            first, second = a, b
+        else:
+            first, second = b, a
+
+        if first.right == Bound.CLOSED and first.upper < second.lower:
+            first = Atomic(
+                first.left,
+                first.lower,
+                incr(first.upper) if callable(incr) else first.upper + incr,
+                Bound.OPEN,
+            )
+
+        return super()._mergeable(first, second)

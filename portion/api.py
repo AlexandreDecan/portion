@@ -7,7 +7,11 @@ from .io import from_string, to_string, from_data, to_data
 from .dict import IntervalDict
 
 
-def partial(wrapped, *args, **kwargs):
+def partial(wrapped, /, *args, **kwargs):
+    """
+    Convenient helper that combines functools.update_wrapper and
+    functools.partial. It has exactly the same signature than functools.partial.
+    """
     return functools.update_wrapper(
         functools.partial(wrapped, *args, **kwargs), wrapped
     )
@@ -18,6 +22,9 @@ def create_api(interval, *, interval_dict=None, name=None):
     Dynamically create a module whose API is similar to the one of portion, but
     configured to use given Interval class. Unless specified, a new IntervalDict
     subclass is automatically generated to use given Interval subclass.
+
+    This feature is experimental, and may be changed even in minor or patch
+    updates of portion.
 
     :param interval: a subclass of Interval.
     :param interval_dict: a subclass of IntervalDict.
