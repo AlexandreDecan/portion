@@ -4,10 +4,16 @@ import portion as P
 
 
 class IntInterval(P.AbstractDiscreteInterval):
-    step = 1
+    _step = 1
+
+
+class CharInterval(P.AbstractDiscreteInterval):
+    _incr = lambda v: chr(ord(v) + 1)
+    _decr = lambda v: chr(ord(v) - 1)
 
 
 D = P.create_api(IntInterval)
+C = P.create_api(CharInterval)
 
 
 class TestCreateAPI:
@@ -54,4 +60,22 @@ class TestIntInterval:
         assert D.singleton(1).adjacent(D.singleton(2))
         assert not D.singleton(1).adjacent(D.singleton(3))
 
+
+class TestCharInterval:
+    # Most of the behaviour is already covered by TestIntInterval.
+    # Only the specificities of _incr and _decr should be tested here.
+
+    def test_empty_and_singletons(self):
+        assert C.open('a', 'b').empty
+        assert C.closed('a', 'a') == C.singleton('a')
+        assert C.open('a', 'c') == C.singleton('b')
+        assert C.openclosed('a', 'b') == C.singleton('b')
+        assert C.closedopen('a', 'b') == C.singleton('a')
+
+    def test_merge(self):
+        assert C.singleton('b') | C.singleton('c') == C.closed('b', 'c')
+        assert C.closed('a', 'b') | C.closed('c', 'd') == C.closed('a', 'd')
+
+        assert C.openclosed('a', 'c') | C.closedopen('d', 'f') == C.open('a', 'f') == C.closed('b', 'e')
+        assert not (C.closedopen('a', 'b') | C.openclosed('b', 'c')).atomic
 

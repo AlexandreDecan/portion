@@ -81,7 +81,8 @@ def iterate(interval, step, *, base=None, reverse=False):
     This function returns a (lazy) iterator over the values of given interval,
     starting from its lower bound and ending on its upper bound (if interval is
     not open). Each returned value merely corresponds to lower + i * step, where
-    "step" defines the step between consecutive values.
+    "step" defines the step between consecutive values. If reverse=True, a
+    negative step must be passed (as in Python's range function).
     It also accepts a callable that is used to compute the next possible
     value based on the current one.
 

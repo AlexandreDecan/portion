@@ -34,6 +34,7 @@ The `portion` library provides data structure and operations for intervals in Py
       * [Map intervals to data](#map-intervals-to-data)
       * [Import & export intervals to strings](#import--export-intervals-to-strings)
       * [Import & export intervals to Python built-in data types](#import--export-intervals-to-python-built-in-data-types)
+      * [Specialize & customize intervals](#specialize--customize-intervals)
   * [Changelog](#changelog)
   * [Contributions](#contributions)
   * [License](#license)
@@ -138,9 +139,10 @@ For convenience, intervals are automatically simplified:
 
 ```
 
-Note that simplification of discrete intervals is **not** supported by `portion` (but it can be simulated though, see [#24](https://github.com/AlexandreDecan/portion/issues/24#issuecomment-604456362)).
+Note that, by default, simplification of discrete intervals is **not** supported by `portion` (but it can be simulated though, see [#24](https://github.com/AlexandreDecan/portion/issues/24#issuecomment-604456362)).
 For example, combining `[0,1]` with `[2,3]` will **not** result in `[0,3]` even if there is
 no integer between `1` and `2`.
+Refer to [Specialize & customize intervals](#specialize--customize-intervals) to see how to create and use specialized discrete intervals.
 
 
 
@@ -573,7 +575,7 @@ This callable will be called with the current value, and is expected to return t
 ```python
 >>> list(P.iterate(P.closed('a', 'd'), step=lambda d: chr(ord(d) + 1)))
 ['a', 'b', 'c', 'd']
->>> # Since we reversed the order, we changed plus to minus in step.
+>>> # Since we reversed the order, we changed "+" to "-" in the lambda.
 >>> list(P.iterate(P.closed('a', 'd'), step=lambda d: chr(ord(d) - 1), reverse=True))
 ['d', 'c', 'b', 'a']
 
@@ -846,6 +848,101 @@ The same set of parameters can be used to specify how bounds and infinities are 
 [datetime.date(2011, 3, 15),datetime.date(2013, 10, 10))
 
 ```
+
+
+[&uparrow; back to top](#table-of-contents)
+### Specialize & customize intervals
+
+**Disclaimer**: the features explained in this section are still experimental and are subject to backward incompatible changes even in minor or patch updates of `portion`.
+
+The intervals provided by `portion` already cover a wide range of use cases.
+However, in some situations, it might be interesting to specialize or customize these intervals.
+One typical example would be to support discrete intervals such as intervals of integers.
+While it is definitely possible to rely on the default intervals provided by `portion` to encode discrete
+intervals, there are a few edge cases that lead some operations to return unexpected results:
+
+```python
+>>> P.singleton(0) | P.singleton(1)  # Case 1: should be [0,1] for discrete numbers
+[0] | [1]
+>>> P.open(0, 1)  # Case 2: should be empty
+(0,1)
+>>> P.closedopen(0, 1)  # Case 3: should be singleton [0]
+[0,1)
+
+```
+
+The `portion` library makes its best to ease defining and using subclasses of `Interval` to address
+these situations. In particular, the `Interval` class always produces intervals using `self.__class__`, and is written in a way that most of its methods can be easily extended.
+To implement a class for intervals of discrete numbers and to cover the three aforementioned cases, we need to change the behaviour of the `Interval._mergeable` class method (to address first case) and of the `Interval.from_atomic` class method (for cases 2 and 3).
+The former is used to detect whether two atomic intervals can be merged into a single interval, while the latter is used to create atomic intervals.
+
+Thankfully, since discrete intervals are expected to be a frequent use case, `portion` already provides an `AbstractDiscreteInterval` class that already makes the appropriate changes to these two methods.
+As indicated by its name, this class cannot be used directly and should be inherited.
+In particular, one has either to provide a `_step` class attribute to define the step between consecutive discrete values, or to define the `_incr` and `_decr` class methods:
+
+```python
+>>> class IntInterval(P.AbstractDiscreteInterval):
+...     _step = 1
+
+```
+That's all!
+We can now use this class to manipulate intervals of discrete numbers and see it covers the three problematic cases:
+
+```python
+>>> IntInterval.from_atomic(P.CLOSED, 0, 0, P.CLOSED) | IntInterval.from_atomic(P.CLOSED, 1, 1, P.CLOSED)
+[0,1]
+>>> IntInterval.from_atomic(P.OPEN, 0, 1, P.OPEN)
+()
+>>> IntInterval.from_atomic(P.CLOSED, 0, 1, P.OPEN)
+[0]
+
+```
+
+For convenience, all the functions that create interval instances accept an additional `klass` parameter to specify the class that creates intervals, circumventing the direct use of the class constructors.
+However, having to specify the `klass` parameter in each call to `P.closed` or other helpers that create intervals is a bit too verbose to be convenient.
+Consequently, `portion` provides a `create_api` function that, given a subclass of `Interval`, returns a dynamically generated module whose API is similar to the one of `portion` but configured to use the subclass instead:
+
+```python
+>>> D = P.create_api(IntInterval)
+>>> D.singleton(0) | D.singleton(1)
+[0,1]
+>>> D.open(0, 1)
+()
+>>> D.closedopen(0, 1)
+[0]
+
+```
+
+Let's extend our example to support intervals of natural numbers.
+Such intervals are quite similar to the above ones, except they cannot go over negative values.
+
+```python
+>>> class NaturalInterval(IntInterval):
+...    @classmethod
+...    def from_atomic(cls, left, lower, upper, right):
+...        return super().from_atomic(
+...            P.CLOSED if lower < 0 else left,
+...            max(0, lower),
+...            upper,
+...            right,
+...        )
+>>> N = P.create_api(NaturalInterval)
+
+```
+
+We can now use the `N` module to check whether our newly defined `NaturalInterval` does the job:
+
+```python
+>>> N.closed(-10, 2)
+[0,2]
+>>> N.open(-10, 2)
+[0,1]
+>>> ~N.empty()
+[0,+inf)
+
+```
+
+
 
 [&uparrow; back to top](#table-of-contents)
 ## Changelog

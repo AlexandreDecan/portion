@@ -96,6 +96,27 @@ class Interval:
                     i = i + 1
 
     @classmethod
+    def from_atomic(cls, left, lower, upper, right):
+        """
+        Create an Interval instance containing a single atomic interval.
+
+        :param left: either CLOSED or OPEN.
+        :param lower: value of the lower bound.
+        :param upper: value of the upper bound.
+        :param right: either CLOSED or OPEN.
+        """
+        left = left if lower not in [inf, -inf] else Bound.OPEN
+        right = right if upper not in [inf, -inf] else Bound.OPEN
+
+        instance = cls()
+        # Check for non-emptiness (otherwise keep instance._intervals = [])
+        if lower < upper or (
+            lower == upper and left == Bound.CLOSED and right == Bound.CLOSED
+        ):
+            instance._intervals = [Atomic(left, lower, upper, right)]
+        return instance
+
+    @classmethod
     def _mergeable(cls, a, b):
         """
         Tester whether two atomic intervals can be merged (i.e. they overlap or
@@ -165,27 +186,6 @@ class Interval:
         An interval is atomic if it is empty or composed of a single interval.
         """
         return len(self._intervals) <= 1
-
-    @classmethod
-    def from_atomic(cls, left, lower, upper, right):
-        """
-        Create an Interval instance containing a single atomic interval.
-
-        :param left: either CLOSED or OPEN.
-        :param lower: value of the lower bound.
-        :param upper: value of the upper bound.
-        :param right: either CLOSED or OPEN.
-        """
-        left = left if lower not in [inf, -inf] else Bound.OPEN
-        right = right if upper not in [inf, -inf] else Bound.OPEN
-
-        instance = cls()
-        # Check for non-emptiness (otherwise keep instance._intervals = [])
-        if lower < upper or (
-            lower == upper and left == Bound.CLOSED and right == Bound.CLOSED
-        ):
-            instance._intervals = [Atomic(left, lower, upper, right)]
-        return instance
 
     @property
     def enclosure(self):
@@ -641,20 +641,53 @@ class AbstractDiscreteInterval(Interval):
     An abstract class for discrete interval.
 
     This class is not expected to be used as-is, and should be subclassed
-    first. The only attribute/method that should be overriden is the `step`
+    first. The only attribute/method that should be overriden is the `_step`
     class variable. This variable defines the step between two consecutive
     values of the discrete domain (e.g., 1 for integers).
+    If a meaningfull step cannot be provided (e.g., for characters), the
+    _incr and _decr class methods can be overriden. They respectively return
+    the next and previous value given the current one.
 
     This class is still experimental and backward incompatible changes may
     occur even in minor or patch updates of portion.
     """
 
-    step = None
+    _step = None
+
+    @classmethod
+    def _incr(cls, value):
+        """
+        Increment given value.
+
+        :param value: value to increment.
+        :return: incremented value.
+        """
+        return value + cls._step
+
+    @classmethod
+    def _decr(cls, value):
+        """
+        Decrement given value.
+
+        :param value: value to decrement.
+        :return: decremented value.
+        """
+        return value - cls._step
+
+    @classmethod
+    def from_atomic(cls, left, lower, upper, right):
+        if left == Bound.OPEN and lower not in [-inf, inf]:
+            left = Bound.CLOSED
+            lower = cls._incr(lower)
+
+        if right == Bound.OPEN and upper not in [-inf, inf]:
+            right = Bound.CLOSED
+            upper = cls._decr(upper)
+
+        return super().from_atomic(left, lower, upper, right)
 
     @classmethod
     def _mergeable(cls, a, b):
-        step = cls.step
-
         if a.upper <= b.upper:
             first, second = a, b
         else:
@@ -664,22 +697,8 @@ class AbstractDiscreteInterval(Interval):
             first = Atomic(
                 first.left,
                 first.lower,
-                first.upper + step,
+                cls._incr(first.upper),
                 Bound.OPEN,
             )
 
         return super()._mergeable(first, second)
-
-    @classmethod
-    def from_atomic(cls, left, lower, upper, right):
-        step = cls.step
-
-        if left == Bound.OPEN and lower not in [-inf, inf]:
-            left = Bound.CLOSED
-            lower = lower + step
-
-        if right == Bound.OPEN and upper not in [-inf, inf]:
-            right = Bound.CLOSED
-            upper = upper - step
-
-        return super().from_atomic(left, lower, upper, right)
