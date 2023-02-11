@@ -641,22 +641,19 @@ class AbstractDiscreteInterval(Interval):
     An abstract class for discrete interval.
 
     This class is not expected to be used as-is, and should be subclassed
-    first. The only attribute/method that should be overriden is the `incr`
+    first. The only attribute/method that should be overriden is the `step`
     class variable. This variable defines the step between two consecutive
-    values of the discrete domain. It accepts either a value (e.g., 1 for
-    discrete intervals of integers) or a callable that, given a value, returns
-    the next value (e.g., lambda c: chr(ord(c) + 1) for discrete intervals of
-    characters).
+    values of the discrete domain (e.g., 1 for integers).
 
     This class is still experimental and backward incompatible changes may
     occur even in minor or patch updates of portion.
     """
 
-    incr = None
+    step = None
 
     @classmethod
     def _mergeable(cls, a, b):
-        incr = cls.incr
+        step = cls.step
 
         if a.upper <= b.upper:
             first, second = a, b
@@ -667,8 +664,22 @@ class AbstractDiscreteInterval(Interval):
             first = Atomic(
                 first.left,
                 first.lower,
-                incr(first.upper) if callable(incr) else first.upper + incr,
+                first.upper + step,
                 Bound.OPEN,
             )
 
         return super()._mergeable(first, second)
+
+    @classmethod
+    def from_atomic(cls, left, lower, upper, right):
+        step = cls.step
+
+        if left == Bound.OPEN and lower not in [-inf, inf]:
+            left = Bound.CLOSED
+            lower = lower + step
+
+        if right == Bound.OPEN and upper not in [-inf, inf]:
+            right = Bound.CLOSED
+            upper = upper - step
+
+        return super().from_atomic(left, lower, upper, right)

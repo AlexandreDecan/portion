@@ -5,6 +5,7 @@
 
 ### Added
  - (experimental) A `create_api` function to generate an API similar to the one of `portion` but configured to use a given subclass of `Interval`.
+ - (experimental) An `AbstractDiscreteInterval` class to ease the creation of specialized discrete intervals.
 
 ### Changed
  - Speed up `repr` and `to_string` for `Interval` instances (see [#76](https://github.com/AlexandreDecan/portion/issues/76), adm271828).
