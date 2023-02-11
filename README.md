@@ -960,7 +960,7 @@ We can now define and use the `N` module to check whether our newly defined `Nat
 
 ```
 
-Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that the all possible operations on these intervals strictly follows it.
+Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that all possible operations on these intervals strictly follow it.
 The following examples illustrate some of the cases where additional checks should be implemented to strictly adhere to these semantics:
 
 ```python
@@ -968,6 +968,8 @@ The following examples illustrate some of the cases where additional checks shou
 [1.5,2.5]
 >>> 0.5 in N.closed(0, 1)  # Given value is not a natural number
 True
+>>> ~N.singleton(0.5)
+[1.5,+inf)
 
 ```
 
