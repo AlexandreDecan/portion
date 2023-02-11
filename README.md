@@ -858,6 +858,7 @@ The same set of parameters can be used to specify how bounds and infinities are 
 The intervals provided by `portion` already cover a wide range of use cases.
 However, in some situations, it might be interesting to specialize or customize these intervals.
 One typical example would be to support discrete intervals such as intervals of integers.
+
 While it is definitely possible to rely on the default intervals provided by `portion` to encode discrete
 intervals, there are a few edge cases that lead some operations to return unexpected results:
 
@@ -872,11 +873,12 @@ intervals, there are a few edge cases that lead some operations to return unexpe
 ```
 
 The `portion` library makes its best to ease defining and using subclasses of `Interval` to address
-these situations. In particular, the `Interval` class always produces intervals using `self.__class__`, and is written in a way that most of its methods can be easily extended.
+these situations. In particular, `Interval` instances always produce new intervals using `self.__class__`, and the class is written in a way that most of its methods can be easily extended.
+
 To implement a class for intervals of discrete numbers and to cover the three aforementioned cases, we need to change the behaviour of the `Interval._mergeable` class method (to address first case) and of the `Interval.from_atomic` class method (for cases 2 and 3).
 The former is used to detect whether two atomic intervals can be merged into a single interval, while the latter is used to create atomic intervals.
 
-Thankfully, since discrete intervals are expected to be a frequent use case, `portion` already provides an `AbstractDiscreteInterval` class that already makes the appropriate changes to these two methods.
+Thankfully, since discrete intervals are expected to be a frequent use case, `portion` provides an `AbstractDiscreteInterval` class that already makes the appropriate changes to these two methods.
 As indicated by its name, this class cannot be used directly and should be inherited.
 In particular, one has either to provide a `_step` class attribute to define the step between consecutive discrete values, or to define the `_incr` and `_decr` class methods:
 
@@ -885,6 +887,7 @@ In particular, one has either to provide a `_step` class attribute to define the
 ...     _step = 1
 
 ```
+
 That's all!
 We can now use this class to manipulate intervals of discrete numbers and see it covers the three problematic cases:
 
@@ -898,8 +901,20 @@ We can now use this class to manipulate intervals of discrete numbers and see it
 
 ```
 
+As an example of using `_incr` and `_decr`, consider the following `CharInterval` subclass tailored to manipulate intervals of characters:
+
+```python
+>>> class CharInterval(P.AbstractDiscreteInterval):
+...     _incr = lambda v: chr(ord(v) + 1)
+...     _decr = lambda v: chr(ord(v) - 1)
+>>> CharInterval.from_atomic(P.OPEN, 'a', 'z', P.OPEN)
+['b','y']
+
+```
+
+Having to call `from_atomic` on the subclass to create intervals is quite verbose.
 For convenience, all the functions that create interval instances accept an additional `klass` parameter to specify the class that creates intervals, circumventing the direct use of the class constructors.
-However, having to specify the `klass` parameter in each call to `P.closed` or other helpers that create intervals is a bit too verbose to be convenient.
+However, having to specify the `klass` parameter in each call to `P.closed` or other helpers that create intervals is still a bit too verbose to be convenient.
 Consequently, `portion` provides a `create_api` function that, given a subclass of `Interval`, returns a dynamically generated module whose API is similar to the one of `portion` but configured to use the subclass instead:
 
 ```python
@@ -913,8 +928,11 @@ Consequently, `portion` provides a `create_api` function that, given a subclass 
 
 ```
 
+This makes it easy to use our newly defined `IntInterval` subclass while still benefiting from `portion`'s API.
+
 Let's extend our example to support intervals of natural numbers.
 Such intervals are quite similar to the above ones, except they cannot go over negative values.
+We can prevent the bounds of an interval to be negative by slightly changing the `from_atomic` class method as follows:
 
 ```python
 >>> class NaturalInterval(IntInterval):
@@ -926,19 +944,30 @@ Such intervals are quite similar to the above ones, except they cannot go over n
 ...            upper,
 ...            right,
 ...        )
->>> N = P.create_api(NaturalInterval)
 
 ```
 
-We can now use the `N` module to check whether our newly defined `NaturalInterval` does the job:
+We can now define and use the `N` module to check whether our newly defined `NaturalInterval` does the job:
 
 ```python
+>>> N = P.create_api(NaturalInterval)
 >>> N.closed(-10, 2)
 [0,2]
 >>> N.open(-10, 2)
 [0,1]
 >>> ~N.empty()
 [0,+inf)
+
+```
+
+Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that the all possible operations on these intervals strictly follows it.
+The following examples illustrate some of the cases where additional checks should be implemented to strictly adhere to these semantics:
+
+```python
+>>> N.closed(1.5, 2.5)  # Bounds are not natural numbers
+[1.5,2.5]
+>>> 0.5 in N.closed(0, 1)  # Given value is not a natural number
+True
 
 ```
 
