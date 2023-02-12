@@ -960,7 +960,7 @@ We can now define and use the `N` module to check whether our newly defined `Nat
 
 ```
 
-Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that all possible operations on these intervals strictly follow it.
+Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that all possible operations on these intervals strictly comply the semantics. 
 The following examples illustrate some of the cases where additional checks should be implemented to strictly adhere to these semantics:
 
 ```python
