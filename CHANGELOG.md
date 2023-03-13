@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2.4.0 (not yet released)
+## 2.4.0 (2023-03-13)
 
 ### Added
  - An `AbstractDiscreteInterval` class to ease the creation of specialized discrete intervals (experimental).
