@@ -392,6 +392,10 @@ class TestIntervalComparison:
         assert not (P.closedopen(0, P.inf) <= P.empty())
         assert not (P.closedopen(0, P.inf) >= P.empty())
 
+    def test_edge_cases(self):
+        assert not (P.closed(0, 2) >= P.open(0, 1))
+        assert not (P.closed(0, 2) >= P.openclosed(0, 1))
+
     def test_with_values(self):
         with pytest.deprecated_call():
             assert 0 < P.closed(1, 2)
@@ -508,9 +512,12 @@ class TestIntervalContainment:
         assert P.closed(-P.inf, P.inf) in P.closed(-P.inf, P.inf)
         assert P.closed(0, 1) in P.closed(-P.inf, P.inf)
         assert P.closed(-P.inf, P.inf) not in P.closed(0, 1)
+        assert P.singleton(0) | P.singleton(5) in P.closed(0, 5)
+        assert P.singleton(0) | P.singleton(5) in P.closed(0, 1) | P.closed(4, 5)
 
         # https://github.com/AlexandreDecan/portion/issues/28
         assert P.closed(5, 6) not in P.closed(1, 2) | P.closed(3, 4)
+        assert P.singleton(0) | P.singleton(6) not in P.closed(0, 1) | P.closed(4, 5)
 
     def test_with_unions(self):
         assert P.closed(0, 1) | P.closed(2, 3) in P.closed(0, 4)
