@@ -9,7 +9,7 @@ with open(
 
 setup(
     name="portion",
-    version="2.4.0",
+    version="2.4.1",
     license="LGPLv3",
     author="Alexandre Decan",
     url="https://github.com/AlexandreDecan/portion",

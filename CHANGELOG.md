@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.4.1 (2023-07-19)
+
+### Fixed
+ - Import error when using `create_api` outside a REPL (see [#85](https://github.com/AlexandreDecan/portion/issues/85)).
+
+
+
 ## 2.4.0 (2023-03-13)
 
 ### Added
