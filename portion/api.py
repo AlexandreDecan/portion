@@ -1,6 +1,7 @@
 import functools
 import importlib
 import importlib.util
+import importlib.machinery
 
 from .const import Bound, inf
 from .func import iterate, open, closed, openclosed, closedopen, empty, singleton
