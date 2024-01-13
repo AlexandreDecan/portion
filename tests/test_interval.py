@@ -1,14 +1,11 @@
 import pytest
 
+import numpy as np
 import portion as P
 
-
-parametrize_infs = pytest.mark.parametrize(("pinf", "ninf"), [
-    (P.inf, -P.inf),
-    (P.inf, -float("inf")),
-    (float("inf"), -P.inf),
-    (float("inf"), -float("inf")),
-])
+pos_infs = [P.inf, *(t("inf") for t in (float, np.float64, np.float32, np.float16))]
+parametrize_pinf = pytest.mark.parametrize("pinf", pos_infs)
+parametrize_ninf = pytest.mark.parametrize("ninf", [-inf for inf in pos_infs])
 
 
 class TestHelpers:
@@ -19,13 +16,15 @@ class TestHelpers:
         assert P.closedopen(0, 1) == P.Interval.from_atomic(P.CLOSED, 0, 1, P.OPEN)
         assert P.singleton(2) == P.closed(2, 2)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_with_infinities(self, pinf, ninf):
         assert P.closed(ninf, pinf) == P.open(ninf, pinf)
         assert P.closed(ninf, 0) == P.openclosed(ninf, 0)
         assert P.closed(0, pinf) == P.closedopen(0, pinf)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_empty(self, pinf, ninf):
         assert P.empty() == P.Interval.from_atomic(P.OPEN, pinf, ninf, P.open)
         assert P.closed(3, -3) == P.empty()
@@ -46,7 +45,8 @@ class TestRepr:
         assert repr(P.closedopen(0, 1)) == '[0,1)'
         assert repr(P.open(0, 1)) == '(0,1)'
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_infinities(self, pinf, ninf):
         assert repr(P.closed(ninf, pinf)) == '(-inf,+inf)'
 
@@ -118,7 +118,8 @@ class TestInterval:
         assert P.Interval().empty
         assert P.empty().empty
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_hash_with_hashable(self, pinf, ninf):
         assert hash(P.closed(0, 1)) is not None
         assert hash(P.closed(0, 1)) != hash(P.closed(1, 2))
@@ -158,7 +159,8 @@ class TestInterval:
 
 
 class TestIntervalReplace:
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_replace_bounds(self, pinf, ninf):
         i = P.open(ninf, pinf)
         assert i.replace(lower=lambda v: 1, upper=lambda v: 1) == P.open(ninf, pinf)
@@ -170,7 +172,8 @@ class TestIntervalReplace:
         assert i.replace(lower=1, upper=2) == P.open(1, 2)
         assert i.replace(lower=lambda v: 1, upper=lambda v: 2) == P.open(1, 2)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_replace_values_on_infinities(self, pinf, ninf):
         i = P.open(ninf, pinf)
         assert i.replace(lower=lambda v: 1, upper=lambda v: 2) == i
@@ -317,7 +320,8 @@ class TestIntervalOverlaps:
         assert P.open(0, 2).overlaps(P.open(0, 1))
         assert P.open(0, 1).overlaps(P.open(0, 2))
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_overlaps_with_empty(self, pinf, ninf):
         assert not P.empty().overlaps(P.open(ninf, pinf))
         assert not P.open(ninf, pinf).overlaps(P.empty())
@@ -396,8 +400,8 @@ class TestIntervalComparison:
         assert not (P.closed(2, 3) <= P.empty())
         assert not (P.closed(2, 3) >= P.empty())
 
-    @parametrize_infs
-    def test_with_empty_and_infinities(self, pinf, ninf):
+    @parametrize_pinf
+    def test_with_empty_and_infinities(self, pinf):
         assert not (P.empty() < P.closedopen(0, pinf))
         assert not (P.empty() <= P.closedopen(0, pinf))
         assert not (P.empty() > P.closedopen(0, pinf))
@@ -501,7 +505,8 @@ class TestIntervalContainment:
         assert 7 not in P.closed(0, 2) | P.closed(4, 6) | P.closed(8, 10)
         assert 11 not in P.closed(0, 2) | P.closed(4, 6) | P.closed(8, 10)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_with_infinities(self, pinf, ninf):
         assert 1 in P.closed(ninf, pinf)
         assert 1 in P.closed(ninf, 1)
@@ -514,13 +519,15 @@ class TestIntervalContainment:
 
         assert P.inf not in P.closed(0, 1)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_with_empty(self, pinf, ninf):
         assert 1 not in P.empty()
         assert pinf not in P.empty()
         assert ninf not in P.empty()
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_with_intervals(self, pinf, ninf):
         assert P.closed(1, 2) in P.closed(0, 3)
         assert P.closed(1, 2) in P.closed(1, 2)
@@ -695,17 +702,20 @@ class TestIntervalUnion:
 
 
 class TestIntervalComplement:
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_singleton(self, pinf, ninf):
         assert ~P.singleton(0) == P.open(ninf, 0) | P.open(0, pinf)
         assert ~(P.open(ninf, 0) | P.open(0, pinf)) == P.singleton(0)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_nonempty(self, pinf, ninf):
         assert ~P.closed(1, 2) == P.open(ninf, 1) | P.open(2, pinf)
         assert ~P.open(1, 2) == P.openclosed(ninf, 1) | P.closedopen(2, pinf)
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_union(self, pinf, ninf):
         assert ~(P.singleton(0) | P.singleton(5) | P.singleton(10)) == P.open(ninf, 0) | P.open(0, 5) | P.open(5, 10) | P.open(10, pinf)
         assert ~(P.open(0, 1) | P.closed(2, 3) | P.open(4, 5)) == P.openclosed(ninf, 0) | P.closedopen(1, 2) | P.openclosed(3, 4) | P.closedopen(5, pinf)
@@ -715,7 +725,8 @@ class TestIntervalComplement:
         for interval in i:
             assert ~(~interval) == interval
 
-    @parametrize_infs
+    @parametrize_pinf
+    @parametrize_ninf
     def test_empty(self, pinf, ninf):
         assert ~P.open(1, 1) == P.open(ninf, pinf)
         assert (~P.closed(ninf, pinf)).empty

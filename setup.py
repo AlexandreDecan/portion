@@ -40,7 +40,7 @@ setup(
         "sortedcontainers ~= 2.2",
     ],
     extras_require={
-        "test": ["pytest ~= 7.0", "coverage ~= 6.0", "black >= 21.8b"],
+        "test": ["pytest ~= 7.0", "numpy", "coverage ~= 6.0", "black >= 21.8b"],
     },
     zip_safe=True,
 )
