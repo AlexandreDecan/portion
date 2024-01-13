@@ -105,8 +105,12 @@ class Interval:
         :param upper: value of the upper bound.
         :param right: either CLOSED or OPEN.
         """
-        left = left if lower not in [inf, -inf] else Bound.OPEN
-        right = right if upper not in [inf, -inf] else Bound.OPEN
+        if cls._is_inf(lower):
+            lower = inf if lower > 0 else -inf
+            left = Bound.OPEN
+        if cls._is_inf(upper):
+            upper = inf if upper > 0 else -inf
+            right = Bound.OPEN
 
         instance = cls()
         # Check for non-emptiness (otherwise keep instance._intervals = [])
@@ -115,6 +119,11 @@ class Interval:
         ):
             instance._intervals = [Atomic(left, lower, upper, right)]
         return instance
+
+    @classmethod
+    def _is_inf(cls, value):
+        """Test whether given value is an infinity."""
+        return value in (inf, -inf)
 
     @classmethod
     def _mergeable(cls, a, b):

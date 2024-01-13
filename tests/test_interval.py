@@ -46,11 +46,9 @@ class TestRepr:
         assert repr(P.closedopen(0, 1)) == '[0,1)'
         assert repr(P.open(0, 1)) == '(0,1)'
 
-    def test_infinities(self):
-        assert repr(P.closed(-P.inf, P.inf)) == '(-inf,+inf)'
-        assert repr(P.closed(-float("inf"), P.inf)) == '(-inf,+inf)'
-        assert repr(P.closed(-P.inf, float("inf"))) == '(-inf,inf)'
-        assert repr(P.closed(-float("inf"), float("inf"))) == '(-inf,inf)'
+    @parametrize_infs
+    def test_infinities(self, pinf, ninf):
+        assert repr(P.closed(ninf, pinf)) == '(-inf,+inf)'
 
     def test_empty(self):
         assert repr(P.empty()) == '()'
