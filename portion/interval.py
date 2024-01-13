@@ -124,7 +124,12 @@ class Interval:
     @classmethod
     def _is_inf(cls, value):
         """Test whether given value is an infinity."""
-        return value in (inf, -inf) or isinstance(value, float) and math.isinf(value)
+        if value in (inf, -inf):
+            return True
+        try:
+            return math.isinf(value)
+        except TypeError:
+            return False
 
     @classmethod
     def _mergeable(cls, a, b):
