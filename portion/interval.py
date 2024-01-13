@@ -1,3 +1,4 @@
+import math
 import warnings
 
 from collections import namedtuple
@@ -123,7 +124,7 @@ class Interval:
     @classmethod
     def _is_inf(cls, value):
         """Test whether given value is an infinity."""
-        return value in (inf, -inf)
+        return value in (inf, -inf) or isinstance(value, float) and math.isinf(value)
 
     @classmethod
     def _mergeable(cls, a, b):

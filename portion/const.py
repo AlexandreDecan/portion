@@ -45,7 +45,7 @@ class _PInf(_Singleton):
         return False
 
     def __eq__(self, o):
-        return isinstance(o, _PInf) or o == float("+inf")
+        return isinstance(o, _PInf)
 
     def __repr__(self):
         return "+inf"
@@ -67,7 +67,7 @@ class _NInf(_Singleton):
         return False
 
     def __eq__(self, o):
-        return isinstance(o, _NInf) or o == float("-inf")
+        return isinstance(o, _NInf)
 
     def __repr__(self):
         return "-inf"
