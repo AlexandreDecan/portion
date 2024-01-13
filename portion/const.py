@@ -1,4 +1,5 @@
 import enum
+from functools import total_ordering
 
 
 class Bound(enum.Enum):
@@ -31,6 +32,7 @@ class _Singleton:
         return cls.__instance
 
 
+@total_ordering
 class _PInf(_Singleton):
     """
     Represent positive infinity.
@@ -42,17 +44,8 @@ class _PInf(_Singleton):
     def __lt__(self, o):
         return False
 
-    def __le__(self, o):
-        return isinstance(o, _PInf)
-
-    def __gt__(self, o):
-        return not isinstance(o, _PInf)
-
-    def __ge__(self, o):
-        return True
-
     def __eq__(self, o):
-        return isinstance(o, _PInf)
+        return isinstance(o, _PInf) or o == float("+inf")
 
     def __repr__(self):
         return "+inf"
@@ -61,6 +54,7 @@ class _PInf(_Singleton):
         return hash(float("+inf"))
 
 
+@total_ordering
 class _NInf(_Singleton):
     """
     Represent negative infinity.
@@ -69,20 +63,11 @@ class _NInf(_Singleton):
     def __neg__(self):
         return _PInf()
 
-    def __lt__(self, o):
-        return not isinstance(o, _NInf)
-
-    def __le__(self, o):
-        return True
-
     def __gt__(self, o):
         return False
 
-    def __ge__(self, o):
-        return isinstance(o, _NInf)
-
     def __eq__(self, o):
-        return isinstance(o, _NInf)
+        return isinstance(o, _NInf) or o == float("-inf")
 
     def __repr__(self):
         return "-inf"
