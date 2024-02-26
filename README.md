@@ -7,7 +7,7 @@
 [![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 
-The `portion` library provides data structure and operations for intervals in Python 3.7+.
+The `portion` library provides data structure and operations for intervals in Python.
 
  - Support intervals of any (comparable) objects.
  - Closed or open, finite or (semi-)infinite intervals.
@@ -859,8 +859,7 @@ The intervals provided by `portion` already cover a wide range of use cases.
 However, in some situations, it might be interesting to specialize or customize these intervals.
 One typical example would be to support discrete intervals such as intervals of integers.
 
-While it is definitely possible to rely on the default intervals provided by `portion` to encode discrete
-intervals, there are a few edge cases that lead some operations to return unexpected results:
+While it is definitely possible to rely on the default intervals provided by `portion` to encode discrete intervals, there are a few edge cases that lead some operations to return unexpected results:
 
 ```python
 >>> P.singleton(0) | P.singleton(1)  # Case 1: should be [0,1] for discrete numbers
@@ -872,8 +871,7 @@ intervals, there are a few edge cases that lead some operations to return unexpe
 
 ```
 
-The `portion` library makes its best to ease defining and using subclasses of `Interval` to address
-these situations. In particular, `Interval` instances always produce new intervals using `self.__class__`, and the class is written in a way that most of its methods can be easily extended.
+The `portion` library makes its best to ease defining and using subclasses of `Interval` to address these situations. In particular, `Interval` instances always produce new intervals using `self.__class__`, and the class is written in a way that most of its methods can be easily extended.
 
 To implement a class for intervals of discrete numbers and to cover the three aforementioned cases, we need to change the behaviour of the `Interval._mergeable` class method (to address first case) and of the `Interval.from_atomic` class method (for cases 2 and 3).
 The former is used to detect whether two atomic intervals can be merged into a single interval, while the latter is used to create atomic intervals.
@@ -960,7 +958,7 @@ We can now define and use the `N` module to check whether our newly defined `Nat
 
 ```
 
-Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that all possible operations on these intervals strictly comply the semantics. 
+Keep in mind that just because `NaturalInterval` has semantics associated with natural numbers does not mean that all possible operations on these intervals strictly comply the semantics.
 The following examples illustrate some of the cases where additional checks should be implemented to strictly adhere to these semantics:
 
 ```python

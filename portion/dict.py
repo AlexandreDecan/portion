@@ -4,7 +4,7 @@ from .const import Bound
 from .interval import Interval
 
 
-def _sort(i):
+def _sortkey(i):
     # Sort by lower bound, closed first
     return (i[0].lower, i[0].left is Bound.OPEN)
 
@@ -42,7 +42,7 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
-        self._storage = SortedDict(_sort)  # Mapping from intervals to values
+        self._storage = SortedDict(_sortkey)  # Mapping from intervals to values
 
         if mapping_or_iterable is not None:
             self.update(mapping_or_iterable)
@@ -113,7 +113,7 @@ class IntervalDict(MutableMapping):
 
     def items(self):
         """
-        Return a view object on the contained items sorted by key
+        Return a view object on the contained items sorted by their key
         (see https://docs.python.org/3/library/stdtypes.html#dict-views).
 
         :return: a view object.
@@ -131,7 +131,7 @@ class IntervalDict(MutableMapping):
 
     def values(self):
         """
-        Return a view object on the contained values sorted by key
+        Return a view object on the contained values sorted by their key
         (see https://docs.python.org/3/library/stdtypes.html#dict-views).
 
         :return: a view object.
@@ -182,8 +182,8 @@ class IntervalDict(MutableMapping):
 
     def setdefault(self, key, default=None):
         """
-        Return given key. If it does not exist, set its value to default and
-        return it.
+        Return given key. If it does not exist, set its value to given default
+        and return it.
 
         :param key: a single value or an Interval instance.
         :param default: default value (default to None).

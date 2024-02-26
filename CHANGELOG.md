@@ -1,6 +1,13 @@
 # Changelog
 
 
+## Next release
+
+### Changed
+ - Drop official support for Python 3.7.
+
+
+
 ## 2.4.2 (2023-12-06)
 
 ### Fixed

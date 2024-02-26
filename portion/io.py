@@ -25,19 +25,18 @@ def from_string(
     This function raises a ValueError if given string cannot be parsed to an interval.
 
     :param string: string to parse.
-    :param conv: function that converts a bound (as string) to an object.
-    :param bound: pattern that matches a value.
-    :param disj: pattern that matches the disjunctive operator (default matches
-        '|' and ' | ').
-    :param sep: pattern that matches a bounds separator (default matches ',').
-    :param left_open: pattern that matches a left open boundary (default matches '(').
-    :param left_closed: pattern that matches a left closed boundary (default
+    :param conv: function to convert a bound (as string) to an object.
+    :param bound: regex pattern for a value.
+    :param disj: regex pattern for disjunctive operator (default matches '|' and ' | ').
+    :param sep: regex pattern for bound separator (default matches ',').
+    :param left_open: regex pattern for left open boundary (default matches '(').
+    :param left_closed: regex pattern for left closed boundary (default
         matches '[').
-    :param right_open: pattern that matches a right open boundary (default matches ')').
-    :param right_closed: pattern that matches a right closed boundary (default
+    :param right_open: regex pattern for right open boundary (default matches ')').
+    :param right_closed: regex pattern for right closed boundary (default
         matches ']').
-    :param pinf: pattern that matches a positive infinity (default matches '+inf').
-    :param ninf: pattern that matches a negative infinity (default matches '-inf').
+    :param pinf: regex pattern for positive infinity (default matches '+inf').
+    :param ninf: regex pattern for negative infinity (default matches '-inf').
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
@@ -155,10 +154,10 @@ def from_data(
     data, conv=None, *, pinf=float("inf"), ninf=float("-inf"), klass=Interval
 ):
     """
-    Import an interval from a piece of data.
+    Import an interval from a list of 4-uples (left, lower, upper, right).
 
     :param data: a list of 4-uples (left, lower, upper, right).
-    :param conv: function that converts "lower" and "upper" to bounds, default to identity.
+    :param conv: function to convert bound values, default to identity.
     :param pinf: value used to represent positive infinity.
     :param ninf: value used to represent negative infinity.
     :param klass: class to use for creating intervals (default to Interval).
@@ -190,11 +189,10 @@ def from_data(
 
 def to_data(interval, conv=None, *, pinf=float("inf"), ninf=float("-inf")):
     """
-    Export given interval to a list of 4-uples (left, lower,
-    upper, right).
+    Export given interval to a list of 4-uples (left, lower, upper, right).
 
     :param interval: an interval.
-    :param conv: function that convert bounds to "lower" and "upper", default to identity.
+    :param conv: function to convert bound values, default to identity.
     :param pinf: value used to encode positive infinity.
     :param ninf: value used to encode negative infinity.
     :return: a list of 4-uples (left, lower, upper, right)

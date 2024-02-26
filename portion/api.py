@@ -9,6 +9,9 @@ from .io import from_string, to_string, from_data, to_data
 from .dict import IntervalDict
 
 
+__all__ = ["create_api"]
+
+
 def partial(wrapped, *args, **kwargs):
     """
     Convenient helper that combines functools.update_wrapper and
