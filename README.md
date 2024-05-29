@@ -1,3 +1,5 @@
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/AlexandreDecan/portion/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/AlexandreDecan/portion)
+
 # portion - data structure and operations for intervals
 
 [![Tests](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml)
