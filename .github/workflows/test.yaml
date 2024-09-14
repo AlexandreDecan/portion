@@ -29,9 +29,8 @@ jobs:
         run: black --check portion
       - name: Execute tests
         run: coverage run --source portion -m pytest
-      - name: Upload coverage
+      - name: Upload coverage to Coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pip install coveralls
-          coveralls --service=github
+        uses: coverallsapp/github-action@v2.3.0
+            
