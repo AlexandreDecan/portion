@@ -218,26 +218,37 @@ class IntervalDict(MutableMapping):
         for i, v in data:
             self[i] = v
 
-    def combine(self, other, how):
+    def combine(self, other, how, *, missing=...):
         """
         Return a new IntervalDict that combines the values from current and
-        provided ones.
+        provided IntervalDict.
 
         If d = d1.combine(d2, f), then d contains (1) all values from d1 whose
         keys do not intersect the ones of d2, (2) all values from d2 whose keys
         do not intersect the ones of d1, and (3) f(x, y) for x in d1, y in d2 for
         intersecting keys.
 
+        When missing is set, the how function is called even for non-intersecting
+        keys using the value of missing to replace the missing values. This is,
+        case (1) corresponds to f(x, missing) and case (2) to f(missing, y).
+
         :param other: another IntervalDict instance.
         :param how: a function of two parameters that combines values.
+        :param missing: if set, use this value for missing values when calling "how".
         :return: a new IntervalDict instance.
         """
         new_items = []
 
         dom1, dom2 = self.domain(), other.domain()
 
-        new_items.extend(self[dom1 - dom2].items())
-        new_items.extend(other[dom2 - dom1].items())
+        if missing is Ellipsis:
+            new_items.extend(self[dom1 - dom2].items())
+            new_items.extend(other[dom2 - dom1].items())
+        else:
+            for i, v in self[dom1 - dom2].items():
+                new_items.append((i, how(v, missing)))
+            for i, v in other[dom2 - dom1].items():
+                new_items.append((i, how(missing, v)))
 
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]

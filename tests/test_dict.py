@@ -152,6 +152,7 @@ class TestIntervalDict:
 
     def test_combine_nonempty(self):
         def add(x, y): return x + y
+
         d1 = P.IntervalDict([(P.closed(1, 3) | P.closed(5, 7), 1)])
         d2 = P.IntervalDict([(P.closed(2, 4) | P.closed(6, 8), 2)])
         assert d1.combine(d2, add) == d2.combine(d1, add)
@@ -179,6 +180,31 @@ class TestIntervalDict:
             P.singleton(4): 3,
             P.openclosed(4, 5): 1,
         })
+
+    def test_combine_missing(self):
+        def how(x, y): return x, y
+
+        d1 = P.IntervalDict([(P.closed(1, 3), 1)])
+        d2 = P.IntervalDict([(P.closed(2, 4), 2)])
+        assert d1.combine(d2, how=how, missing=None) == P.IntervalDict([
+            (P.closedopen(1, 2), (1, None)),
+            (P.closed(2, 3), (1, 2)),
+            (P.openclosed(3, 4), (None, 2))
+        ])
+
+        assert d2.combine(d1, how=how, missing=None) == P.IntervalDict([
+            (P.closedopen(1, 2), (None, 1)),
+            (P.closed(2, 3), (2, 1)),
+            (P.openclosed(3, 4), (2, None))
+        ])
+
+        def add(x, y): return x + y
+        assert d2.combine(d1, how=add, missing=3) == P.IntervalDict([
+            (P.closedopen(1, 2), 4),
+            (P.closed(2, 3), 3),
+            (P.openclosed(3, 4), 5)
+        ])
+
 
     def test_containment(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
