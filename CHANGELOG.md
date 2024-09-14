@@ -1,7 +1,10 @@
 # Changelog
 
 
-## Next release
+## Next release (2.5.0)
+
+### Added
+ - The `combine` method of an `IntervalDict` accepts a `missing` parameter to fill values for non-overlapping keys (see [#95](https://github.com/AlexandreDecan/portion/issues/95)).
 
 ### Changed
  - Drop official support for Python 3.7.
@@ -11,7 +14,7 @@
 ## 2.4.2 (2023-12-06)
 
 ### Fixed
- - Import error when using `create_api` in Python 3.10+ (see [#87](https://github.com/AlexandreDecan/portion/issues/85)).
+ - Import error when using `create_api` in Python 3.10+ (see [#87](https://github.com/AlexandreDecan/portion/issues/87)).
 
 
 
