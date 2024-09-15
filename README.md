@@ -43,8 +43,7 @@ The `portion` library provides data structure and operations for intervals in Py
 ## Installation
 
 You can use `pip` to install it, as usual: `pip install portion`. This will install the latest available version from [PyPI](https://pypi.org/project/portion).
-Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion)
-and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
+Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion) and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 Note that `portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
 
 You can install `portion` and its development environment using `pip install -e .[test]` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [black](https://black.readthedocs.io/en/stable/) (for code formatting).
@@ -54,8 +53,7 @@ You can install `portion` and its development environment using `pip install -e 
 
 ### Interval creation
 
-Assuming this library is imported using `import portion as P`, intervals can be easily
-created using one of the following helpers:
+Assuming this library is imported using `import portion as P`, intervals can be easily created using one of the following helpers:
 
 ```python
 >>> P.open(1, 2)
@@ -140,8 +138,7 @@ For convenience, intervals are automatically simplified:
 ```
 
 Note that, by default, simplification of discrete intervals is **not** supported by `portion` (but it can be simulated though, see [#24](https://github.com/AlexandreDecan/portion/issues/24#issuecomment-604456362)).
-For example, combining `[0,1]` with `[2,3]` will **not** result in `[0,3]` even if there is
-no integer between `1` and `2`.
+For example, combining `[0,1]` with `[2,3]` will **not** result in `[0,3]` even if there is no integer between `1` and `2`.
 Refer to [Specialize & customize intervals](#specialize--customize-intervals) to see how to create and use specialized discrete intervals.
 
 
@@ -185,8 +182,7 @@ An `Interval` defines the following properties:
 
    ```
 
-The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed
-with its `left`, `right`, `lower` and `upper` attributes.
+The left and right boundaries, and the lower and upper bounds of an interval can be respectively accessed with its `left`, `right`, `lower` and `upper` attributes.
 The `left` and `right` bounds are either `P.CLOSED` or `P.OPEN`.
 By definition, `P.CLOSED == ~P.OPEN` and vice-versa.
 
@@ -209,8 +205,7 @@ By convention, empty intervals resolve to `(P.inf, -P.inf)`:
 ```
 
 
-If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure,
-while `right` and `upper` refer to the upper bound of its enclosure:
+If the interval is not atomic, then `left` and `lower` refer to the lower bound of its enclosure, while `right` and `upper` refer to the upper bound of its enclosure:
 
 ```python
 >>> x = P.open(0, 1) | P.closed(3, 4)
@@ -297,10 +292,7 @@ False
    ```
 
  - `i.adjacent(other)` tests if the two intervals are adjacent, i.e., if they do not overlap and their union form a single atomic interval.
- While this definition corresponds to the usual notion of adjacency for atomic
- intervals, it has stronger requirements for non-atomic ones since it requires
- all underlying atomic intervals to be adjacent (i.e. that one
- interval fills the gaps between the atomic intervals of the other one).
+ While this definition corresponds to the usual notion of adjacency for atomic  intervals, it has stronger requirements for non-atomic ones since it requires  all underlying atomic intervals to be adjacent (i.e. that one  interval fills the gaps between the atomic intervals of the other one).
    ```python
    >>> P.closed(0, 1).adjacent(P.openclosed(1, 2))
    True
@@ -342,8 +334,7 @@ False
 
 Moreover, intervals are comparable using `>`, `>=`, `<` or `<=`.
 These comparison operators have a different behaviour than the usual ones.
-For instance, `a < b` holds if all values in `a` are lower than the minimal value of `b` (i.e., `a` is
-entirely on the left of the lower bound of `b`).
+For instance, `a < b` holds if all values in `a` are lower than the minimal value of `b` (i.e., `a` is entirely on the left of the lower bound of `b`).
 
 ```python
 >>> P.closed(0, 1) < P.closed(2, 3)
@@ -353,8 +344,7 @@ False
 
 ```
 
-Similarly, `a <= b` if all values in `a` are lower than the maximal value of `b` (i.e., `a` is
-entirely on the left of the upper bound of `b`).
+Similarly, `a <= b` if all values in `a` are lower than the maximal value of `b` (i.e., `a` is entirely on the left of the upper bound of `b`).
 
 ```python
 >>> P.closed(0, 1) <= P.closed(2, 3)
@@ -381,8 +371,7 @@ True
 ```
 
 Note that all these semantics differ from classical comparison operators.
-As a consequence, the empty interval is never `<`, `<=`, `>` nor `>=` than any other interval, and
-no interval is `<`, `>`, `<=` or `>=` when compared to the empty interval.
+As a consequence, the empty interval is never `<`, `<=`, `>` nor `>=` than any other interval, and no interval is `<`, `>`, `<=` or `>=` when compared to the empty interval.
 
 ```python
 >>> e = P.empty()
@@ -407,16 +396,14 @@ True
 
 ```
 
-As a general rule, if `a < b` holds, then `a <= b`, `b > a`, `b >= a`,
-`not (a > b)`, `not (b < a)`, `not (a >= b)`, and `not (b <= a)` hold.
+As a general rule, if `a < b` holds, then `a <= b`, `b > a`, `b >= a`, `not (a > b)`, `not (b < a)`, `not (a >= b)`, and `not (b <= a)` hold.
 
 
 
 [&uparrow; back to top](#table-of-contents)
 ### Interval transformation
 
-Intervals are immutable but provide a `replace` method to create a new interval based on the
-current one. This method accepts four optional parameters `left`, `lower`, `upper`, and `right`:
+Intervals are immutable but provide a `replace` method to create a new interval based on the current one. This method accepts four optional parameters `left`, `lower`, `upper`, and `right`:
 
 ```python
 >>> i = P.closed(0, 2)
@@ -427,8 +414,7 @@ current one. This method accepts four optional parameters `left`, `lower`, `uppe
 
 ```
 
-Functions can be passed instead of values. If a function is passed, it is called with the current corresponding
-value.
+Functions can be passed instead of values. If a function is passed, it is called with the current corresponding value.
 
 ```python
 >>> P.closed(0, 2).replace(upper=lambda x: 2 * x)
@@ -447,8 +433,7 @@ The provided function won't be called on infinities, unless `ignore_inf` is set 
 
 ```
 
-When `replace` is applied on an interval that is not atomic, it is extended and/or restricted such that
-its enclosure satisfies the new bounds.
+When `replace` is applied on an interval that is not atomic, it is extended and/or restricted such that its enclosure satisfies the new bounds.
 
 ```python
 >>> i = P.openclosed(0, 1) | P.closed(5, 10)
@@ -475,8 +460,7 @@ The provided function is expected to return either an `Interval`, or a 4-uple `(
 ```
 
 The `apply` method is very powerful when used in combination with `replace`.
-Because the latter allows functions to be passed as parameters and ignores infinities by default, it can be
-conveniently used to transform (disjunction of) intervals in presence of infinities.
+Because the latter allows functions to be passed as parameters and ignores infinities by default, it can be conveniently used to transform (disjunction of) intervals in presence of infinities.
 
 ```python
 >>> i = P.openclosed(-P.inf, 0) | P.closed(3, 4) | P.closedopen(8, P.inf)
@@ -500,9 +484,7 @@ conveniently used to transform (disjunction of) intervals in presence of infinit
 [&uparrow; back to top](#table-of-contents)
 ### Discrete iteration
 
-The `iterate` function takes an interval, and returns a generator to iterate over
-the values of an interval. Obviously, as intervals are continuous, it is required to specify the
- `step` between consecutive values. The iteration then starts from the lower bound and ends on the upper one. Only values contained by the interval are returned this way.
+The `iterate` function takes an interval, and returns a generator to iterate over the values of an interval. Obviously, as intervals are continuous, it is required to specify the  `step` between consecutive values. The iteration then starts from the lower bound and ends on the upper one. Only values contained by the interval are returned this way.
 
 ```python
 >>> list(P.iterate(P.closed(0, 3), step=1))
@@ -514,8 +496,7 @@ the values of an interval. Obviously, as intervals are continuous, it is require
 
 ```
 
-When an interval is not atomic, `iterate` consecutively iterates on all underlying atomic
-intervals, starting from each lower bound and ending on each upper one:
+When an interval is not atomic, `iterate` consecutively iterates on all underlying atomic intervals, starting from each lower bound and ending on each upper one:
 
 ```python
 >>> list(P.iterate(P.singleton(0) | P.singleton(3) | P.singleton(5), step=2))  # Won't be [0]
@@ -526,9 +507,7 @@ intervals, starting from each lower bound and ending on each upper one:
 ```
 
 By default, the iteration always starts on the lower bound of each underlying atomic interval.
-The `base` parameter can be used to change this behaviour, by specifying how the initial value to start
-the iteration from must be computed. This parameter accepts a callable that is called with the lower
-bound of each underlying atomic interval, and that returns the initial value to start the iteration from.
+The `base` parameter can be used to change this behaviour, by specifying how the initial value to start the iteration from must be computed. This parameter accepts a callable that is called with the lower bound of each underlying atomic interval, and that returns the initial value to start the iteration from.
 It can be helpful to deal with (semi-)infinite intervals, or to *align* the generated values of the iterator:
 
 ```python
@@ -541,8 +520,7 @@ It can be helpful to deal with (semi-)infinite intervals, or to *align* the gene
 
 ```
 
-The `base` parameter can be used to change how `iterate` applies on unions of atomic interval, by
-specifying a function that returns a single value, as illustrated next:
+The `base` parameter can be used to change how `iterate` applies on unions of atomic interval, by specifying a function that returns a single value, as illustrated next:
 
 ```python
 >>> base = lambda x: 0
@@ -553,9 +531,7 @@ specifying a function that returns a single value, as illustrated next:
 
 ```
 
-Notice that defining `base` such that it returns a single value can be extremely inefficient in
-terms of performance when the intervals are "far apart" each other (i.e., when the *gaps* between
-atomic intervals are large).
+Notice that defining `base` such that it returns a single value can be extremely inefficient in terms of performance when the intervals are "far apart" each other (i.e., when the *gaps* between atomic intervals are large).
 
 Finally, iteration can be performed in reverse order by specifying `reverse=True`.
 
@@ -567,9 +543,7 @@ Finally, iteration can be performed in reverse order by specifying `reverse=True
 
 ```
 
-Again, this library does not make any assumption about the objects being used in an interval, as long as they
-are comparable. However, it is not always possible to provide a meaningful value for `step` (e.g., what would
-be the step between two consecutive characters?). In these cases, a callable can be passed instead of a value.
+Again, this library does not make any assumption about the objects being used in an interval, as long as they are comparable. However, it is not always possible to provide a meaningful value for `step` (e.g., what would be the step between two consecutive characters?). In these cases, a callable can be passed instead of a value.
 This callable will be called with the current value, and is expected to return the next possible value.
 
 ```python
@@ -586,9 +560,7 @@ This callable will be called with the current value, and is expected to return t
 [&uparrow; back to top](#table-of-contents)
 ### Map intervals to data
 
-The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data
-along with intervals. Any value can be stored in such data structure as long as it supports
-equality.
+The library provides an `IntervalDict` class, a `dict`-like data structure to store and query data along with intervals. Any value can be stored in such data structure as long as it supports equality.
 
 
 ```python
@@ -600,8 +572,7 @@ equality.
 
 ```
 
-When a value is defined for an interval that overlaps an existing one, it is automatically updated
-to take the new value into account:
+When a value is defined for an interval that overlaps an existing one, it is automatically updated to take the new value into account:
 
 ```python
 >>> d[P.closed(2, 4)] = 'orange'
@@ -610,8 +581,7 @@ to take the new value into account:
 
 ```
 
-An `IntervalDict` can be queried using single values or intervals. If a single value is used as a
-key, its behaviour corresponds to the one of a classical `dict`:
+An `IntervalDict` can be queried using single values or intervals. If a single value is used as a key, its behaviour corresponds to the one of a classical `dict`:
 
 ```python
 >>> d[2]
@@ -625,8 +595,7 @@ KeyError: 5
 
 ```
 
-When the key is an interval, a new `IntervalDict` containing the values
-for the specified key is returned:
+When the key is an interval, a new `IntervalDict` containing the values for the specified key is returned:
 
 ```python
 >>> d[~P.empty()]  # Get all values, similar to d.copy()
@@ -641,8 +610,7 @@ for the specified key is returned:
 ```
 
 By using `.get`, a default value (defaulting to `None`) can be specified.
-This value is used to "fill the gaps" if the queried interval is not completely
-covered by the `IntervalDict`:
+This value is used to "fill the gaps" if the queried interval is not completely covered by the `IntervalDict`:
 
 ```python
 >>> d.get(P.closed(-2, 1), default='peach')
@@ -655,8 +623,7 @@ covered by the `IntervalDict`:
 ```
 
 For convenience, an `IntervalDict` provides a way to look for specific data values.
-The `.find` method always returns a (possibly empty) `Interval` instance for which given
-value is defined:
+The `.find` method always returns a (possibly empty) `Interval` instance for which given value is defined:
 
 ```python
 >>> d.find('banana')
@@ -708,9 +675,7 @@ The values corresponding to intersecting keys (i.e., when the two instances over
 
 ```
 
-The `combine` method also accepts a `missing` parameter. When `missing` is set,
-the `how` function is called even for non-intersecting keys, using the value of
-`missing` to replace the missing values:
+The `combine` method also accepts a `missing` parameter. When `missing` is set, the `how` function is called even for non-intersecting keys, using the value of `missing` to replace the missing values:
 
 ```python
 >>> d1.combine(d2, how=concat, missing='kiwi')
@@ -718,8 +683,7 @@ the `how` function is called even for non-intersecting keys, using the value of
 
 ```
 
-Resulting keys always correspond to an outer join. Other joins can be easily simulated
-by querying the resulting `IntervalDict` as follows:
+Resulting keys always correspond to an outer join. Other joins can be easily simulated by querying the resulting `IntervalDict` as follows:
 
 ```python
 >>> d = d1.combine(d2, how=concat)
@@ -734,10 +698,9 @@ by querying the resulting `IntervalDict` as follows:
 
 While `.combine` accepts a single `IntervalDict`, it can be generalized to support an arbitrary number of `IntervalDicts`, as illustrated in [#95](https://github.com/AlexandreDecan/portion/issues/95#issuecomment-2351435891).
 
-Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
-`.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
-For convenience, one can export the content of an `IntervalDict` to a classical Python `dict` using
-the `as_dict` method. This method accepts an optional `atomic` parameter (whose default is `False`). When set to `True`, the keys of the resulting `dict` instance are atomic intervals.
+Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines `.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.
+For convenience, one can export the content of an `IntervalDict` to a classical Python `dict` using the `as_dict` method. This method accepts an optional `atomic` parameter (whose default is `False`).
+When set to `True`, the keys of the resulting `dict` instance are atomic intervals.
 
 
 [&uparrow; back to top](#table-of-contents)
@@ -751,8 +714,7 @@ Intervals can be exported to string, either using `repr` (as illustrated above) 
 
 ```
 
-The way string representations are built can be easily parametrized using the various parameters supported by
-`to_string`:
+The way string representations are built can be easily parametrized using the various parameters supported by `to_string`:
 
 ```python
 >>> params = {
@@ -807,8 +769,7 @@ Notice that as `from_string` expects regular expression patterns, we need to esc
 
 ```
 
-When a bound contains a comma or has a representation that cannot be automatically parsed with `from_string`,
-the `bound` parameter can be used to specify the regular expression that should be used to match its representation.
+When a bound contains a comma or has a representation that cannot be automatically parsed with `from_string`, the `bound` parameter can be used to specify the regular expression that should be used to match its representation.
 
 ```python
 >>> s = '[(0, 1), (2, 3)]'  # Bounds are expected to be tuples
@@ -830,8 +791,7 @@ Intervals can also be exported to a list of 4-uples with `to_data`, e.g., to sup
 
 ```
 
-The values used to represent positive and negative infinities can be specified with
-`pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
+The values used to represent positive and negative infinities can be specified with `pinf` and `ninf`. They default to `float('inf')` and `float('-inf')` respectively.
 
 ```python
 >>> x = P.openclosed(0, 1) | P.closedopen(2, P.inf)
