@@ -684,7 +684,7 @@ This method always returns a single `Interval` instance, where `.keys` returns a
 ```
 
 The `.keys`, `.values` and `.items` methods return exactly one element for each stored value (i.e., if two intervals share a value, they are merged into a disjunction), as illustrated next.
-See [#44](https://github.com/AlexandreDecan/portion/issues/44#issuecomment-710199687) to know how to obtained a sorted list of atomic intervals instead.
+See [#44](https://github.com/AlexandreDecan/portion/issues/44#issuecomment-710199687) to know how to obtain a sorted list of atomic intervals instead.
 
 ```python
 >>> d = P.IntervalDict()
@@ -695,13 +695,9 @@ See [#44](https://github.com/AlexandreDecan/portion/issues/44#issuecomment-71019
 ```
 
 
-Two `IntervalDict` instances can be combined together using the `.combine` method.
-This method returns a new `IntervalDict` whose keys and values are taken from the two
-source `IntervalDict`.
-The values corresponding to intersecting keys (i.e., when the two instances overlap)
-are combined using the provided `how` function, while values corresponding to
-non-intersecting keys are simply copied (i.e., the `how` function is not called
-for them), as illustrated hereafter:
+Two `IntervalDict` instances can be combined using the `.combine` method.
+This method returns a new `IntervalDict` whose keys and values are taken from the two source `IntervalDict`.
+The values corresponding to intersecting keys (i.e., when the two instances overlap) are combined using the provided `how` function, while values corresponding to non-intersecting keys are simply copied (i.e., the `how` function is not called for them), as illustrated hereafter:
 
 ```python
 >>> d1 = P.IntervalDict({P.closed(0, 2): 'banana'})
@@ -736,7 +732,7 @@ by querying the resulting `IntervalDict` as follows:
 
 ```
 
-
+While `.combine` accepts a single `IntervalDict`, it can be generalized to support an arbitrary number of `IntervalDicts`, as illustrated in [#95](https://github.com/AlexandreDecan/portion/issues/95#issuecomment-2351435891).
 
 Finally, similarly to a `dict`, an `IntervalDict` also supports `len`, `in` and `del`, and defines
 `.clear`, `.copy`, `.update`, `.pop`, `.popitem`, and `.setdefault`.

@@ -4,7 +4,8 @@
 ## Next release (2.5.0)
 
 ### Added
- - The `combine` method of an `IntervalDict` accepts a `missing` parameter to fill values for non-overlapping keys (see [#95](https://github.com/AlexandreDecan/portion/issues/95)).
+ - The `combine` method of an `IntervalDict` accepts a `missing` parameter to fill values for non-overlapping keys (see [#96](https://github.com/AlexandreDecan/portion/issues/96)).
+ - A recipe to `combine` more than two `IntervalDict` (see [#95](https://github.com/AlexandreDecan/portion/issues/95#issuecomment-2351435891)).
 
 ### Changed
  - Drop official support for Python 3.7.
