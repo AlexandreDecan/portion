@@ -1,7 +1,7 @@
 # Changelog
 
 
-## Next release (2.5.0)
+## 2.5.0 (2024-09-18)
 
 ### Added
  - The `combine` method of an `IntervalDict` accepts a `missing` parameter to fill values for non-overlapping keys (see [#96](https://github.com/AlexandreDecan/portion/issues/96)).
