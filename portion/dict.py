@@ -218,7 +218,7 @@ class IntervalDict(MutableMapping):
         for i, v in data:
             self[i] = v
 
-    def combine(self, other, how, *, missing=...):
+    def combine(self, other, how, *, missing=..., pass_interval=False):
         """
         Return a new IntervalDict that combines the values from current and
         provided IntervalDict.
@@ -232,12 +232,21 @@ class IntervalDict(MutableMapping):
         keys using the value of missing to replace the missing values. This is,
         case (1) corresponds to f(x, missing) and case (2) to f(missing, y).
 
+        If pass_interval is set to True, the current interval will be passed to
+        the "how" function as third parameter.
+
         :param other: another IntervalDict instance.
-        :param how: a function of two parameters that combines values.
+        :param how: a function combining two values.
         :param missing: if set, use this value for missing values when calling "how".
+        :param pass_interval: if set, provide the current interval to the "how" function.
         :return: a new IntervalDict instance.
         """
         new_items = []
+
+        if not pass_interval:
+            _how = lambda x, y, i: how(x, y)
+        else:
+            _how = how
 
         dom1, dom2 = self.domain(), other.domain()
 
@@ -246,9 +255,9 @@ class IntervalDict(MutableMapping):
             new_items.extend(other[dom2 - dom1].items())
         else:
             for i, v in self[dom1 - dom2].items():
-                new_items.append((i, how(v, missing)))
+                new_items.append((i, _how(v, missing, i)))
             for i, v in other[dom2 - dom1].items():
-                new_items.append((i, how(missing, v)))
+                new_items.append((i, _how(missing, v, i)))
 
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]
@@ -257,7 +266,7 @@ class IntervalDict(MutableMapping):
             for i2, v2 in d2.items():
                 if i1.overlaps(i2):
                     i = i1 & i2
-                    v = how(v1, v2)
+                    v = _how(v1, v2, i)
                     new_items.append((i, v))
 
         return self.__class__(new_items)
