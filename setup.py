@@ -9,7 +9,7 @@ with open(
 
 setup(
     name="portion",
-    version="2.5.0",
+    version="2.6.0",
     license="LGPLv3",
     author="Alexandre Decan",
     url="https://github.com/AlexandreDecan/portion",
@@ -31,6 +31,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
     keywords="interval operation range math",
     packages=find_packages(include=["portion"]),
