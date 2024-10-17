@@ -205,6 +205,17 @@ class TestIntervalDict:
             (P.openclosed(3, 4), 5)
         ])
 
+    def test_combine_pass_interval(self):
+        def how(x, y, z): return x, y, z
+
+        d1 = P.IntervalDict([(P.closed(1, 3), 1)])
+        d2 = P.IntervalDict([(P.closed(2, 4), 2)])
+
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict([
+            (P.closedopen(1, 2), 1),
+            (P.closed(2, 3), (1, 2, P.closed(2, 3))),
+            (P.openclosed(3, 4), 2)
+        ])
 
     def test_containment(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
