@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.0 (2024-10-17)
+
+### Added
+ - The `how` function of `combine` can access the current interval if `pass_interval` is set (see [#97](https://github.com/AlexandreDecan/portion/issues/97)).
+
+
 
 ## 2.5.0 (2024-09-18)
 
