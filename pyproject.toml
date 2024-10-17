@@ -1,9 +1,40 @@
 [build-system]
-requires = [
-  "setuptools >= 40.9.0",
-  "wheel",
-]
+requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.black]
-force-exclude = 'tests/'
+[project]
+name = "portion"
+version = "2.6.1"
+license = { text = "LGPLv3" }
+authors = [{ name = "Alexandre Decan", email = "alexandre.decan@lexpage.net" }]
+description = "Python data structure and operations for intervals"
+readme = { file = "README.md", content-type = "text/markdown" }
+urls = { Homepage = "https://github.com/AlexandreDecan/portion" }
+keywords = ["interval", "range", "span"]
+requires-python = "~= 3.9"
+dependencies = ["sortedcontainers ~= 2.2"]
+classifiers = [
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.optional-dependencies]
+test = ["pytest ~= 7.0", "coverage ~= 6.0", "ruff >= 0.6.9"]
+
+[tool.ruff]
+extend-exclude = ["tests/"]
+
+[tool.setuptools]
+packages = ["portion"]

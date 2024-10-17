@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.6.1 (not yet released)
+
+### Changed
+ - Switch from `black` to `ruff` for code style.
+ - Fully migrate to a `pyproject.toml`-based project.
+ - Drop official support for Python 3.8.
+
+
 ## 2.6.0 (2024-10-17)
 
 ### Added

@@ -244,10 +244,11 @@ class IntervalDict(MutableMapping):
         new_items = []
 
         if not pass_interval:
-            _how = lambda x, y, i: how(x, y)
+
+            def _how(x, y, i):
+                return how(x, y)
         else:
             _how = how
-
         dom1, dom2 = self.domain(), other.domain()
 
         if missing is Ellipsis:

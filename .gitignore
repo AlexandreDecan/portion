@@ -1,10 +1,4 @@
 *__pycache__*
+.*
 *.pyc
 *.egg-info*
-.coverage
-.mypy_cache
-.idea
-.vscode
-.pytest_cache
-.hypothesis
-perfs.py

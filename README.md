@@ -46,7 +46,7 @@ You can use `pip` to install it, as usual: `pip install portion`. This will inst
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion) and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 Note that `portion` is also available on [conda-forge](https://anaconda.org/conda-forge/portion).
 
-You can install `portion` and its development environment using `pip install -e .[test]` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [black](https://black.readthedocs.io/en/stable/) (for code formatting).
+You can install `portion` and its development environment using `pip install -e .[test]` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [ruff](https://docs.astral.sh/ruff/) (for code style).
 
 
 ## Documentation & usage

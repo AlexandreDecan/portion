@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -29,7 +29,9 @@ jobs:
       - name: Install test dependencies
         run: pip install .[test]
       - name: Check code style
-        run: black --check portion
+        run: |
+          ruff check --output-format=github
+          ruff format --check
       - name: Execute tests
         run: coverage run --source portion -m pytest
       - name: Upload coverage to Coveralls
