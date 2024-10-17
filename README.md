@@ -675,6 +675,7 @@ The values corresponding to intersecting keys (i.e., when the two instances over
 
 ```
 
+The `how` function can also receive the current intersecting key as third parameter, by enabling the `pass_interval` parameter of `.combine`.
 The `combine` method also accepts a `missing` parameter. When `missing` is set, the `how` function is called even for non-intersecting keys, using the value of `missing` to replace the missing values:
 
 ```python
