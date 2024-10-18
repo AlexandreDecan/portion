@@ -2,6 +2,9 @@
 
 ## 2.6.1 (not yet released)
 
+### Added
+ - Add a `__version__` attribute relying on `importlib.metadata`.
+
 ### Changed
  - Switch from `black` to `ruff` for code style.
  - Fully migrate to a `pyproject.toml`-based project.
