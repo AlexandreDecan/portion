@@ -1,8 +1,7 @@
 import warnings
-
 from collections import namedtuple
-from .const import Bound, inf
 
+from .const import Bound, inf
 
 Atomic = namedtuple("Atomic", ["left", "lower", "upper", "right"])
 
@@ -41,7 +40,7 @@ class Interval:
 
         :param intervals: zero, one or more intervals.
         """
-        self._intervals = list()
+        self._intervals = []
 
         for interval in intervals:
             if isinstance(interval, Interval):
@@ -283,9 +282,7 @@ class Interval:
             elif isinstance(value, tuple):
                 intervals.append(self.__class__.from_atomic(*value))
             else:
-                raise TypeError(
-                    "Unsupported return type {} for {}".format(type(value), value)
-                )
+                raise TypeError(f"Unsupported return type {type(value)} for {value}")
 
         return self.__class__(*intervals)
 
@@ -332,7 +329,7 @@ class Interval:
                     return True
             return False
         else:
-            raise TypeError("Unsupported type {} for {}".format(type(other), other))
+            raise TypeError(f"Unsupported type {type(other)} for {other}")
 
     def intersection(self, other):
         """
@@ -453,7 +450,7 @@ class Interval:
                         # i_current can still intersect next o
                         o_current = next(o_iter, None)
                     else:
-                        assert False
+                        raise AssertionError()
 
             return self.__class__(*intersections)
 
@@ -557,7 +554,8 @@ class Interval:
                 return self.upper < other.lower
         else:
             warnings.warn(
-                "Comparing an interval and a value is deprecated. Convert value to singleton first.",
+                "Comparing an interval and a value is deprecated. "
+                "Convert value to singleton first.",
                 DeprecationWarning,
             )
             return not self.empty and (
@@ -575,7 +573,8 @@ class Interval:
                 return self.lower > other.upper
         else:
             warnings.warn(
-                "Comparing an interval and a value is deprecated. Convert value to singleton first.",
+                "Comparing an interval and a value is deprecated. "
+                "Convert value to singleton first.",
                 DeprecationWarning,
             )
             return not self.empty and (
@@ -593,7 +592,8 @@ class Interval:
                 return self.upper < other.upper
         else:
             warnings.warn(
-                "Comparing an interval and a value is deprecated. Convert value to singleton first.",
+                "Comparing an interval and a value is deprecated. "
+                "Convert value to singleton first.",
                 DeprecationWarning,
             )
             return not self.empty and self.upper <= other
@@ -609,13 +609,14 @@ class Interval:
                 return self.lower > other.lower
         else:
             warnings.warn(
-                "Comparing an interval and a value is deprecated. Convert value to singleton first.",
+                "Comparing an interval and a value is deprecated. "
+                "Convert value to singleton first.",
                 DeprecationWarning,
             )
             return not self.empty and self.lower >= other
 
     def __hash__(self):
-        return hash(tuple([self.lower, self.upper]))
+        return hash((self.lower, self.upper))
 
     def __repr__(self):
         if self.empty:

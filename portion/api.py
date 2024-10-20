@@ -1,13 +1,12 @@
 import functools
 import importlib
-import importlib.util
 import importlib.machinery
+import importlib.util
 
 from .const import Bound, inf
-from .func import iterate, open, closed, openclosed, closedopen, empty, singleton
-from .io import from_string, to_string, from_data, to_data
 from .dict import IntervalDict
-
+from .func import closed, closedopen, empty, iterate, open, openclosed, singleton
+from .io import from_data, from_string, to_data, to_string
 
 __all__ = ["create_api"]
 
@@ -23,7 +22,8 @@ def partial(wrapped, *args, **kwargs):
 
 
 def create_api(interval, *, interval_dict=None, name=None):
-    """
+    """Create a spe
+
     Dynamically create a module whose API is similar to the one of portion, but
     configured to use given Interval class. Unless specified, a new IntervalDict
     subclass is automatically generated to use given Interval subclass.
@@ -35,16 +35,13 @@ def create_api(interval, *, interval_dict=None, name=None):
     :param interval_dict: a subclass of IntervalDict.
     :param name: the name of the new module.
     """
-    if name is None:
-        module_name = "portion_" + interval.__name__
-    else:
-        module_name = name
+    module_name = "portion_" + interval.__name__ if name is None else name
 
     if interval_dict is None:
         interval_dict = type(
             interval.__name__ + "Dict",
             (IntervalDict,),
-            dict(_klass=interval),
+            {"_klass": interval},
         )
 
     objects = {
@@ -70,7 +67,7 @@ def create_api(interval, *, interval_dict=None, name=None):
         importlib.machinery.ModuleSpec(module_name, None)
     )
 
-    module.__all__ = list(objects.keys())
+    # module.__all__ = list(objects.keys())
     for name, obj in objects.items():
         setattr(module, name, obj)
 

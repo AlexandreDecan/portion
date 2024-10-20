@@ -41,12 +41,10 @@ def from_string(
     :return: an interval.
     """
 
-    re_left_boundary = r"(?P<left>{}|{})".format(left_open, left_closed)
-    re_right_boundary = r"(?P<right>{}|{})".format(right_open, right_closed)
-    re_bounds = r"(?P<lower>{bound})({sep}(?P<upper>{bound}))?".format(
-        bound=bound, sep=sep
-    )
-    re_interval = r"{}(|{}){}".format(re_left_boundary, re_bounds, re_right_boundary)
+    re_left_boundary = rf"(?P<left>{left_open}|{left_closed})"
+    re_right_boundary = rf"(?P<right>{right_open}|{right_closed})"
+    re_bounds = rf"(?P<lower>{bound})({sep}(?P<upper>{bound}))?"
+    re_interval = rf"{re_left_boundary}(|{re_bounds}){re_right_boundary}"
 
     intervals = []
     has_more = True
@@ -63,7 +61,7 @@ def from_string(
     while has_more:
         match = re.match(re_interval, string)
         if match is None:
-            raise ValueError('"{}" cannot be parsed to an interval.'.format(source))
+            raise ValueError(f'"{source}" cannot be parsed to an interval.')
 
         # Parse atomic interval
         group = match.groupdict()
@@ -86,7 +84,7 @@ def from_string(
         if len(string) > 0:
             match = re.match(disj, string)
             if match is None:
-                raise ValueError('"{}" cannot be parsed to an interval.'.format(source))
+                raise ValueError(f'"{source}" cannot be parsed to an interval.')
             else:
                 string = string[match.end() :]
         else:

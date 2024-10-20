@@ -3,12 +3,13 @@
 ## 2.6.1 (not yet released)
 
 ### Added
- - Add a `__version__` attribute relying on `importlib.metadata`.
+ - A `__version__` attribute relying on `importlib.metadata`.
 
 ### Changed
+ - Drop official support for Python 3.8.
  - Switch from `black` to `ruff` for code style.
  - Fully migrate to a `pyproject.toml`-based project.
- - Drop official support for Python 3.8.
+ - Ensure code style consistency (see selected rules in `pyproject.toml`).
 
 
 ## 2.6.0 (2024-10-17)

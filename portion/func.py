@@ -1,8 +1,8 @@
 import operator
-
 from functools import partial
-from .interval import Interval
+
 from .const import Bound, inf
+from .interval import Interval
 
 
 def open(lower, upper, *, klass=Interval):

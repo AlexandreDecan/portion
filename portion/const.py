@@ -27,7 +27,7 @@ class _Singleton:
 
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
-            cls.__instance = super(_Singleton, cls).__new__(cls)
+            cls.__instance = super().__new__(cls)
         return cls.__instance
 
 

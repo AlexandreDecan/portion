@@ -1,5 +1,8 @@
+import contextlib
+from collections.abc import Mapping, MutableMapping
+
 from sortedcontainers import SortedDict
-from collections.abc import MutableMapping, Mapping
+
 from .const import Bound
 from .interval import Interval
 
@@ -11,19 +14,20 @@ def _sortkey(i):
 
 class IntervalDict(MutableMapping):
     """
-    An IntervalDict is a dict-like data structure that maps from intervals to data,
-    where keys can be single values or Interval instances.
+    An IntervalDict is a dict-like data structure that maps from intervals to data,where
+    keys can be single values or Interval instances.
 
-    When keys are Interval instances, its behaviour merely corresponds to
-    range queries and it returns IntervalDict instances corresponding to the
-    subset of values covered by the given interval. If no matching value is
-    found, an empty IntervalDict is returned.
+    When keys are Interval instances, its behaviour merely corresponds to range queries
+    and it returns IntervalDict instances corresponding to the subset of values covered
+    by the given interval. If no matching value is found, an empty IntervalDict is
+    returned.
+
     When keys are "single values", its behaviour corresponds to the one of Python
-    built-in dict. When no matchin value is found, a KeyError is raised.
+    built-in dict. When no matching value is found, a KeyError is raised.
 
-    Note that this class does not aim to have the best performance, but is
-    provided mainly for convenience. Its performance mainly depends on the
-    number of distinct values (not keys) that are stored.
+    Note that this class does not aim to have the best performance, but is provided
+    mainly for convenience. Its performance mainly depends on the number of distinct
+    values (not keys) that are stored.
     """
 
     __slots__ = ("_storage",)
@@ -165,10 +169,8 @@ class IntervalDict(MutableMapping):
             return value
         else:
             value = self.get(key, default)
-            try:
+            with contextlib.suppress(KeyError):
                 del self[key]
-            except KeyError:
-                pass
             return value
 
     def popitem(self):
@@ -238,7 +240,7 @@ class IntervalDict(MutableMapping):
         :param other: another IntervalDict instance.
         :param how: a function combining two values.
         :param missing: if set, use this value for missing values when calling "how".
-        :param pass_interval: if set, provide the current interval to the "how" function.
+        :param pass_interval: if set, provide the current interval to the how function.
         :return: a new IntervalDict instance.
         """
         new_items = []
@@ -280,7 +282,7 @@ class IntervalDict(MutableMapping):
         :return: a Python dict.
         """
         if atomic:
-            d = dict()
+            d = {}
             for interval, v in self._storage.items():
                 for i in interval:
                     d[i] = v
@@ -399,10 +401,8 @@ class IntervalDict(MutableMapping):
         return key in self.domain()
 
     def __repr__(self):
-        return "{}{}{}".format(
-            "{",
-            ", ".join("{!r}: {!r}".format(i, v) for i, v in self.items()),
-            "}",
+        return "{{{}}}".format(
+            ", ".join(f"{i!r}: {v!r}" for i, v in self.items()),
         )
 
     def __eq__(self, other):
