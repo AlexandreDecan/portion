@@ -9,7 +9,7 @@ from collections.abc import (
     Mapping,
     MutableMapping,
 )
-from typing import Generic, Protocol, TypeVar, cast, overload, override
+from typing import Generic, Protocol, TypeVar, cast, overload
 
 from sortedcontainers import SortedDict
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
@@ -97,7 +97,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
 
         return d
 
-    @override
     def clear(self):
         """
         Remove all items from the IntervalDict.
@@ -120,7 +119,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         self, key: Interval, default: V | None = None
     ) -> "IntervalDict[V] | None": ...
 
-    @override
     def get(
         self, key: object | Interval, default: V | None = None
     ) -> "IntervalDict[V]" | V | None:
@@ -165,7 +163,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
             ),
         )
 
-    @override
     def items(self) -> ItemsView[Interval, V]:
         """
         Return a view object on the contained items sorted by their key
@@ -175,7 +172,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         """
         return self._storage.items()
 
-    @override
     def keys(self) -> KeysView[Interval]:
         """
         Return a view object on the contained keys (sorted)
@@ -185,7 +181,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         """
         return self._storage.keys()
 
-    @override
     def values(self) -> ValuesView[V]:
         """
         Return a view object on the contained values sorted by their key
@@ -209,7 +204,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
     @overload
     def pop(self, key: object, default: V | None = None) -> V | None: ...
 
-    @override
     def pop(
         self, key: object, default: V | None = None
     ) -> "IntervalDict[V]" | V | None:
@@ -235,7 +229,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
                 del self[key]
             return value
 
-    @override
     def popitem(self) -> tuple[Interval, V]:
         """
         Remove and return some (key, value) pair as a 2-tuple.
@@ -253,7 +246,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
     @overload
     def setdefault(self, key: object, default: V | None = None) -> V: ...
 
-    @override
     def setdefault(
         self, key: object, default: V | None = None
     ) -> V | "IntervalDict[V]" | None:
@@ -278,7 +270,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
                     self[key] = default
                 return default
 
-    @override
     def update(
         self,
         mapping_or_iterable: Mapping[object, V]
@@ -387,7 +378,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
     @overload
     def __getitem__(self, key: object) -> V: ...
 
-    @override
     def __getitem__(self, key: object | Interval) -> V | "IntervalDict[V]":
         if isinstance(key, Interval):
             items = []
@@ -409,7 +399,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
                     return v
             raise KeyError(key)
 
-    @override
     def __setitem__(self, key: object | Interval, value: V | None):
         if isinstance(key, Interval):
             interval = key
@@ -448,7 +437,6 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         for key, value in added_items:
             self._storage[key] = value
 
-    @override
     def __delitem__(self, key: object | Interval):
         if isinstance(key, Interval):
             interval = key
@@ -493,25 +481,20 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         self.update(other)
         return self
 
-    @override
     def __iter__(self) -> Iterator[object]:
         return iter(self._storage)
 
-    @override
     def __len__(self) -> int:
         return len(self._storage)
 
-    @override
     def __contains__(self, key: object) -> bool:
         return key in self.domain()
 
-    @override
     def __repr__(self):
         return "{{{}}}".format(
             ", ".join(f"{i!r}: {v!r}" for i, v in self.items()),
         )
 
-    @override
     def __eq__(self, other: object) -> bool:
         if isinstance(other, IntervalDict):
             return self.as_dict() == other.as_dict()
