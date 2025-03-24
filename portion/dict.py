@@ -305,8 +305,7 @@ class IntervalDict[V](MutableMapping[object, V]):
     def combine(
         self,
         other: "IntervalDict[V]",
-        how: HowToCombineSingle
-        | HowToCombineWithInterval,  # Callable[[V, V], V] | Callable[[V, V, Interval], V],
+        how: HowToCombineSingle | HowToCombineWithInterval,
         *,
         missing: V = ...,
         pass_interval: bool = False,
