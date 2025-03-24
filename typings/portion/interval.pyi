@@ -13,7 +13,6 @@ def mergeable(a, b):
     :param b: an atomic interval.
     :return: True if mergeable, False otherwise.
     """
-    ...
 
 class Interval:
     """
@@ -32,7 +31,6 @@ class Interval:
 
         :param intervals: zero, one or more intervals.
         """
-        ...
 
     @classmethod
     def from_atomic(cls, left, lower, upper, right):  # -> Self:
@@ -44,42 +42,36 @@ class Interval:
         :param upper: value of the upper bound.
         :param right: either CLOSED or OPEN.
         """
-        ...
 
     @property
     def left(self):  # -> Literal[Bound.OPEN]:
         """
         Lowest left boundary is either CLOSED or OPEN.
         """
-        ...
 
     @property
     def lower(self):  # -> _PInf:
         """
         Lowest lower bound value.
         """
-        ...
 
     @property
     def upper(self):  # -> _NInf:
         """
         Highest upper bound value.
         """
-        ...
 
     @property
     def right(self):  # -> Literal[Bound.OPEN]:
         """
         Highest right boundary is either CLOSED or OPEN.
         """
-        ...
 
     @property
     def empty(self):  # -> bool:
         """
         True if interval is empty, False otherwise.
         """
-        ...
 
     @property
     def atomic(self):  # -> bool:
@@ -87,7 +79,6 @@ class Interval:
         True if this interval is atomic, False otherwise.
         An interval is atomic if it is empty or composed of a single interval.
         """
-        ...
 
     @property
     def enclosure(self):  # -> Self:
@@ -97,7 +88,6 @@ class Interval:
 
         :return: an Interval instance.
         """
-        ...
 
     def replace(
         self, left=..., lower=..., upper=..., right=..., *, ignore_inf=...
@@ -121,7 +111,6 @@ class Interval:
             is True).
         :return: an Interval instance
         """
-        ...
 
     def apply(self, func):  # -> Self:
         """
@@ -137,7 +126,6 @@ class Interval:
         :param func: function to apply on each underlying atomic interval.
         :return: an Interval instance.
         """
-        ...
 
     def adjacent(self, other):
         """
@@ -154,7 +142,6 @@ class Interval:
         :param other: an interval.
         :return: True if intervals are adjacent, False otherwise.
         """
-        ...
 
     def overlaps(self, other):  # -> bool:
         """
@@ -163,7 +150,6 @@ class Interval:
         :param other: an interval.
         :return: True if intervals overlap, False otherwise.
         """
-        ...
 
     def intersection(self, other):
         """
@@ -172,7 +158,6 @@ class Interval:
         :param other: an interval.
         :return: the intersection of the intervals.
         """
-        ...
 
     def union(self, other):
         """
@@ -181,7 +166,6 @@ class Interval:
         :param other: an interval.
         :return: the union of the intervals.
         """
-        ...
 
     def contains(self, item):  # -> bool:
         """
@@ -191,7 +175,6 @@ class Interval:
         :param item: an interval or any arbitrary comparable value.
         :return: True if given item is contained, False otherwise.
         """
-        ...
 
     def complement(self):  # -> Interval:
         """
@@ -199,7 +182,6 @@ class Interval:
 
         :return: the complement of this interval.
         """
-        ...
 
     def difference(self, other):
         """
@@ -208,7 +190,6 @@ class Interval:
         :param other: an interval.
         :return: the difference of the intervals.
         """
-        ...
 
     def __getattr__(self, name):  # -> None:
         ...
