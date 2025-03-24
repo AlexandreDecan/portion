@@ -1,18 +1,40 @@
+# pyright: reportIncompatibleMethodOverride=false
+# pyright: reportMissingTypeStubs=false
+
 import contextlib
-from collections.abc import Mapping, MutableMapping
+from collections.abc import (
+    Callable,
+    Collection,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
+from types import UnionType
+from typing import Protocol, cast, overload, override
 
 from sortedcontainers import SortedDict
+from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
 
 from .const import Bound
 from .interval import Interval
 
 
-def _sortkey(i):
+def _sortkey(i: tuple[Interval, object]) -> tuple[object, bool]:
     # Sort by lower bound, closed first
     return (i[0].lower, i[0].left is Bound.OPEN)
 
 
-class IntervalDict(MutableMapping):
+class HowToCombineSingle[V](Protocol):
+    def __call__(self, x: V, y: V) -> V: ...
+
+
+class HowToCombineWithInterval[V](Protocol):
+    def __call__(self, x: V, y: V, i: Interval) -> V: ...
+
+
+class IntervalDict[V](MutableMapping[object, V]):
     """
     An IntervalDict is a dict-like data structure that maps from intervals to data,where
     keys can be single values or Interval instances.
@@ -30,12 +52,17 @@ class IntervalDict(MutableMapping):
     values (not keys) that are stored.
     """
 
-    __slots__ = ("_storage",)
+    __slots__: tuple[str, ...] = ("_storage",)
 
     # Class to use when creating Interval instances
-    _klass = Interval
+    _klass: type = Interval
 
-    def __init__(self, mapping_or_iterable=None):
+    def __init__(
+        self,
+        mapping_or_iterable: Mapping[object, V]
+        | Iterable[tuple[object, V]]
+        | None = None,
+    ):
         """
         Return a new IntervalDict.
 
@@ -46,13 +73,15 @@ class IntervalDict(MutableMapping):
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
-        self._storage = SortedDict(_sortkey)  # Mapping from intervals to values
+        self._storage: SortedDict = SortedDict(
+            _sortkey
+        )  # Mapping from intervals to values
 
         if mapping_or_iterable is not None:
             self.update(mapping_or_iterable)
 
     @classmethod
-    def _from_items(cls, items):
+    def _from_items(cls, items: Collection[tuple[object, V]]):
         """
         Fast creation of an IntervalDict with the provided items.
 
@@ -68,6 +97,7 @@ class IntervalDict(MutableMapping):
 
         return d
 
+    @override
     def clear(self):
         """
         Remove all items from the IntervalDict.
@@ -82,7 +112,18 @@ class IntervalDict(MutableMapping):
         """
         return self.__class__._from_items(self.items())
 
-    def get(self, key, default=None):
+    @overload
+    def get(self, key: object, default: V = None) -> V | None: ...
+
+    @overload
+    def get(
+        self, key: Interval, default: V | None = None
+    ) -> "IntervalDict[V] | None": ...
+
+    @override
+    def get(
+        self, key: object | Interval, default: V | None = None
+    ) -> "IntervalDict[V]" | V | None:
         """
         Return the values associated to given key.
 
@@ -97,7 +138,8 @@ class IntervalDict(MutableMapping):
         """
         if isinstance(key, Interval):
             d = self[key]
-            d[key - d.domain()] = default
+            if default is not None:
+                d[key - d.domain()] = default
             return d
         else:
             try:
@@ -105,7 +147,7 @@ class IntervalDict(MutableMapping):
             except KeyError:
                 return default
 
-    def find(self, value):
+    def find(self, value: V) -> Interval:
         """
         Return a (possibly empty) Interval i such that self[i] = value, and
         self[~i] != value.
@@ -113,9 +155,19 @@ class IntervalDict(MutableMapping):
         :param value: value to look for.
         :return: an Interval instance.
         """
-        return self._klass(*(i for i, v in self._storage.items() if v == value))
+        return cast(
+            Interval,
+            self._klass(
+                *(
+                    i
+                    for i, v in cast(ItemsView[Interval, V], self._storage.items())
+                    if v == value
+                )
+            ),
+        )
 
-    def items(self):
+    @override
+    def items(self) -> ItemsView[Interval, V]:
         """
         Return a view object on the contained items sorted by their key
         (see https://docs.python.org/3/library/stdtypes.html#dict-views).
@@ -124,7 +176,8 @@ class IntervalDict(MutableMapping):
         """
         return self._storage.items()
 
-    def keys(self):
+    @override
+    def keys(self) -> KeysView[Interval]:
         """
         Return a view object on the contained keys (sorted)
         (see https://docs.python.org/3/library/stdtypes.html#dict-views).
@@ -133,7 +186,8 @@ class IntervalDict(MutableMapping):
         """
         return self._storage.keys()
 
-    def values(self):
+    @override
+    def values(self) -> ValuesView[V]:
         """
         Return a view object on the contained values sorted by their key
         (see https://docs.python.org/3/library/stdtypes.html#dict-views).
@@ -142,15 +196,24 @@ class IntervalDict(MutableMapping):
         """
         return self._storage.values()
 
-    def domain(self):
+    def domain(self) -> Interval:
         """
         Return an Interval corresponding to the domain of this IntervalDict.
 
         :return: an Interval.
         """
-        return self._klass(*self._storage.keys())
+        return cast(Interval, self._klass(*self._storage.keys()))
 
-    def pop(self, key, default=None):
+    @overload
+    def pop(self, key: Interval, default: V | None = None) -> "IntervalDict[V]": ...
+
+    @overload
+    def pop(self, key: object, default: V | None = None) -> V | None: ...
+
+    @override
+    def pop(
+        self, key: object, default: V | None = None
+    ) -> "IntervalDict[V]" | V | None:
         """
         Remove key and return the corresponding value if key is not an Interval.
         If key is an interval, it returns an IntervalDict instance.
@@ -173,16 +236,28 @@ class IntervalDict(MutableMapping):
                 del self[key]
             return value
 
-    def popitem(self):
+    @override
+    def popitem(self) -> tuple[Interval, V]:
         """
         Remove and return some (key, value) pair as a 2-tuple.
         Raise KeyError if D is empty.
 
         :return: a (key, value) pair.
         """
-        return self._storage.popitem()
+        return cast(tuple[Interval, V], self._storage.popitem())
 
-    def setdefault(self, key, default=None):
+    @overload
+    def setdefault(
+        self, key: Interval, default: V | None = None
+    ) -> "IntervalDict[V]": ...
+
+    @overload
+    def setdefault(self, key: object, default: V | None = None) -> V: ...
+
+    @override
+    def setdefault(
+        self, key: object, default: V | None = None
+    ) -> V | "IntervalDict[V]" | None:
         """
         Return given key. If it does not exist, set its value to given default
         and return it.
@@ -193,16 +268,24 @@ class IntervalDict(MutableMapping):
         """
         if isinstance(key, Interval):
             value = self.get(key, default)
-            self.update(value)
+            if value is not None:
+                self.update(value)
             return value
         else:
             try:
                 return self[key]
             except KeyError:
-                self[key] = default
+                if default is not None:
+                    self[key] = default
                 return default
 
-    def update(self, mapping_or_iterable):
+    @override
+    def update(
+        self,
+        mapping_or_iterable: Mapping[object, V]
+        | Iterable[tuple[object, V]]
+        | "IntervalDict[V]",
+    ):
         """
         Update current IntervalDict with provided values.
 
@@ -213,14 +296,24 @@ class IntervalDict(MutableMapping):
         :param mapping_or_iterable: mapping or iterable.
         """
         if isinstance(mapping_or_iterable, Mapping):
-            data = mapping_or_iterable.items()
+            data = cast(ItemsView[Interval, V], mapping_or_iterable.items())
         else:
             data = mapping_or_iterable
 
         for i, v in data:
             self[i] = v
 
-    def combine(self, other, how, *, missing=..., pass_interval=False):
+    def combine(
+        self,
+        other: "IntervalDict[V]",
+        how: HowToCombineSingle[V]
+        | HowToCombineWithInterval[
+            V
+        ],  # Callable[[V, V], V] | Callable[[V, V, Interval], V],
+        *,
+        missing: V = ...,
+        pass_interval: bool = False,
+    ) -> "IntervalDict[V]":
         """
         Return a new IntervalDict that combines the values from current and
         provided IntervalDict.
@@ -246,10 +339,12 @@ class IntervalDict(MutableMapping):
         new_items = []
 
         if not pass_interval:
+            how = cast(HowToCombineSingle[V], how)
 
-            def _how(x, y, i):
+            def _how(x: V, y: V, i: Interval) -> V:
                 return how(x, y)
         else:
+            how = cast(HowToCombineWithInterval[V], how)
             _how = how
         dom1, dom2 = self.domain(), other.domain()
 
@@ -274,7 +369,7 @@ class IntervalDict(MutableMapping):
 
         return self.__class__(new_items)
 
-    def as_dict(self, atomic=False):
+    def as_dict(self, atomic: bool = False) -> dict[Interval, V]:
         """
         Return the content as a classical Python dict.
 
@@ -290,10 +385,17 @@ class IntervalDict(MutableMapping):
         else:
             return dict(self._storage)
 
-    def __getitem__(self, key):
+    @overload
+    def __getitem__(self, key: Interval) -> "IntervalDict[V]": ...
+
+    @overload
+    def __getitem__(self, key: object) -> V: ...
+
+    @override
+    def __getitem__(self, key: object | Interval) -> V | "IntervalDict[V]":
         if isinstance(key, Interval):
             items = []
-            for i, v in self._storage.items():
+            for i, v in cast(ItemsView[Interval, V], self._storage.items()):
                 # Early out
                 if key.upper < i.lower:
                     break
@@ -303,7 +405,7 @@ class IntervalDict(MutableMapping):
                     items.append((intersection, v))
             return self.__class__._from_items(items)
         else:
-            for i, v in self._storage.items():
+            for i, v in cast(ItemsView[Interval, V], self._storage.items()):
                 # Early out
                 if key < i.lower:
                     break
@@ -311,11 +413,14 @@ class IntervalDict(MutableMapping):
                     return v
             raise KeyError(key)
 
-    def __setitem__(self, key, value):
+    @override
+    def __setitem__(self, key: object | Interval, value: V):
         if isinstance(key, Interval):
             interval = key
         else:
-            interval = self._klass.from_atomic(Bound.CLOSED, key, key, Bound.CLOSED)
+            interval = cast(
+                Interval, self._klass.from_atomic(Bound.CLOSED, key, key, Bound.CLOSED)
+            )
 
         if interval.empty:
             return
@@ -324,7 +429,7 @@ class IntervalDict(MutableMapping):
         added_items = []
 
         found = False
-        for i, v in self._storage.items():
+        for i, v in cast(ItemsView[Interval, V], self._storage.items()):
             if value == v:
                 found = True
                 # Extend existing key
@@ -347,7 +452,8 @@ class IntervalDict(MutableMapping):
         for key, value in added_items:
             self._storage[key] = value
 
-    def __delitem__(self, key):
+    @override
+    def __delitem__(self, key: object | Interval):
         if isinstance(key, Interval):
             interval = key
         else:
@@ -382,31 +488,36 @@ class IntervalDict(MutableMapping):
         for key, value in added_items:
             self._storage[key] = value
 
-    def __or__(self, other):
+    def __or__(self, other: "IntervalDict[V]") -> "IntervalDict[V]":
         d = self.copy()
         d.update(other)
         return d
 
-    def __ior__(self, other):
+    def __ior__(self, other: "IntervalDict[V]") -> "IntervalDict[V]":
         self.update(other)
         return self
 
-    def __iter__(self):
+    @override
+    def __iter__(self) -> Iterator[object]:
         return iter(self._storage)
 
-    def __len__(self):
+    @override
+    def __len__(self) -> int:
         return len(self._storage)
 
-    def __contains__(self, key):
+    @override
+    def __contains__(self, key: object) -> bool:
         return key in self.domain()
 
+    @override
     def __repr__(self):
         return "{{{}}}".format(
             ", ".join(f"{i!r}: {v!r}" for i, v in self.items()),
         )
 
-    def __eq__(self, other):
+    @override
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, IntervalDict):
             return self.as_dict() == other.as_dict()
-        else:
-            return NotImplemented
+
+        return NotImplemented
