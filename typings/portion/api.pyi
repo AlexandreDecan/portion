@@ -11,7 +11,6 @@ def partial(
     Convenient helper that combines functools.update_wrapper and
     functools.partial. It has exactly the same signature than functools.partial.
     """
-    ...
 
 def create_api(interval, *, interval_dict=..., name=...):  # -> ModuleType:
     """Create a spe
@@ -27,4 +26,3 @@ def create_api(interval, *, interval_dict=..., name=...):  # -> ModuleType:
     :param interval_dict: a subclass of IntervalDict.
     :param name: the name of the new module.
     """
-    ...

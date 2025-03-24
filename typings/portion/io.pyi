@@ -38,7 +38,6 @@ def from_string(
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def to_string(
     interval,
@@ -68,7 +67,6 @@ def to_string(
     :param ninf: string representing a negative infinity (default is '-inf').
     :return: a string representation for given interval.
     """
-    ...
 
 def from_data(data, conv=..., *, pinf=..., ninf=..., klass=...):  # -> Interval:
     """
@@ -81,7 +79,6 @@ def from_data(data, conv=..., *, pinf=..., ninf=..., klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def to_data(interval, conv=..., *, pinf=..., ninf=...):  # -> list[Any]:
     """
@@ -93,4 +90,3 @@ def to_data(interval, conv=..., *, pinf=..., ninf=...):  # -> list[Any]:
     :param ninf: value used to encode negative infinity.
     :return: a list of 4-uples (left, lower, upper, right)
     """
-    ...

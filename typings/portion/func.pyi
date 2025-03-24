@@ -11,7 +11,6 @@ def open(lower, upper, *, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def closed(lower, upper, *, klass=...):  # -> Interval:
     """
@@ -22,7 +21,6 @@ def closed(lower, upper, *, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def openclosed(lower, upper, *, klass=...):  # -> Interval:
     """
@@ -33,7 +31,6 @@ def openclosed(lower, upper, *, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def closedopen(lower, upper, *, klass=...):  # -> Interval:
     """
@@ -44,7 +41,6 @@ def closedopen(lower, upper, *, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def singleton(value, *, klass=...):  # -> Interval:
     """
@@ -54,7 +50,6 @@ def singleton(value, *, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def empty(*, klass=...):  # -> Interval:
     """
@@ -63,7 +58,6 @@ def empty(*, klass=...):  # -> Interval:
     :param klass: class to use for creating intervals (default to Interval).
     :return: an interval.
     """
-    ...
 
 def iterate(
     interval, step, *, base=..., reverse=...
@@ -95,4 +89,3 @@ def iterate(
     :param reverse: set to True for descending order.
     :return: a lazy iterator.
     """
-    ...
