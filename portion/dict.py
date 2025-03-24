@@ -9,7 +9,7 @@ from collections.abc import (
     Mapping,
     MutableMapping,
 )
-from typing import Protocol, TypeVar, cast, overload, override
+from typing import Generic, Protocol, TypeVar, cast, overload, override
 
 from sortedcontainers import SortedDict
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
@@ -34,7 +34,7 @@ class HowToCombineWithInterval(Protocol):
     def __call__(self, x: V, y: V, i: Interval) -> V: ...
 
 
-class IntervalDict[V](MutableMapping[object, V]):
+class IntervalDict(Generic[V], MutableMapping[object, V]):
     """
     An IntervalDict is a dict-like data structure that maps from intervals to data,where
     keys can be single values or Interval instances.
