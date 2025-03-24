@@ -56,4 +56,4 @@ ignore = ["B028"]
 packages = ["portion"]
 
 [tool.setuptools.package-data]
-portion = ["typings/**/*.pyi"]
+portion = ["py.typed", "**/*.pyi"]
