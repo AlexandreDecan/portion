@@ -3,15 +3,12 @@
 
 import contextlib
 from collections.abc import (
-    Callable,
     Collection,
     Iterable,
     Iterator,
     Mapping,
     MutableMapping,
-    Sequence,
 )
-from types import UnionType
 from typing import Protocol, cast, overload, override
 
 from sortedcontainers import SortedDict
@@ -138,8 +135,7 @@ class IntervalDict[V](MutableMapping[object, V]):
         """
         if isinstance(key, Interval):
             d = self[key]
-            if default is not None:
-                d[key - d.domain()] = default
+            d[key - d.domain()] = default
             return d
         else:
             try:
@@ -284,7 +280,7 @@ class IntervalDict[V](MutableMapping[object, V]):
         self,
         mapping_or_iterable: Mapping[object, V]
         | Iterable[tuple[object, V]]
-        | "IntervalDict[V]",
+        | type["IntervalDict[V]"],
     ):
         """
         Update current IntervalDict with provided values.
@@ -300,7 +296,7 @@ class IntervalDict[V](MutableMapping[object, V]):
         else:
             data = mapping_or_iterable
 
-        for i, v in data:
+        for i, v in cast(Collection[tuple[object, V]], data):
             self[i] = v
 
     def combine(
@@ -414,7 +410,7 @@ class IntervalDict[V](MutableMapping[object, V]):
             raise KeyError(key)
 
     @override
-    def __setitem__(self, key: object | Interval, value: V):
+    def __setitem__(self, key: object | Interval, value: V | None):
         if isinstance(key, Interval):
             interval = key
         else:
