@@ -34,7 +34,7 @@ classifiers = [
 test = ["pytest ~= 7.0", "coverage ~= 6.0", "ruff >= 0.6.9"]
 
 [tool.ruff]
-extend-exclude = ["tests/"]
+extend-exclude = ["tests/", "typings/"]
 
 [tool.ruff.lint]
 select = [
