@@ -9,7 +9,7 @@ from collections.abc import (
     Mapping,
     MutableMapping,
 )
-from typing import Generic, Protocol, TypeVar, Union, cast, overload
+from typing import Generic, Optional, Protocol, TypeVar, Union, cast, overload
 
 from sortedcontainers import SortedDict
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
@@ -113,15 +113,15 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
 
     @overload
     def get(
-        self, key: Interval, default: V | None = None
+        self, key: Interval, default: Optional[V] = None
     ) -> "IntervalDict[V] | None": ...
 
     @overload
-    def get(self, key: object, default: V = None) -> V | None: ...
+    def get(self, key: object, default: V = None) -> Optional[V]: ...
 
     def get(
-        self, key: object | Interval, default: V | None = None
-    ) -> "IntervalDict[V]" | V | None:
+        self, key: Union[object, Interval], default: Optional[V] = None
+    ) -> Union["IntervalDict[V]", V, None]:
         """
         Return the values associated to given key.
 
@@ -199,14 +199,14 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         return cast(Interval, self._klass(*self._storage.keys()))
 
     @overload
-    def pop(self, key: Interval, default: V | None = None) -> "IntervalDict[V]": ...
+    def pop(self, key: Interval, default: Optional[V] = None) -> "IntervalDict[V]": ...
 
     @overload
-    def pop(self, key: object, default: V | None = None) -> V | None: ...
+    def pop(self, key: object, default: Optional[V] = None) -> Optional[V]: ...
 
     def pop(
-        self, key: object, default: V | None = None
-    ) -> "IntervalDict[V]" | V | None:
+        self, key: object, default: Optional[V] = None
+    ) -> Union["IntervalDict[V]", V, None]:
         """
         Remove key and return the corresponding value if key is not an Interval.
         If key is an interval, it returns an IntervalDict instance.
@@ -240,15 +240,15 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
 
     @overload
     def setdefault(
-        self, key: Interval, default: V | None = None
+        self, key: Interval, default: Optional[V] = None
     ) -> "IntervalDict[V]": ...
 
     @overload
-    def setdefault(self, key: object, default: V | None = None) -> V: ...
+    def setdefault(self, key: object, default: Optional[V] = None) -> V: ...
 
     def setdefault(
-        self, key: object, default: V | None = None
-    ) -> V | "IntervalDict[V]" | None:
+        self, key: object, default: Optional[V] = None
+    ) -> Union[V, "IntervalDict[V]", None]:
         """
         Return given key. If it does not exist, set its value to given default
         and return it.
@@ -272,9 +272,9 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
 
     def update(
         self,
-        mapping_or_iterable: Mapping[object, V]
-        | Iterable[tuple[object, V]]
-        | type["IntervalDict[V]"],
+        mapping_or_iterable: Union[
+            Mapping[object, V], Iterable[tuple[object, V]], type["IntervalDict[V]"]
+        ],
     ):
         """
         Update current IntervalDict with provided values.
@@ -296,7 +296,7 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
     def combine(
         self,
         other: "IntervalDict[V]",
-        how: HowToCombineSingle | HowToCombineWithInterval,
+        how: Union[HowToCombineSingle, HowToCombineWithInterval],
         *,
         missing: V = ...,
         pass_interval: bool = False,
@@ -378,7 +378,7 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
     @overload
     def __getitem__(self, key: object) -> V: ...
 
-    def __getitem__(self, key: object | Interval) -> V | "IntervalDict[V]":
+    def __getitem__(self, key: Union[object, Interval]) -> Union[V, "IntervalDict[V]"]:
         if isinstance(key, Interval):
             items = []
             for i, v in cast(ItemsView[Interval, V], self._storage.items()):
@@ -399,7 +399,7 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
                     return v
             raise KeyError(key)
 
-    def __setitem__(self, key: object | Interval, value: V | None):
+    def __setitem__(self, key: Union[object, Interval], value: Optional[V]):
         if isinstance(key, Interval):
             interval = key
         else:
@@ -437,7 +437,7 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         for key, value in added_items:
             self._storage[key] = value
 
-    def __delitem__(self, key: object | Interval):
+    def __delitem__(self, key: Union[object, Interval]):
         if isinstance(key, Interval):
             interval = key
         else:
