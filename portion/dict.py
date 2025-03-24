@@ -23,7 +23,7 @@ def _sortkey(i: tuple[Interval, object]) -> tuple[object, bool]:
     return (i[0].lower, i[0].left is Bound.OPEN)
 
 
-V = TypeVar("V")
+V = TypeVar("V", bound=object)
 
 
 class HowToCombineSingle(Protocol):

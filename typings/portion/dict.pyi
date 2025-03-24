@@ -7,7 +7,7 @@ from typing import Generic, Optional, Protocol, TypeVar, Union, overload
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
 from .interval import Interval
 
-V = TypeVar("V")
+V = TypeVar("V", bound=object)
 class HowToCombineSingle(Protocol):
     def __call__(self, x: V, y: V) -> V:
         ...
