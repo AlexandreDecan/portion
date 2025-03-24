@@ -9,7 +9,7 @@ from collections.abc import (
     Mapping,
     MutableMapping,
 )
-from typing import Generic, Protocol, TypeVar, cast, overload
+from typing import Generic, Protocol, TypeVar, Union, cast, overload
 
 from sortedcontainers import SortedDict
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
@@ -59,9 +59,9 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
 
     def __init__(
         self,
-        mapping_or_iterable: Mapping[object, V]
-        | Iterable[tuple[object, V]]
-        | None = None,
+        mapping_or_iterable: Union[
+            Mapping[object, V], Iterable[tuple[object, V]], None
+        ] = None,
     ):
         """
         Return a new IntervalDict.
@@ -112,12 +112,12 @@ class IntervalDict(Generic[V], MutableMapping[object, V]):
         return self.__class__._from_items(self.items())
 
     @overload
-    def get(self, key: object, default: V = None) -> V | None: ...
-
-    @overload
     def get(
         self, key: Interval, default: V | None = None
     ) -> "IntervalDict[V] | None": ...
+
+    @overload
+    def get(self, key: object, default: V = None) -> V | None: ...
 
     def get(
         self, key: object | Interval, default: V | None = None
