@@ -9,7 +9,7 @@ from collections.abc import (
     Mapping,
     MutableMapping,
 )
-from typing import Protocol, cast, overload, override
+from typing import Protocol, TypeVar, cast, overload, override
 
 from sortedcontainers import SortedDict
 from sortedcontainers.sorteddict import ItemsView, KeysView, ValuesView
@@ -23,11 +23,14 @@ def _sortkey(i: tuple[Interval, object]) -> tuple[object, bool]:
     return (i[0].lower, i[0].left is Bound.OPEN)
 
 
-class HowToCombineSingle[V](Protocol):
+V = TypeVar("V")
+
+
+class HowToCombineSingle(Protocol):
     def __call__(self, x: V, y: V) -> V: ...
 
 
-class HowToCombineWithInterval[V](Protocol):
+class HowToCombineWithInterval(Protocol):
     def __call__(self, x: V, y: V, i: Interval) -> V: ...
 
 
@@ -302,10 +305,8 @@ class IntervalDict[V](MutableMapping[object, V]):
     def combine(
         self,
         other: "IntervalDict[V]",
-        how: HowToCombineSingle[V]
-        | HowToCombineWithInterval[
-            V
-        ],  # Callable[[V, V], V] | Callable[[V, V, Interval], V],
+        how: HowToCombineSingle
+        | HowToCombineWithInterval,  # Callable[[V, V], V] | Callable[[V, V, Interval], V],
         *,
         missing: V = ...,
         pass_interval: bool = False,
@@ -335,12 +336,12 @@ class IntervalDict[V](MutableMapping[object, V]):
         new_items = []
 
         if not pass_interval:
-            how = cast(HowToCombineSingle[V], how)
+            how = cast(HowToCombineSingle, how)
 
             def _how(x: V, y: V, i: Interval) -> V:
                 return how(x, y)
         else:
-            how = cast(HowToCombineWithInterval[V], how)
+            how = cast(HowToCombineWithInterval, how)
             _how = how
         dom1, dom2 = self.domain(), other.domain()
 
