@@ -27,7 +27,7 @@ jobs:
           pip install pip -U
           pip install .
       - name: Install test dependencies
-        run: pip install .[test]
+        run: pip install --group test
       - name: Check code style
         run: |
           ruff check --output-format=github
