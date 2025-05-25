@@ -33,7 +33,9 @@ jobs:
           uv run ruff check --output-format=github
           uv run ruff format --check
       - name: Execute tests
-        run: uv run coverage run --source portion -m pytest
+        run: |
+          uv run coverage run --source portion -m pytest
+          uv run coverage report
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         env:
