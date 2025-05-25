@@ -1,10 +1,10 @@
 # Changelog
 
-## 2.6.1 (not yet released)
+## 2.6.1 (2025-05-25)
 
 ### Added
  - A `__version__` attribute relying on `importlib.metadata`.
- - A `uv.lock` lock-file.
+ - A `uv.lock` lock-file for reproducible builds.
 
 ### Changed
  - Drop official support for Python 3.8.
@@ -13,6 +13,7 @@
  - Ensure code style consistency (see selected rules in `pyproject.toml`).
  - Extra dependencies are part of the `dev` dependency group (PEP 735).
  - Switch from `setuptools` to `hatchling` for building `portion`.
+ - Switch from `coverage` to `pytest-cov` for test coverage.
 
 
 
