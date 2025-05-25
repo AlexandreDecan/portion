@@ -31,7 +31,7 @@ classifiers = [
 ]
 
 [dependency-groups]
-dev = ["pytest ~= 7.0", "coverage ~= 6.0", "ruff >= 0.6.9"]
+dev = ["pytest >= 7.4.4", "pytest-cov >= 6.1.1", "ruff >= 0.6.9"]
 
 [tool.ruff]
 extend-exclude = ["tests/"]
