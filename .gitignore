@@ -3,3 +3,4 @@
 *.pyc
 *.egg-info*
 !.github
+!.python-version

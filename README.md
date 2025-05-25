@@ -45,7 +45,7 @@ The `portion` library provides data structure and operations for intervals in Py
 You can use `pip` to install it, as usual: `pip install portion`. This will install the latest available version from [PyPI](https://pypi.org/project/portion).
 Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion) and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
 
-You can install `portion` and its development environment using `pip install --group test` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [ruff](https://docs.astral.sh/ruff/) (for code style).
+You can install `portion` and its development environment using `pip install --group dev` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [ruff](https://docs.astral.sh/ruff/) (for code style).
 
 
 ## Documentation & usage

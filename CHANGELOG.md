@@ -4,13 +4,16 @@
 
 ### Added
  - A `__version__` attribute relying on `importlib.metadata`.
+ - A `uv.lock` lock-file.
 
 ### Changed
  - Drop official support for Python 3.8.
  - Switch from `black` to `ruff` for code style.
  - Fully migrate to a `pyproject.toml`-based project.
  - Ensure code style consistency (see selected rules in `pyproject.toml`).
- - Extra dependencies are part of a dependency group (PEP 735).
+ - Extra dependencies are part of the `dev` dependency group (PEP 735).
+ - Switch from `setuptools` to `hatchling` for building `portion`.
+
 
 
 ## 2.6.0 (2024-10-17)

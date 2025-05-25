@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "portion"
@@ -31,7 +31,7 @@ classifiers = [
 ]
 
 [dependency-groups]
-test = ["pytest ~= 7.0", "coverage ~= 6.0", "ruff >= 0.6.9"]
+dev = ["pytest ~= 7.0", "coverage ~= 6.0", "ruff >= 0.6.9"]
 
 [tool.ruff]
 extend-exclude = ["tests/"]
@@ -51,6 +51,3 @@ select = [
     "Q",   # flake8-quotes
 ]
 ignore = ["B028"]
-
-[tool.setuptools]
-packages = ["portion"]

@@ -18,22 +18,22 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install pip -U
-          pip install .
-      - name: Install test dependencies
-        run: pip install --group test
+      - name: Install project
+        run: uv sync --locked
+      - name: Check lockfile
+        run: uv lock --check
       - name: Check code style
         run: |
           ruff check --output-format=github
           ruff format --check
       - name: Execute tests
-        run: coverage run --source portion -m pytest
+        run: uv run coverage run --source portion -m pytest
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         env:
