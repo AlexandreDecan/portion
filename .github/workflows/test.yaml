@@ -30,8 +30,8 @@ jobs:
         run: uv lock --check
       - name: Check code style
         run: |
-          ruff check --output-format=github
-          ruff format --check
+          uv run ruff check --output-format=github
+          uv run ruff format --check
       - name: Execute tests
         run: uv run coverage run --source portion -m pytest
       - name: Upload coverage to Coveralls
