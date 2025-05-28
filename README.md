@@ -1,24 +1,29 @@
+<div align="center">
+
 # portion - data structure and operations for intervals
 
+[![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
 [![Tests](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
-[![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
 [![PyPI](https://badgen.net/pypi/v/portion)](https://pypi.org/project/portion)
 [![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
+</div>
 
 The `portion` library provides data structure and operations for intervals in Python.
+In particular, it provides the following features:
 
- - Support intervals of any (comparable) objects.
- - Closed or open, finite or (semi-)infinite intervals.
- - Interval sets (union of atomic intervals) are supported.
- - Automatic simplification of intervals.
- - Support comparison, transformation, intersection, union, complement, difference and containment.
- - Provide test for emptiness, atomicity, overlap and adjacency.
- - Discrete iterations on the values of an interval.
- - Dict-like structure to map intervals to data.
- - Import and export intervals to strings and to Python built-in data types.
- - Heavily tested with high code coverage.
+ - Support intervals of any (comparable) objects;
+ - Closed or open, finite or (semi-)infinite intervals;
+ - Interval sets (union of atomic intervals) are supported;
+ - Automatic simplification of intervals;
+ - Support comparison, transformation, intersection, union, complement, difference and containment;
+ - Provide test for emptiness, atomicity, overlap and adjacency;
+ - Discrete iterations on the values of an interval;
+ - Dict-like structure to map intervals to data;
+ - Import and export intervals to strings and to Python built-in data types;
+ - Heavily tested with high code coverage (regardless of what it means);
+ - Mainly developed by a stubborn but enthusiastic Pythonista!
 
 
 ## Table of contents
@@ -43,7 +48,7 @@ The `portion` library provides data structure and operations for intervals in Py
 ## Installation
 
 You can use `pip` to install it, as usual: `pip install portion`. This will install the latest available version from [PyPI](https://pypi.org/project/portion).
-Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion) and can be installed with `pip install git+https://github.com/AlexandreDecan/portion`.
+Pre-releases are available from the *master* branch on [GitHub](https://github.com/AlexandreDecan/portion) and can be installed with `pip install git+https://github.com/AlexandreDecan/portion` (but don't trust pre-releases!).
 
 You can install `portion` and its development environment using `pip install --group dev` at the root of this repository. This automatically installs [pytest](https://docs.pytest.org/en/latest/) (for the test suites) and [ruff](https://docs.astral.sh/ruff/) (for code style).
 
@@ -946,16 +951,15 @@ True
 [&uparrow; back to top](#table-of-contents)
 ## Changelog
 
-This library adheres to a [semantic versioning](https://semver.org) scheme.
+This library adheres to a [semantic versioning](https://semver.org) scheme (except for the experimental features as mentionned in the documentation).
 See [CHANGELOG.md](https://github.com/AlexandreDecan/portion/blob/master/CHANGELOG.md) for the list of changes.
 
 
 
 ## Contributions
 
-Contributions are very welcome!
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
-
+Contributions are very welcome, but please open an issue before, especially for new features ;-)
 
 
 ## License
