@@ -485,7 +485,7 @@ Because the latter allows functions to be passed as parameters and ignores infin
 ```
 
 Thanks to the `apply` and `replace` methods, several advanced operations or transformations of intervals can be easily expressed. 
-See [this comment](https://github.com/AlexandreDecan/portion/issues/103#issuecomment-3379881796) for an example of interval dilatation/erosion using these two methods. 
+See [this comment](https://github.com/AlexandreDecan/portion/issues/103#issuecomment-3379881796) for an example of a morphological opening and closing of intervals with dilatation/erosion using these two methods. 
 
 
 [&uparrow; back to top](#table-of-contents)
