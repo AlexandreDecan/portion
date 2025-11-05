@@ -300,8 +300,6 @@ class IntervalDict(MutableMapping):
                 
                 j += 1
 
-                j += 1
-
         return self.__class__(new_items)
 
     def as_dict(self, atomic=False):
