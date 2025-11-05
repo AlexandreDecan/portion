@@ -275,7 +275,6 @@ class IntervalDict(MutableMapping):
             # Find all intervals in d2 that overlap with i1
             # Start from where we left off for efficiency
             j = j_start
-            advanced_start = False
             
             while j < len(items2):
                 i2, v2 = items2[j]
@@ -284,11 +283,11 @@ class IntervalDict(MutableMapping):
                 if i2.lower > i1.upper:
                     break
                 
-                # If i2 is completely before i1, skip it and advance j_start
+                # If i2 is completely before i1, skip it
                 if i2.upper < i1.lower:
-                    if not advanced_start:
-                        j_start = j + 1
-                        advanced_start = True
+                    # Advance j_start if we're at the start position
+                    if j == j_start:
+                        j_start += 1
                     j += 1
                     continue
                 

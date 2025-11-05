@@ -206,4 +206,4 @@ Additional optimizations that were considered but not implemented:
 2. **IntervalDict.find indexing**: Could maintain reverse index for frequent lookups
 3. **Interval operations**: Some set operations could benefit from similar sweep-line algorithms
 
-These were not implemented to maintain minimal changes and because the primary bottlenecks (interval merging) has been addressed.
+These were not implemented to maintain minimal changes and because the primary bottleneck (interval merging) has been addressed.
