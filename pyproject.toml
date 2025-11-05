@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "portion"
-version = "2.6.1"
+version = "2.6.2-pre1"
 license = { text = "LGPLv3" }
 authors = [{ name = "Alexandre Decan", email = "alexandre.decan@lexpage.net" }]
 description = "Python data structure and operations for intervals"

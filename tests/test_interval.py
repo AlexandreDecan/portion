@@ -66,6 +66,11 @@ class TestInterval:
         # https://github.com/AlexandreDecan/python-intervals/issues/19
         assert P.Interval(P.empty(), P.empty()) == P.empty()
 
+    def test_merge_consecutive(self):
+        i = P.Interval(P.closed(0, 2), P.closed(1, 4), P.closed(3, 5))
+        assert i == P.closed(0, 5)
+        assert len(i._intervals) == 1
+
     def test_bounds(self):
         i = P.openclosed(1, 2)
         assert i.left == P.OPEN

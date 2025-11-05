@@ -53,13 +53,22 @@ class Interval:
             # Sort intervals by lower bound, closed first.
             self._intervals.sort(key=lambda i: (i.lower, i.left is Bound.OPEN))
 
-            i = 0
             # Try to merge consecutive intervals
-            while i < len(self._intervals) - 1:
+            new_intervals = []
+            i = 0
+            while i < len(self._intervals):
                 current = self._intervals[i]
-                successor = self._intervals[i + 1]
 
-                if self.__class__._mergeable(current, successor):
+                # Keep merging with consecutive intervals while possible
+                while i + 1 < len(self._intervals):
+                    # `current' is either self._intervals[i] or the result of
+                    # the last merge operation in this loop.
+                    successor = self._intervals[i + 1]
+
+                    if not self.__class__._mergeable(current, successor):
+                        break
+
+                    # Merge current with successor
                     if current.lower == successor.lower:
                         lower = current.lower
                         left = (
@@ -67,7 +76,6 @@ class Interval:
                             if current.left == Bound.CLOSED
                             else successor.left
                         )
-
                     else:
                         lower = min(current.lower, successor.lower)
                         left = (
@@ -87,12 +95,13 @@ class Interval:
                             current.right if upper == current.upper else successor.right
                         )
 
-                    union = Atomic(left, lower, upper, right)
-                    self._intervals.pop(i)  # pop current
-                    self._intervals.pop(i)  # pop successor
-                    self._intervals.insert(i, union)
-                else:
-                    i = i + 1
+                    current = Atomic(left, lower, upper, right)
+                    i += 1
+
+                new_intervals.append(current)
+                i += 1
+
+            self._intervals = new_intervals
 
     @classmethod
     def from_atomic(cls, left, lower, upper, right):

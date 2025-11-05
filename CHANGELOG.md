@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.6.2 (not yet released)
+
+### Changed
+ - Improve performance of `Interval` creation and union for large disjunctions of overlapping intervals.
+
+
+
 ## 2.6.1 (2025-05-25)
 
 ### Added
