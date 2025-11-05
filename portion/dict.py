@@ -265,12 +265,42 @@ class IntervalDict(MutableMapping):
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]
 
-        for i1, v1 in d1.items():
-            for i2, v2 in d2.items():
+        # Optimize: use a sweep-line algorithm instead of nested loop
+        # Skip intervals that can't possibly overlap for better performance
+        items1 = list(d1.items())
+        items2 = list(d2.items())
+        
+        j_start = 0
+        for i1, v1 in items1:
+            # Find all intervals in d2 that overlap with i1
+            # Start from where we left off for efficiency
+            j = j_start
+            advanced_start = False
+            
+            while j < len(items2):
+                i2, v2 = items2[j]
+                
+                # If i2 is completely after i1, no more overlaps possible
+                if i2.lower > i1.upper:
+                    break
+                
+                # If i2 is completely before i1, skip it and advance j_start
+                if i2.upper < i1.lower:
+                    if not advanced_start:
+                        j_start = j + 1
+                        advanced_start = True
+                    j += 1
+                    continue
+                
+                # Check for overlap
                 if i1.overlaps(i2):
-                    i = i1 & i2
-                    v = _how(v1, v2, i)
-                    new_items.append((i, v))
+                    inter = i1 & i2
+                    v = _how(v1, v2, inter)
+                    new_items.append((inter, v))
+                
+                j += 1
+
+                j += 1
 
         return self.__class__(new_items)
 
