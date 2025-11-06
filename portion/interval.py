@@ -504,14 +504,23 @@ class Interval:
         else:
             # Item is a value
             if self.upper < item or self.lower > item:
+                # Early out
                 return False
 
-            for i in self._intervals:
-                left = (item >= i.lower) if i.left == Bound.CLOSED else (item > i.lower)
-                right = (
-                    (item <= i.upper) if i.right == Bound.CLOSED else (item < i.upper)
-                )
-                if left and right:
+            low, high = 0, len(self._intervals) - 1
+            while low <= high:
+                mid = (low + high) // 2
+                current = self._intervals[mid]
+
+                if item < current.lower or (
+                    item == current.lower and current.left is Bound.OPEN
+                ):
+                    high = mid - 1
+                elif item > current.upper or (
+                    item == current.upper and current.right is Bound.OPEN
+                ):
+                    low = mid + 1
+                else:
                     return True
             return False
 

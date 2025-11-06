@@ -4,7 +4,7 @@
 
 ### Changed
  - Improve performance of `Interval` creation and union for large disjunctions of overlapping intervals.
-
+ - Improve performance of `Interval.__contains__` for values.
 
 
 ## 2.6.1 (2025-05-25)
