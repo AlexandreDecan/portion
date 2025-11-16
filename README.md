@@ -1,12 +1,14 @@
 <div align="center">
 
+![Logo](https://raw.githubusercontent.com/AlexandreDecan/portion/refs/heads/master/logo.png)
+
 # portion - data structure and operations for intervals
 
-[![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
+[![License](https://badges.ws/pypi/l/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
 [![Tests](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
-[![PyPI](https://badgen.net/pypi/v/portion)](https://pypi.org/project/portion)
-[![Commits](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
+[![PyPI](https://badges.ws/pypi/v/portion)](https://pypi.org/project/portion)
+[![Last commit](https://badges.ws/github/last-commit/alexandredecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 </div>
 
