@@ -117,6 +117,7 @@ class Interval:
         right = right if upper not in [inf, -inf] else Bound.OPEN
 
         instance = cls()
+
         # Check for non-emptiness (otherwise keep instance._intervals = [])
         if lower < upper or (
             lower == upper and left == Bound.CLOSED and right == Bound.CLOSED
