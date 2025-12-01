@@ -12,7 +12,7 @@ readme = { file = "README.md", content-type = "text/markdown" }
 urls = { Homepage = "https://github.com/AlexandreDecan/portion" }
 keywords = ["interval", "range", "span"]
 requires-python = ">= 3.9"
-dependencies = ["sortedcontainers ~= 2.2"]
+dependencies = ["sortedcontainers~=2.4"]
 classifiers = [
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Development Status :: 5 - Production/Stable",
@@ -32,23 +32,11 @@ classifiers = [
 ]
 
 [dependency-groups]
-dev = ["pytest >= 7.4.4", "pytest-cov >= 6.1.1", "ruff >= 0.6.9"]
+dev = ["pytest>=8.4.2", "pytest-cov>=7.0.0", "ruff>=0.14.7"]
+
 
 [tool.ruff]
 extend-exclude = ["tests/"]
 
 [tool.ruff.lint]
-select = [
-    "F",   # pyflakes
-    "E",   # pycodestyle
-    "W",   # pycodestyle
-    "UP",  # pyupgrade
-    "I",   # Sort imports
-    "N",   # pep8-naming
-    "B",   # flake8-bugbear
-    "SIM", # flake8-simplify
-    "C4",  # flake8-comprehensions
-    "PIE", # flake8-pie
-    "Q",   # flake8-quotes
-]
-ignore = ["B028"]
+ignore = ["B028"] # warnings.warn without stacklevel=2
