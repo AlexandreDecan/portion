@@ -36,6 +36,6 @@ jobs:
           uv run ruff format --check
       - name: Execute tests
         run: |
-          uv run pytest --cov portion
+          uv run pytest --cov --cov-report=lcov portion
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
