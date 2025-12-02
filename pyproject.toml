@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "portion"
 version = "2.6.2-pre1"
-license = { text = "LGPLv3" }
+license = "LGPLv3"
+license-files = ["LICENSE.txt"]
 authors = [{ name = "Alexandre Decan", email = "alexandre.decan@lexpage.net" }]
 description = "Python data structure and operations for intervals"
 readme = { file = "README.md", content-type = "text/markdown" }
-urls = { Homepage = "https://github.com/AlexandreDecan/portion" }
-keywords = ["interval", "range", "span"]
+keywords = ["interval", "interval-set", "range", "span"]
 requires-python = ">= 3.9"
 dependencies = ["sortedcontainers~=2.4"]
 classifiers = [
@@ -31,9 +31,16 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
+[project.urls]
+homepage = "https://github.com/AlexandreDecan/portion"
+repository = "https://github.com/AlexandreDecan/portion"
+changelog = "https://github.com/AlexandreDecan/portion/blob/master/CHANGELOG.md"
+documentation = "https://github.com/AlexandreDecan/portion/blob/master/README.md"
+issues = "https://github.com/AlexandreDecan/portion/issues"
+funding = "https://github.com/sponsors/AlexandreDecan"
+
 [dependency-groups]
 dev = ["pytest>=8.4.2", "pytest-cov>=7.0.0", "ruff>=0.14.7"]
-
 
 [tool.ruff]
 extend-exclude = ["tests/"]
