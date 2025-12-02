@@ -4,11 +4,11 @@
 
 # portion - data structure and operations for intervals
 
-[![License](https://badges.ws/pypi/l/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
+[![License](https://badgen.net/pypi/license/portion)](https://github.com/AlexandreDecan/portion/blob/master/LICENSE.txt)
 [![Tests](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/AlexandreDecan/portion/actions/workflows/test.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/AlexandreDecan/portion/badge.svg?branch=master)](https://coveralls.io/github/AlexandreDecan/portion?branch=master)
-[![PyPI](https://badges.ws/pypi/v/portion)](https://pypi.org/project/portion)
-[![Last commit](https://badges.ws/github/last-commit/alexandredecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
+[![PyPI](https://badgen.net/pypi/v/portion)](https://pypi.org/project/portion)
+[![Last commit](https://badgen.net/github/last-commit/AlexandreDecan/portion)](https://github.com/AlexandreDecan/portion/commits/)
 
 </div>
 
@@ -486,8 +486,8 @@ Because the latter allows functions to be passed as parameters and ignores infin
 
 ```
 
-Thanks to the `apply` and `replace` methods, several advanced operations or transformations of intervals can be easily expressed. 
-See [this comment](https://github.com/AlexandreDecan/portion/issues/103#issuecomment-3379881796) for an example of a morphological opening and closing of intervals with dilatation/erosion using these two methods. 
+Thanks to the `apply` and `replace` methods, several advanced operations or transformations of intervals can be easily expressed.
+See [this comment](https://github.com/AlexandreDecan/portion/issues/103#issuecomment-3379881796) for an example of a morphological opening and closing of intervals with dilatation/erosion using these two methods.
 
 
 [&uparrow; back to top](#table-of-contents)
