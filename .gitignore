@@ -4,3 +4,7 @@
 *.egg-info*
 !.github
 !.python-version
+
+# Rust build artifacts
+rust_core/target/
+rust_core/Cargo.lock

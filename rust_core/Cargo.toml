@@ -1,0 +1,21 @@
+[package]
+name = "portion_rust"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance interval operations for the portion library"
+license = "MIT"
+
+[lib]
+name = "portion_rust"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[features]
+default = []
