@@ -1,5 +1,8 @@
 name: Deployment
 
+permissions:
+  contents: read
+
 on:
   release:
     types: [published]
