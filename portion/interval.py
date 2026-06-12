@@ -1,3 +1,4 @@
+import bisect
 import warnings
 from collections import namedtuple
 
@@ -206,6 +207,18 @@ class Interval:
         """
         return self.__class__.from_atomic(self.left, self.lower, self.upper, self.right)
 
+    def _tail_iterator(self, value):
+        """
+        Return an iterator over this interval's atomic subintervals which skips
+        all subintervals where i.upper < value. Optimization for intersection checks.
+        """
+        if value < self.lower:
+            yield from self
+        elif value <= self.upper:
+            start = bisect.bisect_left(self._intervals, value, key=lambda i: i.upper)
+            for index in range(start, len(self._intervals)):
+                yield self.__class__.from_atomic(*self._intervals[index])
+
     def replace(
         self, left=None, lower=None, upper=None, right=None, *, ignore_inf=True
     ):
@@ -325,8 +338,8 @@ class Interval:
                 # Early out for clearly non-overlapping intervals
                 return False
 
-            i_iter = iter(self)
-            o_iter = iter(other)
+            i_iter = self._tail_iterator(other.lower)
+            o_iter = other._tail_iterator(self.lower)
             i_current = next(i_iter, None)
             o_current = next(o_iter, None)
 
@@ -439,8 +452,8 @@ class Interval:
         else:
             intersections = []
 
-            i_iter = iter(self)
-            o_iter = iter(other)
+            i_iter = self._tail_iterator(other.lower)
+            o_iter = other._tail_iterator(self.lower)
             i_current = next(i_iter, None)
             o_current = next(o_iter, None)
 
@@ -488,7 +501,7 @@ class Interval:
                 )
                 return left and right
             else:
-                selfiter = iter(self)
+                selfiter = self._tail_iterator(item.lower)
                 current = next(selfiter)
 
                 for other in item:

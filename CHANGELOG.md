@@ -6,6 +6,7 @@
  - Improve performance of `Interval` creation and union for large disjunctions of overlapping intervals.
  - Improve performance of `Interval.__contains__` for values.
  - Drop official support for Python 3.9.
+ - Improve performance of `Interval.overlaps`, `__and__`, and `__contains__` for large, complex intervals when applied to small subintervals (see [#107](https://github.com/AlexandreDecan/portion/pull/107)).
 
 
 ## 2.6.1 (2025-05-25)
