@@ -218,8 +218,16 @@ class IntervalDict(MutableMapping):
         else:
             data = mapping_or_iterable
 
+        hashable_values = dict()
         for i, v in data:
-            self[i] = v
+            if not isinstance(i, Interval):
+                i = self._klass.from_atomic(Bound.CLOSED, i, i, Bound.CLOSED)
+            try:
+                hashable_values.setdefault(v, list()).append(i)
+            except TypeError:
+                self[i] = v
+        for v, i in hashable_values.items():
+            self[self._klass(*i)] = v
 
     def combine(self, other, how, *, missing=..., pass_interval=False):
         """

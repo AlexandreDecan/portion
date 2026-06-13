@@ -16,6 +16,10 @@ class TestIntervalDict:
             d[3]
         assert d.get(3) is None
 
+        # Non hashable values
+        d = P.IntervalDict()
+        d[P.closed(0, 2)] = [0]
+
     def test_with_intervals(self):
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         assert d[P.open(-P.inf, P.inf)].as_dict() == {P.closed(0, 2): 0}
@@ -349,6 +353,15 @@ class TestIntervalDict:
         d.update(d2.items())
         assert d[1] == 'a'
         assert d[2] == 'b'
+        assert len(d) == 2
+
+    def test_update_with_non_hashable_values(self):
+        d = P.IntervalDict()
+        d2 = {1: [1], 2: [2]}
+
+        d.update(d2)
+        assert d[1] == [1]
+        assert d[2] == [2]
         assert len(d) == 2
 
     def test_as_dict(self):
