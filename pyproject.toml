@@ -11,7 +11,7 @@ authors = [{ name = "Alexandre Decan", email = "alexandre.decan@lexpage.net" }]
 description = "Python data structure and operations for intervals"
 readme = { file = "README.md", content-type = "text/markdown" }
 keywords = ["interval", "interval-set", "range", "span"]
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 dependencies = ["sortedcontainers~=2.4"]
 classifiers = [
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
@@ -23,7 +23,6 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
