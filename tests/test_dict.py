@@ -366,3 +366,8 @@ class TestIntervalDict:
             P.open(7, 8): 2,
             P.closed(10, 12): 2,
         }
+
+    @pytest.mark.parametrize("size", [10, 100, 1000])
+    def test_init_repeating_values(self, benchmark, size):
+        tuples = [(P.closed(i, i+1), i%2) for i in range(size)]
+        benchmark(P.IntervalDict, tuples)

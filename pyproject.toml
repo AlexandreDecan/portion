@@ -39,10 +39,18 @@ issues = "https://github.com/AlexandreDecan/portion/issues"
 funding = "https://github.com/sponsors/AlexandreDecan"
 
 [dependency-groups]
-dev = ["pytest>=8.4.2", "pytest-cov>=7.0.0", "ruff>=0.14.7"]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-benchmark>=5.2.3",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.7",
+]
 
 [tool.ruff]
 extend-exclude = ["tests/"]
 
 [tool.ruff.lint]
 ignore = ["B028"] # warnings.warn without stacklevel=2
+
+[tool.pytest.ini_options]
+addopts = "--benchmark-skip"
