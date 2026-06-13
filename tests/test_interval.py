@@ -323,6 +323,12 @@ class TestIntervalOverlaps():
         with pytest.raises(TypeError):
             P.closed(0, 1).overlaps(1)
 
+    @pytest.mark.parametrize("size", [10, 100, 1000, 10000])
+    def test_overlaps_benchmark(self, benchmark, size):
+        domain = P.Interval(*(P.closed(2*i, 2*i+1) for i in range(size)))
+        other = P.closed(size / 3, 2 * size / 3)
+        benchmark(lambda: domain.overlaps(other))
+
 
 class TestIntervalComparison:
     @pytest.mark.parametrize('i1,i2,i3', [
@@ -587,6 +593,12 @@ class TestIntervalIntersection:
     def test_with_invalid_type(self):
         with pytest.raises(TypeError):
             P.closed(0, 1) & 1
+
+    @pytest.mark.parametrize("size", [10, 100, 1000, 10000])
+    def test_intersect_benchmark(self, benchmark, size):
+        domain = P.Interval(*(P.closed(2*i, 2*i+1) for i in range(size)))
+        other = P.closed(size / 2, size / 2 + 8)
+        benchmark(lambda: domain & other)
 
 
 class TestIntervalUnion:
