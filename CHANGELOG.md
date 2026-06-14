@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.6.2 (not yet released)
+## 2.6.2 (2026-06-14)
 
 ### Changed
  - Drop official support for Python 3.9 (EoL).
