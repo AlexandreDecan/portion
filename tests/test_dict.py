@@ -268,6 +268,10 @@ class TestIntervalDict:
         t = d.pop(4, 1)
         assert t == 1
 
+        # None as explicit default must be returned, not treated as "no default"
+        t = d.pop(4, None)
+        assert t is None
+
     def test_pop_interval(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         t = d.pop(P.closed(0, 1))

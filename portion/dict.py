@@ -5,6 +5,8 @@ from sortedcontainers import SortedDict
 from .const import Bound
 from .interval import Interval
 
+_MISSING = object()  # Sentinel to distinguish "no default" from "default=None"
+
 
 def _sortkey(i):
     # Sort by lower bound, closed first
@@ -149,20 +151,20 @@ class IntervalDict(MutableMapping):
         """
         return self._klass(*self._storage.keys())
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=_MISSING):
         """
         Remove key and return the corresponding value if key is not an Interval.
         If key is an interval, it returns an IntervalDict instance.
 
         This method combines self[key] and del self[key]. If a default value
-        is provided and is not None, it uses self.get(key, default) instead of
-        self[key].
+        is provided, it uses self.get(key, default) instead of self[key],
+        which means missing keys return the default rather than raising KeyError.
 
         :param key: a single value or an Interval instance.
         :param default: optional default value.
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
-        if default is None:
+        if default is _MISSING:
             value = self[key]
             del self[key]
             return value
