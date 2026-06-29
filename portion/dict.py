@@ -149,20 +149,20 @@ class IntervalDict(MutableMapping):
         """
         return self._klass(*self._storage.keys())
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=...):
         """
         Remove key and return the corresponding value if key is not an Interval.
         If key is an interval, it returns an IntervalDict instance.
 
         This method combines self[key] and del self[key]. If a default value
-        is provided and is not None, it uses self.get(key, default) instead of
+        is provided, it uses self.get(key, default) instead of
         self[key].
 
         :param key: a single value or an Interval instance.
         :param default: optional default value.
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
-        if default is None:
+        if default is ...:
             value = self[key]
             del self[key]
             return value

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "portion"
-version = "2.6.2"
+version = "2.7.0-pre1"
 license = "LGPL-3.0-or-later"
 license-files = ["LICENSE.txt"]
 authors = [{ name = "Alexandre Decan", email = "alexandre.decan@lexpage.net" }]

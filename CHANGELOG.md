@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.0-pre1 (not yet released)
+
+### Added
+ - `IntervalDict.pop` accepts `None` as default value.
+
+
 ## 2.6.2 (2026-06-14)
 
 ### Changed

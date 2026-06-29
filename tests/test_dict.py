@@ -265,8 +265,13 @@ class TestIntervalDict:
         with pytest.raises(KeyError):
             d.pop(4)
 
-        t = d.pop(4, 1)
-        assert t == 1
+    def test_pop_missing_with_default(self):
+        d = P.IntervalDict([(P.closed(0, 3), 0)])
+        assert d.pop(0, default=1) == 0
+        assert d.pop(4, default=1) == 1
+
+        assert d.pop(1, default=None) == 0
+        assert d.pop(5, default=None) == None
 
     def test_pop_interval(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
