@@ -369,6 +369,35 @@ class TestIntervalDict:
         assert d[2] == [2]
         assert len(d) == 2
 
+    def test_update_respects_order_on_overlapping_keys(self):
+        # Later pairs must win over earlier ones on overlapping keys, just like
+        # a regular dict built from a list of (key, value) pairs.
+        d = P.IntervalDict()
+        d.update(
+            [
+                (P.closed(4, 6), "c"),
+                (P.closed(-5, -1), "b"),
+                (P.open(-5, -3), "c"),
+            ]
+        )
+        assert d[-4] == "c"
+        assert d[-5] == "b"
+        assert d[-1] == "b"
+        assert d[5] == "c"
+
+        # Same check, but with the last pair using a non-hashable value so it
+        # goes through the "unhashable value" code path.
+        d = P.IntervalDict()
+        d.update(
+            [
+                (P.closed(-5, -1), "b"),
+                (P.open(-5, -3), ["c"]),
+            ]
+        )
+        assert d[-4] == ["c"]
+        assert d[-5] == "b"
+        assert d[-1] == "b"
+
     def test_as_dict(self):
         content = {
             P.closed(1, 2) | P.closed(4, 5): 1,

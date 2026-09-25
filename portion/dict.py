@@ -211,6 +211,10 @@ class IntervalDict(MutableMapping):
         another IntervalDict). If an iterable is provided, it must consist of a
         list of (key, value) pairs.
 
+        As with a regular dict, when several given keys overlap, the value that
+        is kept for the overlapping part is the one associated the last matching
+        pair, following the order in which pairs are provided.
+
         :param mapping_or_iterable: mapping or iterable.
         """
         if isinstance(mapping_or_iterable, Mapping):
@@ -218,16 +222,38 @@ class IntervalDict(MutableMapping):
         else:
             data = mapping_or_iterable
 
-        hashable_values = dict()
+        # Consecutive pairs sharing the same value are grouped so they can be
+        # applied with a single __setitem__ call, but groups are otherwise
+        # applied in the order they appear so that later pairs correctly take
+        # precedence over earlier ones on overlapping keys (as a regular dict
+        # would when updated from a list of pairs).
+        pending_value = pending_intervals = None
+        has_pending = False
+
+        def flush():
+            if has_pending:
+                self[self._klass(*pending_intervals)] = pending_value
+
         for i, v in data:
             if not isinstance(i, Interval):
                 i = self._klass.from_atomic(Bound.CLOSED, i, i, Bound.CLOSED)
             try:
-                hashable_values.setdefault(v, list()).append(i)
+                hash(v)
             except TypeError:
+                flush()
+                has_pending = False
                 self[i] = v
-        for v, i in hashable_values.items():
-            self[self._klass(*i)] = v
+                continue
+
+            if has_pending and v == pending_value:
+                pending_intervals.append(i)
+            else:
+                flush()
+                pending_value = v
+                pending_intervals = [i]
+                has_pending = True
+
+        flush()
 
     def combine(self, other, how, *, missing=..., pass_interval=False):
         """
