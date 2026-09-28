@@ -212,7 +212,7 @@ class IntervalDict(MutableMapping):
         list of (key, value) pairs.
 
         As with a regular dict, when several given keys overlap, the value that
-        is kept for the overlapping part is the one associated the last matching
+        is kept for the overlapping part is the one associated with the last matching
         pair, following the order in which pairs are provided.
 
         :param mapping_or_iterable: mapping or iterable.
