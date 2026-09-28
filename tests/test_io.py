@@ -72,6 +72,12 @@ class TestFromString:
         assert P.from_string('(-inf,1]', int) == P.openclosed(-P.inf, 1)
         assert P.from_string('[1,+inf)', int) == P.closedopen(1, P.inf)
 
+    def test_full_match(self):
+        with pytest.raises(ValueError):
+            P.from_string('(-infinity,1]', int)
+        with pytest.raises(ValueError):
+                    P.from_string('(1,infinity]', int)
+
     def test_unions(self):
         assert P.from_string('[0,1] | [2,3]', int) == P.closed(0, 1) | P.closed(2, 3)
 

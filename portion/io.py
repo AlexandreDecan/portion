@@ -51,9 +51,9 @@ def from_string(
     source = string
 
     def _convert(bound):
-        if re.match(pinf, bound):
+        if re.fullmatch(pinf, bound):
             return inf
-        elif re.match(ninf, bound):
+        elif re.fullmatch(ninf, bound):
             return -inf
         else:
             return conv(bound)
@@ -66,11 +66,9 @@ def from_string(
         # Parse atomic interval
         group = match.groupdict()
 
-        left = (
-            Bound.CLOSED if re.match(left_closed + "$", group["left"]) else Bound.OPEN
-        )
+        left = Bound.CLOSED if re.fullmatch(left_closed, group["left"]) else Bound.OPEN
         right = (
-            Bound.CLOSED if re.match(right_closed + "$", group["right"]) else Bound.OPEN
+            Bound.CLOSED if re.fullmatch(right_closed, group["right"]) else Bound.OPEN
         )
         lower = group.get("lower", None)
         upper = group.get("upper", None)

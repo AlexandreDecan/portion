@@ -22,7 +22,7 @@ def partial(wrapped, *args, **kwargs):
 
 
 def create_api(interval, *, interval_dict=None, name=None):
-    """Create a spe
+    """Create a specialized API for given Interval subclass.
 
     Dynamically create a module whose API is similar to the one of portion, but
     configured to use given Interval class. Unless specified, a new IntervalDict

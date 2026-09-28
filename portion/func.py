@@ -98,7 +98,7 @@ def iterate(interval, step, *, base=None, reverse=False):
 
     :param interval: an interval.
     :param step: step between values, or a callable that returns the next value.
-    :param base: a callable that accepts a bound and returns an initial value.
+    :param base: a (pure) callable that accepts a bound and returns an initial value.
     :param reverse: set to True for descending order.
     :return: a lazy iterator.
     """
