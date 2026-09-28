@@ -5,6 +5,9 @@
 ### Added
  - `IntervalDict.pop` accepts `None` as default value.
 
+### Fixed
+ - Documentation of `IntervalDict.update` explicitly states that order is not considered when passing overlapping intervals with different values.
+
 
 ## 2.6.2 (2026-06-14)
 
@@ -13,7 +16,7 @@
  - Improve performance of `Interval` creation and union for large disjunctions of overlapping intervals.
  - Improve performance of `Interval.__contains__` for values.
  - Improve performance of `Interval.overlaps`, `__and__`, and `__contains__` for large, complex intervals when applied to small subintervals (see [#107](https://github.com/AlexandreDecan/portion/pull/107), Henry Tung).
- - Improve performance of `IntervalDict.update` and `IntervalDict` constructor for hashable values (see [#108](https://github.com/AlexandreDecan/portion/issues/97)).
+ - Improve performance of `IntervalDict.update` and `IntervalDict` constructor for hashable values (see [#108](https://github.com/AlexandreDecan/portion/issues/108)).
 
 
 ## 2.6.1 (2025-05-25)

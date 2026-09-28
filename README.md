@@ -965,6 +965,7 @@ See [CHANGELOG.md](https://github.com/AlexandreDecan/portion/blob/master/CHANGEL
 
 Feel free to report bugs or suggest new features using GitHub issues and/or pull requests.
 Contributions are very welcome, but please open an issue before, especially for new features ;-)
+Contributions made by Gen-AI tools are accepted as long as (1) the use of these tools is explicitly disclosed and (2) there is/was a human involved in the loop.
 
 
 ## License

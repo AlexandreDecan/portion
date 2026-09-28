@@ -211,6 +211,10 @@ class IntervalDict(MutableMapping):
         another IntervalDict). If an iterable is provided, it must consist of a
         list of (key, value) pairs.
 
+        Contrarilly to the built-in dict.update method, there is no guarantee that
+        the last provided value in case of overlapping intervals "wins" against
+        previous values.
+
         :param mapping_or_iterable: mapping or iterable.
         """
         if isinstance(mapping_or_iterable, Mapping):
