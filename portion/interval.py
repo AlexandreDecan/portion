@@ -721,12 +721,12 @@ class AbstractDiscreteInterval(Interval):
 
     @classmethod
     def _mergeable(cls, a, b):
-        if a.upper <= b.upper:
+        if a.lower <= b.lower:
             first, second = a, b
         else:
             first, second = b, a
 
-        if first.right == Bound.CLOSED and first.upper < second.lower:
+        if first.right == Bound.CLOSED:
             first = Atomic(
                 first.left,
                 first.lower,

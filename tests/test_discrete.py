@@ -53,6 +53,11 @@ class TestIntInterval:
         assert D.singleton(1) | D.singleton(2) == D.closed(1, 2)
         assert D.closed(0, 1) | D.closed(2, 3) == D.closed(0, 3)
 
+        assert len(D.singleton(1) | D.singleton(3)) == 2
+
+        assert D.closedopen(0, 2) | D.closed(2, 3) == D.closed(0, 3)
+        assert D.closed(0, 2) | D.openclosed(2, 3) == D.closed(0, 3)
+
         assert D.openclosed(0, 2) | D.closedopen(3, 5) == D.open(0, 5) == D.closed(1, 4)
         assert not (D.closedopen(0, 1) | D.openclosed(1, 2)).atomic
 
@@ -75,6 +80,8 @@ class TestCharInterval:
     def test_merge(self):
         assert C.singleton('b') | C.singleton('c') == C.closed('b', 'c')
         assert C.closed('a', 'b') | C.closed('c', 'd') == C.closed('a', 'd')
+
+        assert len(C.singleton('a') | C.singleton('c')) == 2
 
         assert C.openclosed('a', 'c') | C.closedopen('d', 'f') == C.open('a', 'f') == C.closed('b', 'e')
         assert not (C.closedopen('a', 'b') | C.openclosed('b', 'c')).atomic
