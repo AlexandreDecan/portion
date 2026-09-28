@@ -43,6 +43,9 @@ class IntervalDict(MutableMapping):
         new IntervalDict with the same key-value pairs is created. If an
         iterable is provided, it has to be a list of (key, value) pairs.
 
+        In case of overlapping intervals, there is no guarantee that the last
+        provided value "wins" against previous values.
+
         :param mapping_or_iterable: optional mapping or iterable.
         """
         self._storage = SortedDict(_sortkey)  # Mapping from intervals to values

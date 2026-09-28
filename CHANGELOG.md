@@ -6,7 +6,7 @@
  - `IntervalDict.pop` accepts `None` as default value.
 
 ### Fixed
- - Documentation of `IntervalDict.update` explicitly states that order is not considered when passing overlapping intervals with different values.
+ - Documentation of `IntervalDict` and `IntervalDict.update` explicitly states that order is not considered when passing overlapping intervals with different values.
 
 
 ## 2.6.2 (2026-06-14)
