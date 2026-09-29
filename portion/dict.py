@@ -165,7 +165,7 @@ class IntervalDict(MutableMapping):
         :param default: optional default value.
         :return: an IntervalDict, or a single value if key is not an Interval.
         """
-        if default is ...:
+        if default is Ellipsis:
             value = self[key]
             del self[key]
             return value
@@ -292,12 +292,31 @@ class IntervalDict(MutableMapping):
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]
 
-        for i1, v1 in d1.items():
-            for i2, v2 in d2.items():
-                if i1.overlaps(i2):
-                    i = i1 & i2
-                    v = _how(v1, v2, i)
-                    new_items.append((i, v))
+        i_iter, o_iter = iter(d1.items()), iter(d2.items())
+        i_current, o_current = next(i_iter, None), next(o_iter, None)
+
+        while i_current is not None and o_current is not None:
+            i1, v1 = i_current
+            i2, v2 = o_current
+
+            if i1.overlaps(i2):
+                i = i1 & i2
+                v = _how(v1, v2, i)
+                new_items.append((i, v))
+
+            if i1.upper < i2.upper:
+                i_current = next(i_iter, None)
+            elif i2.upper < i1.upper:
+                o_current = next(o_iter, None)
+            else:
+                # Equal upper bounds include the i1 == i2 case; openness breaks ties.
+                if i1.right is Bound.OPEN and i2.right is Bound.CLOSED:
+                    i_current = next(i_iter, None)
+                elif i2.right is Bound.OPEN and i1.right is Bound.CLOSED:
+                    o_current = next(o_iter, None)
+                else:
+                    # Equal upper bounds and openness: advance both intervals.
+                    i_current, o_current = next(i_iter, None), next(o_iter, None)
 
         return self.__class__(new_items)
 

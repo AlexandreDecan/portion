@@ -28,7 +28,10 @@ class TestIntervalDict:
         assert d[P.closed(-2, -1)].as_dict() == {}
         assert d.get(P.closed(0, 2)).as_dict() == {P.closed(0, 2): 0}
         assert d.get(P.closed(-2, -1)).as_dict() == {P.closed(-2, -1): None}
-        assert d.get(P.closed(-1, 0)).as_dict() == {P.closedopen(-1, 0): None, P.singleton(0): 0}
+        assert d.get(P.closed(-1, 0)).as_dict() == {
+            P.closedopen(-1, 0): None,
+            P.singleton(0): 0,
+        }
 
         d[P.closed(1, 3)] = 1
         assert d.as_dict() == {P.closedopen(0, 1): 0, P.closed(1, 3): 1}
@@ -53,7 +56,11 @@ class TestIntervalDict:
         d[P.closed(0, 2)] = 1
         assert d.as_dict() == {P.closed(0, 2): 1, P.singleton(3): 3}
         d[P.closed(-1, 1)] = 2
-        assert d.as_dict() == {P.closed(-1, 1): 2, P.openclosed(1, 2): 1, P.singleton(3): 3}
+        assert d.as_dict() == {
+            P.closed(-1, 1): 2,
+            P.openclosed(1, 2): 1,
+            P.singleton(3): 3,
+        }
 
         d = P.IntervalDict([(P.closed(0, 2), 0)])
         d[P.closed(-1, 4)] = 1
@@ -109,7 +116,9 @@ class TestIntervalDict:
         assert d.as_dict() == {P.closedopen(-1, 0): 2, P.closed(0, 2): 0}
 
     def test_iterators(self):
-        d = P.IntervalDict([(P.closedopen(0, 1), 0), (P.closedopen(1, 3), 1), (P.singleton(3), 2)])
+        d = P.IntervalDict(
+            [(P.closedopen(0, 1), 0), (P.closedopen(1, 3), 1), (P.singleton(3), 2)]
+        )
 
         assert set(d.keys()) == {P.closedopen(0, 1), P.closedopen(1, 3), P.singleton(3)}
         assert d.domain() == P.closed(0, 3)
@@ -147,7 +156,9 @@ class TestIntervalDict:
         assert list(d) == list([P.singleton(2), P.open(2, 3)])
 
     def test_combine_empty(self):
-        def add(x, y): return x + y
+        def add(x, y):
+            return x + y
+
         assert P.IntervalDict().combine(P.IntervalDict(), add) == P.IntervalDict()
 
         d = P.IntervalDict([(P.closed(0, 3), 0)])
@@ -155,71 +166,162 @@ class TestIntervalDict:
         assert d.combine(P.IntervalDict(), add) == d
 
     def test_combine_nonempty(self):
-        def add(x, y): return x + y
+        def add(x, y):
+            return x + y
 
         d1 = P.IntervalDict([(P.closed(1, 3) | P.closed(5, 7), 1)])
         d2 = P.IntervalDict([(P.closed(2, 4) | P.closed(6, 8), 2)])
         assert d1.combine(d2, add) == d2.combine(d1, add)
-        assert d1.combine(d2, add) == P.IntervalDict([
-            (P.closedopen(1, 2) | P.closedopen(5, 6), 1),
-            (P.closed(2, 3) | P.closed(6, 7), 3),
-            (P.openclosed(3, 4) | P.openclosed(7, 8), 2),
-        ])
+        assert d1.combine(d2, add) == P.IntervalDict(
+            [
+                (P.closedopen(1, 2) | P.closedopen(5, 6), 1),
+                (P.closed(2, 3) | P.closed(6, 7), 3),
+                (P.openclosed(3, 4) | P.openclosed(7, 8), 2),
+            ]
+        )
 
-        d1 = P.IntervalDict({
-            P.closed(0, 1): 2,
-            P.closed(3, 4): 2
-        })
-        d2 = P.IntervalDict({
-            P.closed(1, 3): 3,
-            P.closed(4, 5): 1
-        })
+        d1 = P.IntervalDict({P.closed(0, 1): 2, P.closed(3, 4): 2})
+        d2 = P.IntervalDict({P.closed(1, 3): 3, P.closed(4, 5): 1})
         assert d1.combine(d2, add) == d2.combine(d1, add)
-        assert d1.combine(d2, add) == P.IntervalDict({
-            P.closedopen(0, 1): 2,
-            P.singleton(1): 5,
-            P.open(1, 3): 3,
-            P.singleton(3): 5,
-            P.open(3, 4): 2,
-            P.singleton(4): 3,
-            P.openclosed(4, 5): 1,
-        })
+        assert d1.combine(d2, add) == P.IntervalDict(
+            {
+                P.closedopen(0, 1): 2,
+                P.singleton(1): 5,
+                P.open(1, 3): 3,
+                P.singleton(3): 5,
+                P.open(3, 4): 2,
+                P.singleton(4): 3,
+                P.openclosed(4, 5): 1,
+            }
+        )
+
+    def test_combine_shared_endpoint_sweep(self):
+        combine_values = lambda x, y: (x, y)
+
+        # The next interval on the left includes the endpoint where the
+        # current left interval is open, while the right interval is closed.
+        left = P.IntervalDict(
+            [
+                (P.closedopen(0, 1), "left-1"),
+                (P.closed(1, 2), "left-2"),
+            ]
+        )
+        right = P.IntervalDict([(P.closed(0, 1), "right")])
+        assert left.combine(right, combine_values) == P.IntervalDict(
+            [
+                (P.closedopen(0, 1), ("left-1", "right")),
+                (P.singleton(1), ("left-2", "right")),
+                (P.openclosed(1, 2), "left-2"),
+            ]
+        )
+
+        # Also cover the symmetric case where the right interval ends open.
+        left = P.IntervalDict([(P.closed(0, 1), "left")])
+        right = P.IntervalDict(
+            [
+                (P.closedopen(0, 1), "right-1"),
+                (P.closed(1, 2), "right-2"),
+            ]
+        )
+        assert left.combine(right, combine_values) == P.IntervalDict(
+            [
+                (P.closedopen(0, 1), ("left", "right-1")),
+                (P.singleton(1), ("left", "right-2")),
+                (P.openclosed(1, 2), "right-2"),
+            ]
+        )
+
+    def test_combine_equal_open_upper_bounds(self):
+        left = P.IntervalDict([(P.open(0, 2), "left-1"), (P.closed(2, 3), "left-2")])
+        right = P.IntervalDict([(P.open(1, 2), "right-1"), (P.closed(2, 4), "right-2")])
+
+        assert left.combine(right, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.openclosed(0, 1), "left-1"),
+                (P.open(1, 2), ("left-1", "right-1")),
+                (P.closed(2, 3), ("left-2", "right-2")),
+                (P.openclosed(3, 4), "right-2"),
+            ]
+        )
+
+    def test_combine_equal_closed_upper_bounds(self):
+        left = P.IntervalDict([(P.closed(0, 2), "left-1"), (P.open(2, 3), "left-2")])
+        right = P.IntervalDict([(P.closed(1, 2), "right-1"), (P.open(2, 4), "right-2")])
+
+        assert left.combine(right, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.closedopen(0, 1), "left-1"),
+                (P.closed(1, 2), ("left-1", "right-1")),
+                (P.open(2, 3), ("left-2", "right-2")),
+                (P.closedopen(3, 4), "right-2"),
+            ]
+        )
+
+    def test_combine_one_interval_over_many(self):
+        left = P.IntervalDict([(P.closed(0, 10), "left")])
+        right = P.IntervalDict(
+            [
+                (P.closed(1, 2), "first"),
+                (P.closed(4, 5), "second"),
+                (P.closed(8, 9), "third"),
+            ]
+        )
+
+        assert left.combine(right, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.closedopen(0, 1), "left"),
+                (P.closed(1, 2), ("left", "first")),
+                (P.open(2, 4), "left"),
+                (P.closed(4, 5), ("left", "second")),
+                (P.open(5, 8), "left"),
+                (P.closed(8, 9), ("left", "third")),
+                (P.openclosed(9, 10), "left"),
+            ]
+        )
 
     def test_combine_missing(self):
-        def how(x, y): return x, y
+        def how(x, y):
+            return x, y
 
         d1 = P.IntervalDict([(P.closed(1, 3), 1)])
         d2 = P.IntervalDict([(P.closed(2, 4), 2)])
-        assert d1.combine(d2, how=how, missing=None) == P.IntervalDict([
-            (P.closedopen(1, 2), (1, None)),
-            (P.closed(2, 3), (1, 2)),
-            (P.openclosed(3, 4), (None, 2))
-        ])
+        assert d1.combine(d2, how=how, missing=None) == P.IntervalDict(
+            [
+                (P.closedopen(1, 2), (1, None)),
+                (P.closed(2, 3), (1, 2)),
+                (P.openclosed(3, 4), (None, 2)),
+            ]
+        )
 
-        assert d2.combine(d1, how=how, missing=None) == P.IntervalDict([
-            (P.closedopen(1, 2), (None, 1)),
-            (P.closed(2, 3), (2, 1)),
-            (P.openclosed(3, 4), (2, None))
-        ])
+        assert d2.combine(d1, how=how, missing=None) == P.IntervalDict(
+            [
+                (P.closedopen(1, 2), (None, 1)),
+                (P.closed(2, 3), (2, 1)),
+                (P.openclosed(3, 4), (2, None)),
+            ]
+        )
 
-        def add(x, y): return x + y
-        assert d2.combine(d1, how=add, missing=3) == P.IntervalDict([
-            (P.closedopen(1, 2), 4),
-            (P.closed(2, 3), 3),
-            (P.openclosed(3, 4), 5)
-        ])
+        def add(x, y):
+            return x + y
+
+        assert d2.combine(d1, how=add, missing=3) == P.IntervalDict(
+            [(P.closedopen(1, 2), 4), (P.closed(2, 3), 3), (P.openclosed(3, 4), 5)]
+        )
 
     def test_combine_pass_interval(self):
-        def how(x, y, z): return x, y, z
+        def how(x, y, z):
+            return x, y, z
 
         d1 = P.IntervalDict([(P.closed(1, 3), 1)])
         d2 = P.IntervalDict([(P.closed(2, 4), 2)])
 
-        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict([
-            (P.closedopen(1, 2), 1),
-            (P.closed(2, 3), (1, 2, P.closed(2, 3))),
-            (P.openclosed(3, 4), 2)
-        ])
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict(
+            [
+                (P.closedopen(1, 2), 1),
+                (P.closed(2, 3), (1, 2, P.closed(2, 3))),
+                (P.openclosed(3, 4), 2),
+            ]
+        )
 
     def test_containment(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
@@ -234,25 +336,21 @@ class TestIntervalDict:
         d1 = P.IntervalDict({P.closed(0, 1): 1, P.closed(3, 4): 2})
         d2 = P.IntervalDict({P.closed(0.5, 2): 3})
 
-        assert d1 | d2 == P.IntervalDict({
-            P.closedopen(0, 0.5): 1,
-            P.closed(0.5, 2): 3,
-            P.closed(3, 4): 2
-        })
+        assert d1 | d2 == P.IntervalDict(
+            {P.closedopen(0, 0.5): 1, P.closed(0.5, 2): 3, P.closed(3, 4): 2}
+        )
         assert d1 == P.IntervalDict({P.closed(0, 1): 1, P.closed(3, 4): 2})
         assert d2 == P.IntervalDict({P.closed(0.5, 2): 3})
 
         d1 |= d2
-        assert d1 == P.IntervalDict({
-            P.closedopen(0, 0.5): 1,
-            P.closed(0.5, 2): 3,
-            P.closed(3, 4): 2
-        })
+        assert d1 == P.IntervalDict(
+            {P.closedopen(0, 0.5): 1, P.closed(0.5, 2): 3, P.closed(3, 4): 2}
+        )
         assert d2 == P.IntervalDict({P.closed(0.5, 2): 3})
 
     def test_repr(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
-        assert repr(d) == '{' + repr(P.closed(0, 3)) + ': 0}'
+        assert repr(d) == "{" + repr(P.closed(0, 3)) + ": 0}"
 
     def test_pop_value(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
@@ -306,7 +404,9 @@ class TestIntervalDict:
         assert d.find(0) == P.closed(0, 3)
 
     def test_find_on_unions(self):
-        d = P.IntervalDict([(P.closed(0, 2), 0), (P.closed(3, 5), 0), (P.closed(7, 9), 1)])
+        d = P.IntervalDict(
+            [(P.closed(0, 2), 0), (P.closed(3, 5), 0), (P.closed(7, 9), 1)]
+        )
         assert d.find(1) == P.closed(7, 9)
         assert d.find(0) == P.closed(0, 2) | P.closed(3, 5)
 
@@ -325,7 +425,11 @@ class TestIntervalDict:
         assert a != d
         assert a == b
         assert a != 1
-        assert a.as_dict() == {P.closed(-1, 1): 2, P.openclosed(1, 2): 0, P.closed(4, 5): 1}
+        assert a.as_dict() == {
+            P.closed(-1, 1): 2,
+            P.openclosed(1, 2): 0,
+            P.closed(4, 5): 1,
+        }
 
         assert P.IntervalDict([(0, 0), (1, 1)]) == P.IntervalDict([(1, 1), (0, 0)])
 
@@ -333,31 +437,31 @@ class TestIntervalDict:
         d = P.IntervalDict()
         d2 = P.IntervalDict()
 
-        d[1] = 'c'
-        d2[1] = 'a'
-        d2[2] = 'b'
+        d[1] = "c"
+        d2[1] = "a"
+        d2[2] = "b"
 
         d.update(d2)
-        assert d[1] == 'a'
-        assert d[2] == 'b'
+        assert d[1] == "a"
+        assert d[2] == "b"
         assert len(d) == 2
 
     def test_update_with_mapping(self):
         d = P.IntervalDict()
-        d2 = {1: 'a', 2: 'b'}
+        d2 = {1: "a", 2: "b"}
 
         d.update(d2)
-        assert d[1] == 'a'
-        assert d[2] == 'b'
+        assert d[1] == "a"
+        assert d[2] == "b"
         assert len(d) == 2
 
     def test_update_with_iterable(self):
         d = P.IntervalDict()
-        d2 = {1: 'a', 2: 'b'}
+        d2 = {1: "a", 2: "b"}
 
         d.update(d2.items())
-        assert d[1] == 'a'
-        assert d[2] == 'b'
+        assert d[1] == "a"
+        assert d[2] == "b"
         assert len(d) == 2
 
     def test_update_with_non_hashable_values(self):
@@ -558,5 +662,5 @@ class TestIntervalDict:
 
     @pytest.mark.parametrize("size", [10, 100, 1000])
     def test_init_repeating_values(self, benchmark, size):
-        tuples = [(P.closed(i, i+1), i%2) for i in range(size)]
+        tuples = [(P.closed(i, i + 1), i % 2) for i in range(size)]
         benchmark(P.IntervalDict, tuples)
