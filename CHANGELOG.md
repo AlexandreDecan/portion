@@ -1,14 +1,13 @@
 # Changelog
 
-## 2.7.0-pre1 (not yet released)
-
-### Added
- - `IntervalDict.pop` accepts `None` as default value.
+## 2.6.3 (2026-09-29)
 
 ### Fixed
+ - `IntervalDict.update` and `__init__` behave like `dict.update` when the provided intervals overlap (the last provided value wins).
+ - `IntervalDict.pop` accepts `None` as default value.
  - Fix `from_string` accepting prefix (`re.match`) instead of full value (`re.fullmatch`) for infinities.
  - Documentation of `iterate` explicitly states that `base` should be side-effect-free.
- - Documentation of `IntervalDict` and `IntervalDict.update` explicitly states that order is not considered when passing overlapping intervals with different values.
+
 
 
 ## 2.6.2 (2026-06-14)
@@ -19,6 +18,7 @@
  - Improve performance of `Interval.__contains__` for values.
  - Improve performance of `Interval.overlaps`, `__and__`, and `__contains__` for large, complex intervals when applied to small subintervals (see [#107](https://github.com/AlexandreDecan/portion/pull/107), Henry Tung).
  - Improve performance of `IntervalDict.update` and `IntervalDict` constructor for hashable values (see [#108](https://github.com/AlexandreDecan/portion/issues/108)).
+
 
 
 

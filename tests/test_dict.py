@@ -369,6 +369,177 @@ class TestIntervalDict:
         assert d[2] == [2]
         assert len(d) == 2
 
+    def test_update_with_itself(self):
+        d = P.IntervalDict({P.closed(0, 1): 1, P.closed(3, 4): 2, P.closed(6, 7): 1})
+        expected = d.copy()
+
+        d.update(d)
+        assert d == expected
+
+        d |= d
+        assert d == expected
+
+    def test_update_with_empty(self):
+        d = P.IntervalDict({P.closed(0, 1): 1})
+
+        d.update([])
+        d.update({})
+        d.update([(P.empty(), 2)])
+        assert d.as_dict() == {P.closed(0, 1): 1}
+
+        d.update([(P.closed(0, 1), 1), (P.empty(), 2), (P.closed(2, 3), 1)])
+        assert d.as_dict() == {P.closed(0, 1) | P.closed(2, 3): 1}
+
+    def test_update_last_value_wins_with_overlapping_intervals(self):
+        # Same value before and after an overlapping interval with another value
+        items = [(P.closed(0, 5), 1), (P.closed(3, 8), 2), (P.closed(6, 10), 1)]
+        expected = {P.closedopen(0, 3) | P.closed(6, 10): 1, P.closedopen(3, 6): 2}
+
+        d = P.IntervalDict()
+        d.update(items)
+        assert d.as_dict() == expected
+
+        # Dict preserves insertion order, hence the same holds for mappings
+        d = P.IntervalDict()
+        d.update(dict(items))
+        assert d.as_dict() == expected
+
+        assert P.IntervalDict(items).as_dict() == expected
+        assert (P.IntervalDict() | dict(items)).as_dict() == expected
+
+        # And the order of the items matters
+        d = P.IntervalDict()
+        d.update(items[::-1])
+        assert d.as_dict() == {
+            P.closed(0, 5) | P.openclosed(8, 10): 1,
+            P.openclosed(5, 8): 2,
+        }
+
+    def test_update_last_value_wins_with_nested_intervals(self):
+        # Later interval fully covers earlier ones sharing the same value
+        d = P.IntervalDict()
+        d.update([(P.closed(2, 3), 2), (P.closed(0, 10), 1), (P.closed(4, 5), 2)])
+        assert d.as_dict() == {
+            P.closedopen(0, 4) | P.openclosed(5, 10): 1,
+            P.closed(4, 5): 2,
+        }
+
+        # Later interval is fully covered by earlier ones
+        d = P.IntervalDict()
+        d.update([(P.closed(0, 10), 1), (P.closed(2, 8), 2), (P.closed(4, 6), 1)])
+        assert d.as_dict() == {
+            P.closedopen(0, 2) | P.closed(4, 6) | P.openclosed(8, 10): 1,
+            P.closedopen(2, 4) | P.openclosed(6, 8): 2,
+        }
+
+    def test_update_last_value_wins_with_single_values(self):
+        items = [(1, "a"), (1, "b"), (1, "a"), (2, "b"), (2, "a")]
+
+        d = P.IntervalDict()
+        d.update(items)
+        assert d[1] == "a"
+        assert d[2] == "a"
+
+        d2 = {}
+        d2.update(items)
+        assert d.domain() == P.singleton(1) | P.singleton(2)
+        for key, value in d2.items():
+            assert d[key] == value
+
+    def test_update_last_value_wins_with_non_hashable_values(self):
+        d = P.IntervalDict()
+        d.update([(P.closed(0, 5), [1]), (P.closed(3, 8), [2]), (P.closed(6, 10), [1])])
+        assert d.as_dict() == {
+            P.closedopen(0, 3) | P.closed(6, 10): [1],
+            P.closedopen(3, 6): [2],
+        }
+
+    def test_update_last_value_wins_with_mixed_values(self):
+        # Non-hashable value first, then hashable value overriding it
+        d = P.IntervalDict()
+        d.update([(P.closed(0, 5), [2]), (P.closed(3, 8), 1)])
+        assert d.as_dict() == {P.closedopen(0, 3): [2], P.closed(3, 8): 1}
+
+        # Hashable value first, then non-hashable value overriding it
+        d = P.IntervalDict()
+        d.update([(P.closed(0, 5), 1), (P.closed(3, 8), [2])])
+        assert d.as_dict() == {P.closedopen(0, 3): 1, P.closed(3, 8): [2]}
+
+        # Alternating hashable and non-hashable values
+        d = P.IntervalDict()
+        d.update([(P.closed(0, 4), 1), (P.closed(2, 6), [1]), (P.closed(4, 8), 1)])
+        assert d.as_dict() == {
+            P.closedopen(0, 2) | P.closed(4, 8): 1,
+            P.closedopen(2, 4): [1],
+        }
+
+    def test_update_last_value_wins_with_existing_content(self):
+        d = P.IntervalDict({P.closed(0, 10): 0})
+        d.update([(P.closed(2, 6), 1), (P.closed(4, 8), 2), (P.closed(6, 9), 1)])
+        assert d.as_dict() == {
+            P.closedopen(0, 2) | P.openclosed(9, 10): 0,
+            P.closedopen(2, 4) | P.closed(6, 9): 1,
+            P.closedopen(4, 6): 2,
+        }
+
+    @pytest.mark.parametrize(
+        "items, expected",
+        [
+            pytest.param(
+                [(P.closed(0, 2), 1), (P.closed(0, 2), 2), (P.closed(0, 2), 1)],
+                {P.closed(0, 2): 1},
+                id="same-interval-repeated",
+            ),
+            pytest.param(
+                [(P.closed(1, 2), 1), (P.closed(0, 3), 2)],
+                {P.closed(0, 3): 2},
+                id="fully-covered-by-later",
+            ),
+            pytest.param(
+                [(P.closed(0, 4), 1), (P.open(2, 6), 2)],
+                {P.closed(0, 2): 1, P.open(2, 6): 2},
+                id="same-bound-with-different-openness",
+            ),
+            pytest.param(
+                [(P.closedopen(0, 2), 1), (P.closedopen(2, 4), 2), (P.closed(1, 3), 1)],
+                {P.closed(0, 3): 1, P.open(3, 4): 2},
+                id="touching-intervals",
+            ),
+            pytest.param(
+                [(P.closed(0, 4), 1), (2, 2), (P.closed(3, 5), 3)],
+                {
+                    P.closedopen(0, 2) | P.open(2, 3): 1,
+                    P.singleton(2): 2,
+                    P.closed(3, 5): 3,
+                },
+                id="single-value-between-intervals",
+            ),
+            pytest.param(
+                [
+                    (P.openclosed(-P.inf, 5), 1),
+                    (P.closedopen(3, P.inf), 2),
+                    (P.open(4, P.inf), 1),
+                ],
+                {P.open(-P.inf, 3) | P.open(4, P.inf): 1, P.closed(3, 4): 2},
+                id="unbounded-intervals",
+            ),
+            pytest.param(
+                [(P.closed(0, 3), [1]), (P.closed(2, 5), 1), (P.closed(4, 7), [1])],
+                {
+                    P.closedopen(0, 2) | P.closed(4, 7): [1],
+                    P.closedopen(2, 4): 1,
+                },
+                id="non-hashable-values-around-hashable-value",
+            ),
+        ],
+    )
+    def test_update_last_value_wins(self, items, expected):
+        d = P.IntervalDict()
+        d.update(items)
+        assert d.as_dict() == expected
+
+        assert P.IntervalDict(items).as_dict() == expected
+
     def test_as_dict(self):
         content = {
             P.closed(1, 2) | P.closed(4, 5): 1,

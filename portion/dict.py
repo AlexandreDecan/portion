@@ -43,8 +43,8 @@ class IntervalDict(MutableMapping):
         new IntervalDict with the same key-value pairs is created. If an
         iterable is provided, it has to be a list of (key, value) pairs.
 
-        In case of overlapping intervals, there is no guarantee that the last
-        provided value "wins" against previous values.
+        In case of overlapping intervals, the last provided value "wins" against
+        previous values.
 
         :param mapping_or_iterable: optional mapping or iterable.
         """
@@ -214,9 +214,8 @@ class IntervalDict(MutableMapping):
         another IntervalDict). If an iterable is provided, it must consist of a
         list of (key, value) pairs.
 
-        Contrarilly to the built-in dict.update method, there is no guarantee that
-        the last provided value in case of overlapping intervals "wins" against
-        previous values.
+        Similarly to the built-in dict.update method, when the provided intervals
+        overlap, the last provided value "wins" against previous values.
 
         :param mapping_or_iterable: mapping or iterable.
         """
@@ -225,16 +224,28 @@ class IntervalDict(MutableMapping):
         else:
             data = mapping_or_iterable
 
-        hashable_values = dict()
+        # Items are materialized first, as data may be a view on this very IntervalDict.
+        if mapping_or_iterable is self:
+            data = list(data)
+
+        # Consecutive items sharing the same value are applied at once.
+        run_intervals = []
+        run_value = ...
         for i, v in data:
             if not isinstance(i, Interval):
                 i = self._klass.from_atomic(Bound.CLOSED, i, i, Bound.CLOSED)
-            try:
-                hashable_values.setdefault(v, list()).append(i)
-            except TypeError:
-                self[i] = v
-        for v, i in hashable_values.items():
-            self[self._klass(*i)] = v
+
+            if v != run_value:
+                if len(run_intervals) > 0:
+                    self[self._klass(*run_intervals)] = run_value
+                run_intervals = [i]
+            else:
+                run_intervals.append(i)
+
+            run_value = v
+
+        if len(run_intervals) > 0:
+            self[self._klass(*run_intervals)] = run_value
 
     def combine(self, other, how, *, missing=..., pass_interval=False):
         """
