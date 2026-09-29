@@ -408,7 +408,7 @@ class Interval:
 
                 if inspect.stack()[1].function == "pprint_thing":
                     return
-            except Exception:
+            except Exception:  # noqa
                 pass
         raise AttributeError
 

@@ -47,7 +47,7 @@ dev = [
 ]
 
 [tool.ruff]
-extend-exclude = ["tests/"]
+include = ["portion/*.py"]
 
 [tool.ruff.lint]
 ignore = ["B028"] # warnings.warn without stacklevel=2

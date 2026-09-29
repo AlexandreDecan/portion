@@ -368,11 +368,11 @@ class IntervalDict(MutableMapping):
             added_items.append((interval, value))
 
         # Update storage accordingly
-        for key in removed_keys:
-            self._storage.pop(key)
+        for k in removed_keys:
+            self._storage.pop(k)
 
-        for key, value in added_items:
-            self._storage[key] = value
+        for k, v in added_items:
+            self._storage[k] = v
 
     def __delitem__(self, key):
         if isinstance(key, Interval):
@@ -403,11 +403,11 @@ class IntervalDict(MutableMapping):
             raise KeyError(key)
 
         # Update storage accordingly
-        for key in removed_keys:
-            self._storage.pop(key)
+        for k in removed_keys:
+            self._storage.pop(k)
 
-        for key, value in added_items:
-            self._storage[key] = value
+        for k, value in added_items:
+            self._storage[k] = value
 
     def __or__(self, other):
         d = self.copy()

@@ -68,7 +68,7 @@ def create_api(interval, *, interval_dict=None, name=None):
     )
 
     # module.__all__ = list(objects.keys())
-    for name, obj in objects.items():
-        setattr(module, name, obj)
+    for o_name, obj in objects.items():
+        setattr(module, o_name, obj)
 
     return module

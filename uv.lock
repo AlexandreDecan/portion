@@ -170,7 +170,7 @@ wheels = [
 
 [[package]]
 name = "portion"
-version = "2.7.0rc1"
+version = "2.6.3"
 source = { editable = "." }
 dependencies = [
     { name = "sortedcontainers" },
