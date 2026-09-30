@@ -34,9 +34,9 @@ jobs:
       - name: Check lockfile
         run: uv lock --check
       - name: Check code quality
-        run: uv tool run ruff check --output-format=github
+        run: uv run ruff check --output-format=github
       - name: Check code formatting
-        run: uv tool run ruff format --check
+        run: uv run ruff format --check
       - name: Execute tests
         run: uv run pytest --cov-report lcov --cov portion
       - name: Upload coverage to Coveralls
