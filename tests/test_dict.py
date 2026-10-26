@@ -279,6 +279,33 @@ class TestIntervalDict:
             ]
         )
 
+    def test_combine_non_atomic_interval_with_interior_piece(self):
+        # A non-atomic interval key merged with a singleton that fills its
+        # interior gap must not lose the singleton when combined.
+        left = P.IntervalDict(
+            [
+                (P.closedopen(3, 4) | P.openclosed(4, 5), "sides"),
+                (P.singleton(4), "middle"),
+            ]
+        )
+        right = P.IntervalDict([(P.open(3, 5), "right")])
+
+        assert left.combine(right, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.singleton(3) | P.singleton(5), "sides"),
+                (P.open(3, 4) | P.open(4, 5), ("sides", "right")),
+                (P.singleton(4), ("middle", "right")),
+            ]
+        )
+        # Mirrored: non-atomic key on the right, singleton on the left.
+        assert right.combine(left, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.singleton(3) | P.singleton(5), "sides"),
+                (P.open(3, 4) | P.open(4, 5), ("right", "sides")),
+                (P.singleton(4), ("right", "middle")),
+            ]
+        )
+
     def test_combine_missing(self):
         def how(x, y):
             return x, y
@@ -322,6 +349,40 @@ class TestIntervalDict:
                 (P.openclosed(3, 4), 2),
             ]
         )
+
+    def test_combine_pass_interval_non_atomic_keys(self):
+        # With non-atomic keys on both sides, `how` must be invoked once per
+        # pair of intersecting keys, with the (non-atomic) intersection.
+        calls = []
+
+        def how(x, y, i):
+            calls.append((x, y, i))
+            return i
+
+        key = P.closed(0, 1) | P.closed(2, 3)
+        d1 = P.IntervalDict([(key, 1)])
+        d2 = P.IntervalDict([(key, 2)])
+
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict([(key, key)])
+        assert calls == [(1, 2, key)]
+
+    def test_combine_pass_interval_non_atomic_spanning_keys(self):
+        # A non-atomic key spanning another key's gap must still lead to a
+        # single `how` call per intersecting key pair, with the union.
+        calls = []
+
+        def how(x, y, i):
+            calls.append((x, y, i))
+            return i
+
+        d1 = P.IntervalDict([(P.closed(0, 1) | P.closed(2, 3), 1)])
+        d2 = P.IntervalDict([(P.closed(0, 3), 2)])
+
+        union = P.closed(0, 1) | P.closed(2, 3)
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict(
+            [(union, union), (P.open(1, 2), 2)]
+        )
+        assert calls == [(1, 2, union)]
 
     def test_containment(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
