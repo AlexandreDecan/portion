@@ -292,7 +292,20 @@ class IntervalDict(MutableMapping):
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]
 
-        i_iter, o_iter = iter(d1.items()), iter(d2.items())
+        def _atomic_items(d):
+            # Iterating keys then their atomic pieces does not guarantee a
+            # globally sorted stream: later keys may fill gaps in earlier,
+            # non-atomic ones (e.g. a singleton inside a union). The sweep
+            # below requires sorted, disjoint atomic intervals.
+            items = [
+                (atomic, value)
+                for interval, value in d.items()
+                for atomic in interval
+            ]
+            items.sort(key=lambda item: (item[0].lower, item[0].left is Bound.OPEN))
+            return iter(items)
+
+        i_iter, o_iter = _atomic_items(d1), _atomic_items(d2)
         i_current, o_current = next(i_iter, None), next(o_iter, None)
 
         while i_current is not None and o_current is not None:
