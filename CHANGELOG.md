@@ -1,10 +1,7 @@
 # Changelog
 
 
-## 2.7.0-pre1 (not yet released)
-
-### Changed
- - Improve performance of `IntervalDict.combine`.
+## 2.7.0-pre2 (not yet released)
 
 
 
