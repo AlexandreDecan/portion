@@ -292,57 +292,12 @@ class IntervalDict(MutableMapping):
         intersection = dom1 & dom2
         d1, d2 = self[intersection], other[intersection]
 
-        def _atomic_items(d):
-            # Iterating keys then their atomic pieces does not guarantee a
-            # globally sorted stream: later keys may fill gaps in earlier,
-            # non-atomic ones (e.g. a singleton inside a union). The sweep
-            # below requires sorted, disjoint atomic intervals. Each atomic
-            # piece belongs to exactly one stored key, which is carried along
-            # to group intersections by original key pair.
-            items = [
-                (atomic, value, interval)
-                for interval, value in d.items()
-                for atomic in interval
-            ]
-            items.sort(key=lambda item: (item[0].lower, item[0].left is Bound.OPEN))
-            return iter(items)
-
-        i_iter, o_iter = _atomic_items(d1), _atomic_items(d2)
-        i_current, o_current = next(i_iter, None), next(o_iter, None)
-
-        # Intersections are accumulated per original key pair, so that `how`
-        # is invoked exactly once for each pair of intersecting keys, with the
-        # (possibly non-atomic) intersection of these keys.
-        pairwise = {}
-
-        while i_current is not None and o_current is not None:
-            i1, v1, k1 = i_current
-            i2, v2, k2 = o_current
-
-            if i1.overlaps(i2):
-                key = (k1, k2)
-                if key in pairwise:
-                    pairwise[key][0].append(i1 & i2)
-                else:
-                    pairwise[key] = [[i1 & i2], v1, v2]
-
-            if i1.upper < i2.upper:
-                i_current = next(i_iter, None)
-            elif i2.upper < i1.upper:
-                o_current = next(o_iter, None)
-            else:
-                # Equal upper bounds include the i1 == i2 case; openness breaks ties.
-                if i1.right is Bound.OPEN and i2.right is Bound.CLOSED:
-                    i_current = next(i_iter, None)
-                elif i2.right is Bound.OPEN and i1.right is Bound.CLOSED:
-                    o_current = next(o_iter, None)
-                else:
-                    # Equal upper bounds and openness: advance both intervals.
-                    i_current, o_current = next(i_iter, None), next(o_iter, None)
-
-        for pieces, v1, v2 in pairwise.values():
-            i = pieces[0] if len(pieces) == 1 else Interval(*pieces)
-            new_items.append((i, _how(v1, v2, i)))
+        for i1, v1 in d1.items():
+            for i2, v2 in d2.items():
+                if i1.overlaps(i2):
+                    i = i1 & i2
+                    v = _how(v1, v2, i)
+                    new_items.append((i, v))
 
         return self.__class__(new_items)
 
