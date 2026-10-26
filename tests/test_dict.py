@@ -350,6 +350,40 @@ class TestIntervalDict:
             ]
         )
 
+    def test_combine_pass_interval_non_atomic_keys(self):
+        # With non-atomic keys on both sides, `how` must be invoked once per
+        # pair of intersecting keys, with the (non-atomic) intersection.
+        calls = []
+
+        def how(x, y, i):
+            calls.append((x, y, i))
+            return i
+
+        key = P.closed(0, 1) | P.closed(2, 3)
+        d1 = P.IntervalDict([(key, 1)])
+        d2 = P.IntervalDict([(key, 2)])
+
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict([(key, key)])
+        assert calls == [(1, 2, key)]
+
+    def test_combine_pass_interval_non_atomic_spanning_keys(self):
+        # A non-atomic key spanning another key's gap must still lead to a
+        # single `how` call per intersecting key pair, with the union.
+        calls = []
+
+        def how(x, y, i):
+            calls.append((x, y, i))
+            return i
+
+        d1 = P.IntervalDict([(P.closed(0, 1) | P.closed(2, 3), 1)])
+        d2 = P.IntervalDict([(P.closed(0, 3), 2)])
+
+        union = P.closed(0, 1) | P.closed(2, 3)
+        assert d1.combine(d2, how, pass_interval=True) == P.IntervalDict(
+            [(union, union), (P.open(1, 2), 2)]
+        )
+        assert calls == [(1, 2, union)]
+
     def test_containment(self):
         d = P.IntervalDict([(P.closed(0, 3), 0)])
         assert 0 in d
