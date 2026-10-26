@@ -279,6 +279,33 @@ class TestIntervalDict:
             ]
         )
 
+    def test_combine_non_atomic_interval_with_interior_piece(self):
+        # A non-atomic interval key merged with a singleton that fills its
+        # interior gap must not lose the singleton when combined.
+        left = P.IntervalDict(
+            [
+                (P.closedopen(3, 4) | P.openclosed(4, 5), "sides"),
+                (P.singleton(4), "middle"),
+            ]
+        )
+        right = P.IntervalDict([(P.open(3, 5), "right")])
+
+        assert left.combine(right, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.singleton(3) | P.singleton(5), "sides"),
+                (P.open(3, 4) | P.open(4, 5), ("sides", "right")),
+                (P.singleton(4), ("middle", "right")),
+            ]
+        )
+        # Mirrored: non-atomic key on the right, singleton on the left.
+        assert right.combine(left, lambda x, y: (x, y)) == P.IntervalDict(
+            [
+                (P.singleton(3) | P.singleton(5), "sides"),
+                (P.open(3, 4) | P.open(4, 5), ("right", "sides")),
+                (P.singleton(4), ("right", "middle")),
+            ]
+        )
+
     def test_combine_missing(self):
         def how(x, y):
             return x, y
